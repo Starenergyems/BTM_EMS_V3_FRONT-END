@@ -1,0 +1,19 @@
+# Development mode Dockerfile
+FROM node:20-bullseye-slim
+
+WORKDIR /app
+
+# 只複製 package.json 和 package-lock.json (利用 cache)
+COPY package.json package-lock.json ./
+
+# 使用 npm ci 確保乾淨安裝 (更快且可重現)
+RUN npm ci --prefer-offline --no-audit
+
+# 複製所有檔案（會被 volume 覆蓋，但需要初始化）
+COPY . .
+
+# 開放 Vite dev server port
+EXPOSE 5173
+
+# 啟動開發模式
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
