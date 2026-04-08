@@ -1,7 +1,7 @@
 const statusValues = {
-  0: '停用',
-  1: '啟用',
-  2: '鎖定',
+  activate: '啟用',
+  deactivate: '停用',
+  lock: '鎖定',
 };
 
 export { statusValues };

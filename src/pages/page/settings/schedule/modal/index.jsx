@@ -1,4 +1,4 @@
-import ModalNormal from '@/components/widgets/modalNomal';
+import ModalNormal from '@/components/widgets/modalNormal';
 import Typography from '@/components/units/typography';
 import { color } from '@/styles/variable/indexStyle';
 import { ScopeStyle } from './indexStyle';

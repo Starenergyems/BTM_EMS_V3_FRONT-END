@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useBoolean } from '@/hooks/useBoolean';
-import { Table } from 'antd';
+import { Table, Flex } from 'antd';
+import Button from '@/components/units/button';
 import { omRole } from '@/slices/api/main/accounts';
 import { Select } from '@/components/units';
 import { ModalOverview } from './modalOverview';
@@ -14,6 +15,7 @@ function ManagementTable({ data, name, onChange }) {
     data: data,
     filteredDatas: data,
   });
+  const [isEdit, setisEdit] = useState(false);
 
   const isPermissionManagement = name === 'permissionManagement';
 
@@ -22,6 +24,7 @@ function ManagementTable({ data, name, onChange }) {
     setState,
     name,
     toggle,
+    setisEdit,
   });
 
   const selectOptions = Object.keys(omRole).map((key) => ({
@@ -33,13 +36,24 @@ function ManagementTable({ data, name, onChange }) {
   return (
     <>
       {isPermissionManagement && (
-        <Select
-          size="sm"
-          placeholder="選擇角色名稱"
-          options={selectOptions}
-          onChange={handleSelectChange}
-          className="mg-y-20"
-        />
+        <Flex justify="space-between" align="center">
+          <Select
+            size="sm"
+            placeholder="選擇角色名稱"
+            options={selectOptions}
+            onChange={handleSelectChange}
+            className="mg-y-20"
+          />
+          <Button
+            type="primary"
+            onClick={() => {
+              setisEdit(false);
+              toggle.onTrue();
+            }}
+          >
+            新增帳號
+          </Button>
+        </Flex>
       )}
       <Table
         columns={getColumnDatas()}
@@ -60,7 +74,7 @@ function ManagementTable({ data, name, onChange }) {
           '--nodata-overflow': data?.length === 0 ? 'hidden' : 'auto hidden',
         }}
       />
-      <ModalOverview toggle={toggle} />
+      <ModalOverview toggle={toggle} isEdit={isEdit} />
     </>
   );
 }

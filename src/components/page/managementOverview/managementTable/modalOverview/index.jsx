@@ -1,11 +1,10 @@
 import { useRef } from 'react';
-
+import { passwordValidationRules } from '@/utils/helpers';
 import { omRole } from '@/slices/api/main/accounts';
 import ModalForm from '@/components/widgets/modalForm';
 import { statusValues } from '../indexConfig';
 
-export const ModalOverview = ({ toggle }) => {
-  // const [isModalOpen, setModalOpen] = useState(true);
+export const ModalOverview = ({ toggle, isEdit }) => {
   const modalInnerFormRef = useRef();
   const modalFormIsSubmittedRef = useRef(false);
 
@@ -13,22 +12,6 @@ export const ModalOverview = ({ toggle }) => {
     <ModalForm
       list={[
         {
-          id: 'id',
-          formItemAttr: {
-            label: '工號',
-            name: 'id',
-            value: '',
-            rules: [{ required: true, message: '請輸入工號' }],
-          },
-          variants: 'input',
-          componentProps: {
-            inputAttr: {
-              placeholder: '請輸入工號',
-            },
-          },
-        },
-        {
-          id: 'name',
           formItemAttr: {
             label: '姓名',
             name: 'name',
@@ -43,35 +26,6 @@ export const ModalOverview = ({ toggle }) => {
           },
         },
         {
-          id: 'company',
-          formItemAttr: {
-            label: '公司名稱',
-            name: 'company',
-            value: '',
-          },
-          variants: 'input',
-          componentProps: {
-            inputAttr: {
-              placeholder: '請輸入公司名稱',
-            },
-          },
-        },
-        {
-          id: 'department',
-          formItemAttr: {
-            label: '部門',
-            name: 'department',
-            value: '',
-          },
-          variants: 'input',
-          componentProps: {
-            inputAttr: {
-              placeholder: '請輸入部門',
-            },
-          },
-        },
-        {
-          id: 'email',
           formItemAttr: {
             label: 'Email(帳號)',
             name: 'email',
@@ -86,11 +40,11 @@ export const ModalOverview = ({ toggle }) => {
           },
         },
         {
-          id: 'permission',
           formItemAttr: {
             label: '權限',
             name: 'permission',
-            value: '一般用戶',
+
+            themecategory: 'circle-light',
             rules: [{ required: true, message: '請輸入權限' }],
           },
           variants: 'select',
@@ -98,17 +52,19 @@ export const ModalOverview = ({ toggle }) => {
             selectAttr: {
               placeholder: '請輸入權限',
             },
+            defaultValue: 'viewer',
             options: Object.keys(omRole).map((key) => ({
               label: omRole[key].key,
-              value: omRole[key].key,
+              value: omRole[key].value,
             })),
           },
         },
         {
-          id: 'status',
           formItemAttr: {
             label: '啟用狀態',
             name: 'status',
+            themecategory: 'circle-light',
+
             value: 1,
             rules: [{ required: true, message: '請輸入啟用狀態' }],
           },
@@ -117,24 +73,42 @@ export const ModalOverview = ({ toggle }) => {
             selectAttr: {
               placeholder: '請輸入啟用狀態',
             },
+            defaultValue: 'activate',
             options: Object.entries(statusValues).map(([key, label]) => ({
               label,
-              value: Number(key),
+              value: key,
             })),
           },
         },
 
         {
-          id: 'password',
           formItemAttr: {
             label: '密碼',
             name: 'password',
             value: '',
+            rules: [
+              { required: true, message: '請輸入密碼' },
+              { validator: (_, value) => passwordValidationRules(value) },
+            ],
           },
           variants: 'input',
           componentProps: {
             inputAttr: {
               placeholder: '請輸入密碼',
+              type: 'password',
+            },
+          },
+        },
+        {
+          formItemAttr: {
+            label: '附註',
+            name: 'note',
+            value: '',
+          },
+          variants: 'input',
+          componentProps: {
+            inputAttr: {
+              placeholder: '請輸入附註',
             },
           },
         },
@@ -148,7 +122,7 @@ export const ModalOverview = ({ toggle }) => {
         onOk: () => console.log('ok'),
         okText: '儲存',
         open: toggle.value,
-        title: '編輯帳戶',
+        title: isEdit ? '編輯帳戶' : '新增帳戶',
       }}
       onSuccess={(values, formInstance, isSubmitted) => {
         console.log('success');

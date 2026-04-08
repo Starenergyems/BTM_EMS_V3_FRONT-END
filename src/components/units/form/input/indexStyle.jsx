@@ -23,7 +23,7 @@ const style = styled.div`
     --ant-border-radius: 25px;
 
     &.ant-input {
-      --ant-color-text: ${color.darkGray};
+      --ant-color-text: ${color.black};
       --ant-color-border: ${color.gray};
       --ant-color-bg-container-disabled: ${color.inputGray};
       --ant-color-text-disabled: ${color.darkGray};
@@ -51,12 +51,14 @@ const style = styled.div`
     position: relative;
     display: inline;
   }
-  .input-unit {
+  .input-unit,
+  .input-pwd {
     display: flex;
     position: absolute;
     right: 16px;
     top: 50%;
     transform: translateY(-45%);
+    padding: 0px;
   }
 `;
 

@@ -1,15 +1,17 @@
-import { useState } from 'react';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Flex, Form, Typography } from 'antd';
+
 import Button from '@/components/units/button';
 import { clearToken, postToken } from '@/slices/api/main/token/index';
 import { getAccountsInfo } from '@/slices/api/main/accounts/indexHelper';
+import { renderField } from '@/components/widgets/modalForm/indexHelper';
 import { pagesPathName } from '@/router';
 import logoEng from '@/assets/img/logo-with-eng-word.png';
-import FormInput from '@/components/units/form/input/index';
 import ScopeStyle from '../indexStyle';
 import { GoBack } from '../components/goBack';
+import { formFields } from './indexConfig';
+import Password from 'antd/lib/input/Password';
 
 function SendEmail() {
   const dispatch = useDispatch();
@@ -17,7 +19,6 @@ function SendEmail() {
   const navigate = useNavigate();
   const location = useLocation();
   const [formData] = Form.useForm();
-  const [isSubmitted, setIsSubmitted] = useState(false);
 
   //表單送出
   async function handleOnSubmit(values) {
@@ -31,7 +32,7 @@ function SendEmail() {
     const postTokenRes = await apiDispatch(
       postToken({
         data: {
-          username: values.username,
+          email: values.email,
           password: values.password,
         },
       }),
@@ -60,34 +61,19 @@ function SendEmail() {
           layout="vertical"
           onFinish={handleOnSubmit}
           requiredMark={false}
-          validateTrigger={isSubmitted ? 'onChange' : 'onSubmit'}
         >
-          <Form.Item
-            label=""
-            name="username"
-            rules={[{ required: true, message: '請輸入您的註冊信箱' }]}
-          >
-            <FormInput
-              inputAttr={{
-                placeholder: '請輸入您的註冊信箱',
-              }}
-              styles={{
-                input: { width: '100%' },
-              }}
-            />
-          </Form.Item>
-          <Form.Item className="mg-t-20">
-            <Flex align="center" justify="center" gap={32}>
-              <Button
-                type="primary"
-                size="md"
-                onClick={() => setIsSubmitted(true)}
-              >
-                送出
-              </Button>
-              <GoBack />
-            </Flex>
-          </Form.Item>
+          {formFields?.map((item, idx) => (
+            <Form.Item key={`form-item-${idx}`} {...item.formItemAttr}>
+              {renderField(item)}
+            </Form.Item>
+          ))}
+
+          <Flex align="center" justify="center" gap={32}>
+            <Button type="primary" size="md" htmlType="submit">
+              送出
+            </Button>
+            <GoBack />
+          </Flex>
         </Form>
       </Flex>
     </ScopeStyle>

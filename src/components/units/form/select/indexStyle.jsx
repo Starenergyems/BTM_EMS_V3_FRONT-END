@@ -15,7 +15,7 @@ const ScopeStyle = styled.styled.div`
   width: 100%;
 
   [class*="css-var"] {
-    --ant-color-text: ${color.inputGray};
+    --ant-color-text: ${color.black};
     --ant-color-text-quaternary: ${color.themeBlack};
     --ant-color-text-disabled: ${color.darkGray};
     --ant-color-bg-container-disabled: ${color.inputGray};

@@ -74,6 +74,7 @@ function ModalForm({
         <Flex key="modal-footer" justify="center" gutter={[16, 0]}>
           <Button
             size="md"
+            variant="default"
             className="btn-cancel"
             onClick={modalAttr?.onCancel}
           >

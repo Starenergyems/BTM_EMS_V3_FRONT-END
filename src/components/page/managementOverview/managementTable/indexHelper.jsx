@@ -3,15 +3,15 @@ import { useSelector } from 'react-redux';
 import { Icon } from '@iconify/react';
 import { formatTimestamp } from '@/utils/format';
 import { omRole } from '@/slices/api/main/accounts/index';
+import { Flex, Tooltip } from 'antd';
 import Button from '@/components/units/button';
 import { statusValues } from './indexConfig';
-import style from '../indexStyle';
 
 // useHelpers 為最外層 function，function 內區塊的撰寫順序由上而下為：
 // 1. useCallback 需要相依的 function
 // 2. api function
 // 3. 一般 function
-function useHelpers({ state, setState, name, toggle }) {
+function useHelpers({ state, setState, name, toggle, setisEdit }) {
   const accountsState = useSelector((state) => state.accounts);
   const isSuperUser = accountsState?.omRole === omRole.superUser.value;
 
@@ -32,24 +32,9 @@ function useHelpers({ state, setState, name, toggle }) {
   // 取得得標狀態的表格欄位
   function getColumnDatas() {
     return [
-      name === 'permissionManagement'
-        ? {
-            dataIndex: 'id',
-            title: '工號',
-            align: 'center',
-            fixed: 'right',
-            render: (value) => value || '--',
-          }
-        : {},
       {
         dataIndex: 'name',
         title: '姓名',
-        align: 'center',
-        render: (value) => value || '--',
-      },
-      {
-        dataIndex: 'company',
-        title: '公司名稱',
         align: 'center',
         render: (value) => value || '--',
       },
@@ -81,20 +66,42 @@ function useHelpers({ state, setState, name, toggle }) {
       name === 'permissionManagement' && isSuperUser
         ? {
             dataIndex: 'action',
-            title: '操作',
+            title: '',
             align: 'center',
             fixed: 'right',
             className: 'edit-column',
             render: () => (
-              <Button variant="icon" onClick={() => toggle.onTrue()}>
-                <Icon icon="fa6-solid:pen" fontSize="24" />
-              </Button>
+              <Flex justify="center" align="center" gap={8}>
+                <Tooltip title="編輯帳號">
+                  <Button
+                    variant="icon"
+                    onClick={() => {
+                      toggle.onTrue();
+                      setisEdit(true);
+                    }}
+                  >
+                    <Icon icon="fa6-solid:pen" fontSize="20" />
+                  </Button>
+                </Tooltip>
+                <Tooltip title="刪除帳號">
+                  <Button
+                    variant="icon"
+                    onClick={() => {
+                      toggle.onTrue();
+                      setisEdit(true);
+                    }}
+                  >
+                    <Icon icon="mdi:garbage" fontSize="24" />
+                  </Button>
+                </Tooltip>
+              </Flex>
             ),
           }
         : {},
     ];
   }
 
+  // 選擇角色名稱
   const handleSelectChange = (permission) => {
     const data = [...state.data];
 

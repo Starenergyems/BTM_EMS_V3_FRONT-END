@@ -116,6 +116,7 @@ const datePickerStyles = css`
       padding-left: 16px;
       padding-right: 16px;
       height: 32px;
+      --ant-color-text: ${color.inputGrayblack};
     }
     .ant-picker-input {
       > input {

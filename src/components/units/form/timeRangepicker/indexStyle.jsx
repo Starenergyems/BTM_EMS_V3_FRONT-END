@@ -1,6 +1,4 @@
-import styled, { css } from 'styled-components';
-import { color } from '@/styles/variable/indexStyle';
-
+import styled from 'styled-components';
 
 const style = styled.div`
   .ant-picker {

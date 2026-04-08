@@ -13,7 +13,6 @@ const style = styled.div`
       width: 100%;
     }
     &.ant-picker {
-      --ant-color-text: ${color.inputGray};
       --ant-color-border: ${color.semiDarkGray};
     }
   }

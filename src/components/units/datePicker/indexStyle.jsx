@@ -46,10 +46,9 @@ const style = styled.div`
     // --ant-border-radius: 25px;
     --ant-border-radius: 8px;
     border-color: ${(props) =>
-    props.$isInvalid ? color.alertRed : color.semiDarkGray};
+      props.$isInvalid ? color.alertRed : color.semiDarkGray};
 
     &.ant-picker {
-      --ant-color-text: ${color.inputGray};
       --ant-color-border: ${color.semiDarkGray};
       --ant-color-bg-container-disabled: ${color.inputGray};
       --ant-color-text-disabled: ${color.darkGray};

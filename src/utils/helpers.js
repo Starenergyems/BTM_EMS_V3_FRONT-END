@@ -28,3 +28,29 @@ export const inputNumHandler = (e) => {
   // 更新輸入值
   e.target.value = value;
 };
+
+// 密碼驗證規則
+
+export const passwordValidationRules = (value) => {
+  if (!value) return Promise.resolve();
+
+  if (value.length < 8 || value.length > 16) {
+    return Promise.reject(new Error('密碼長度需為 8 至 16 個字元'));
+  }
+  if (!/[A-Z]/.test(value)) {
+    return Promise.reject(new Error('密碼需至少包含一個大寫字母（A-Z）'));
+  }
+  if (!/[a-z]/.test(value)) {
+    return Promise.reject(new Error('密碼需至少包含一個小寫字母（a-z）'));
+  }
+  if (!/[0-9]/.test(value)) {
+    return Promise.reject(new Error('密碼需至少包含一個數字（0-9）'));
+  }
+  if (!/[!@#$%^&*()_+\-={}|;:,.<>?]/.test(value)) {
+    return Promise.reject(
+      new Error('密碼需至少包含一個特殊符號（如 ! @ # $ % ^ & * ...）'),
+    );
+  }
+
+  return Promise.resolve();
+};

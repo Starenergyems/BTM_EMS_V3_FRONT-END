@@ -1,15 +1,15 @@
-import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Flex, Form, Typography } from 'antd';
 import Button from '@/components/units/button';
 import { clearToken, postToken } from '@/slices/api/main/token/index';
 import { getAccountsInfo } from '@/slices/api/main/accounts/indexHelper';
+import { renderField } from '@/components/widgets/modalForm/indexHelper';
 import { pagesPathName } from '@/router';
 import logoEng from '@/assets/img/logo-with-eng-word.png';
-import FormInput from '@/components/units/form/input/index';
 import { GoBack } from '../components/goBack/index';
 import ScopeStyle from '../indexStyle';
+import { useHelpers } from './indexHelper';
 
 function ResetPassword() {
   const dispatch = useDispatch();
@@ -17,7 +17,8 @@ function ResetPassword() {
   const navigate = useNavigate();
   const location = useLocation();
   const [formData] = Form.useForm();
-  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const { formFields } = useHelpers({ formData });
 
   //表單送出
   async function handleOnSubmit(values) {
@@ -31,8 +32,8 @@ function ResetPassword() {
     const postTokenRes = await apiDispatch(
       postToken({
         data: {
-          username: values.username,
           password: values.password,
+          newPassword: values.newPassword,
         },
       }),
     ).unwrap();
@@ -60,50 +61,19 @@ function ResetPassword() {
           layout="vertical"
           onFinish={handleOnSubmit}
           requiredMark={false}
-          validateTrigger={isSubmitted ? 'onChange' : 'onSubmit'}
         >
-          <Form.Item
-            label="新密碼"
-            name="username"
-            rules={[{ required: true, message: '請輸入您的註冊信箱' }]}
-          >
-            <FormInput
-              inputAttr={{
-                placeholder: '請輸入您的註冊信箱',
-              }}
-              styles={{
-                input: { width: '100%' },
-              }}
-            />
-          </Form.Item>
-          <Form.Item
-            label="確認新密碼"
-            name="password"
-            rules={[{ required: true, message: '請輸入您的密碼' }]}
-          >
-            <FormInput
-              inputAttr={{
-                placeholder: '請輸入您的密碼',
-              }}
-              styles={{
-                input: { width: '100%' },
-              }}
-              type="password"
-            />
-          </Form.Item>
-          <Form.Item className="mg-t-20">
-            <Flex align="center" justify="center" gap={32}>
-              <Button
-                size="md"
-                htmlType="submit"
-                type="primary"
-                onClick={() => setIsSubmitted(true)}
-              >
-                送出
-              </Button>
-              <GoBack />
-            </Flex>
-          </Form.Item>
+          {formFields?.map((item, idx) => (
+            <Form.Item key={`form-item-${idx}`} {...item.formItemAttr}>
+              {renderField(item)}
+            </Form.Item>
+          ))}
+
+          <Flex align="center" justify="center" gap={32}>
+            <Button size="md" htmlType="submit" type="primary">
+              送出
+            </Button>
+            <GoBack />
+          </Flex>
         </Form>
       </Flex>
     </ScopeStyle>

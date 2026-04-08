@@ -6,16 +6,16 @@ import {
 } from './indexHelper';
 
 const omRole = {
-  superUser: { key: '最高權限', value: 0 },
-  manager: { key: '管理者	', value: 1 },
-  normal: { key: '一般用戶', value: 2 },
+  superUser: { key: '最高權限', value: 'admin' },
+  manager: { key: '管理者	', value: 'manager' },
+  normal: { key: '一般用戶', value: 'viewer' },
 };
 
 //初始值
 const initialState = {
   id: null,
   // omRole: null,
-  omRole: 0,
+  omRole: 'admin',
   omRoleStr: '',
   operators: [],
   microsoftData: {},
