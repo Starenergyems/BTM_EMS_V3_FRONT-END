@@ -1,5 +1,5 @@
-import { Radio } from "antd";
 import styled, { css } from "styled-components";
+import { Radio } from "antd";
 import { color } from "@/styles/variable/indexStyle";
 
 const commonStyle = css`
@@ -22,4 +22,4 @@ const RadioGroupStyle = styled(Radio.Group)`
   ${commonStyle}
 `;
 
-export { RadioStyle, RadioGroupStyle };
+export { RadioGroupStyle, RadioStyle };

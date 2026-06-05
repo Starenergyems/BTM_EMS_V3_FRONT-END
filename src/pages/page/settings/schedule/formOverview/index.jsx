@@ -1,44 +1,37 @@
-import { useEffect, useState } from 'react';
-import { api } from '@/slices/api/setting';
-import { endpoints } from '@/utils/endpoints';
-import toast from 'react-hot-toast';
-import dayjs from 'dayjs';
+import { useState } from 'react';
 import { Icon } from '@iconify/react';
-import { useBoolean } from '@/hooks/useBoolean';
-import { color } from '@/styles/variable/indexStyle';
-import { Flex, Col, Form } from 'antd';
-import Typography from '@/components/units/typography';
+import dayjs from 'dayjs';
 import Button from '@/components/units/button';
-import FormInput from '@/components/units/form/input/index';
 import { OuterFrame } from '@/components/units/outerFrame/index';
+import Typography from '@/components/units/typography';
 import { renderField } from '@/components/widgets/modalForm/indexHelper';
+import { Flex, Form } from 'antd';
+import { config } from '../indexConfig';
 import { useHelpers } from './indexHelper';
 import { ScopeStyle } from './indexStyle';
-import { config } from '../indexConfig';
+import { color } from '@/styles/variable/indexStyle';
 
-export const FormOverview = ({ events, getEventData }) => {
+export const FormOverview = ({ events, getEventData, initialList = [] }) => {
   // const favToggle = useBoolean(false);
   const [formInstance] = Form.useForm();
   const [formSecInstance] = Form.useForm();
-  const [list, setList] = useState([]);
-  const [favList, setFavList] = useState([]);
-  const [showPreviewFav, setShowPreviewFav] = useState([]);
+  const normalisedInitialList = Array.isArray(initialList)
+    ? initialList
+    : initialList
+      ? [initialList]
+      : [];
+  const [list, setList] = useState(normalisedInitialList);
+  const [, setFavList] = useState([]);
+  const [showPreviewFav] = useState([]);
 
-  const {
-    getFavList,
-    formFields,
-    favFormFields,
-    handleDelete,
-    addListHandler,
-    onSubmit,
-  } = useHelpers({
+  const { addListHandler, formFields, handleDelete, onSubmit } = useHelpers({
+    events,
     formInstance,
     formSecInstance,
-    list,
-    events,
-    setList,
-    setFavList,
     getEventData,
+    list,
+    setFavList,
+    setList,
   });
 
   // useEffect(() => {
@@ -46,18 +39,19 @@ export const FormOverview = ({ events, getEventData }) => {
   // }, []);
 
   const showList = showPreviewFav.length > 0 ? showPreviewFav : list;
+  const safeShowList = Array.isArray(showList) ? showList : [];
 
   return (
     <ScopeStyle>
       <RenderFormItem
-        // title={favToggle.value ? '常用清單' : '新增排程'}
-        title={'常用清單'}
         button={{
           // name: favToggle.value ? null : '新增',
           name: '新增',
           onClick: addListHandler,
         }}
         instance={formInstance}
+        // title={favToggle.value ? '常用清單' : '新增排程'}
+        title={'常用清單'}
         // icon={
         //   <Button
         //     variant="icon"
@@ -103,12 +97,12 @@ export const FormOverview = ({ events, getEventData }) => {
         ))}
       </RenderFormItem>
       <RenderFormItem
-        title="排程預覽"
         button={{
           name: '儲存',
           onClick: list?.length > 0 ? onSubmit : undefined,
         }}
         instance={formSecInstance}
+        title="排程預覽"
       >
         {/* {favFormFields()?.map((item, idx) => (
           <Form.Item key={`form-item-${idx}`} {...item.formItemAttr}>
@@ -116,24 +110,24 @@ export const FormOverview = ({ events, getEventData }) => {
           </Form.Item>
         ))} */}
         <ul>
-          {showList.map((item, idx) => (
-            <li key={`list-item-${idx}`} className="list-item">
+          {safeShowList.map((item, idx) => (
+            <li className="list-item" key={`list-item-${idx}`}>
               <Typography
-                xxl={{ size: 'sm' }}
+                color={color.themeBlack}
                 lg={{ size: 'xs' }}
                 size="sm"
-                color={color.themeBlack}
+                xxl={{ size: 'sm' }}
               >
                 {dayjs(item.start).format('YYYY-MM-DD HH:mm')}~
                 {dayjs(item.end).format('YYYY-MM-DD HH:mm')} <br />
                 {
                   config?.filter(
-                    (el) => el.strategy === item.extendedProps.strategy,
+                    (el) => el.strategy === item.extendedProps?.strategy,
                   )[0]?.title
                 }
               </Typography>
-              <Button variant="icon" onClick={() => handleDelete(idx)}>
-                <Icon icon="mdi:trash" fontSize="24" color={color.themeBlack} />
+              <Button onClick={() => handleDelete(idx)} variant="icon">
+                <Icon color={color.themeBlack} fontSize="24" icon="mdi:trash" />
               </Button>
             </li>
           ))}
@@ -143,21 +137,21 @@ export const FormOverview = ({ events, getEventData }) => {
   );
 };
 
-const RenderFormItem = ({ title, children, button, instance, icon }) => {
+const RenderFormItem = ({ button, children, icon, instance, title }) => {
   const { getDefaultValuesHandler } = useHelpers({});
 
   return (
-    <OuterFrame title={title} icon={icon}>
+    <OuterFrame icon={icon} title={title}>
       <Form form={instance} initialValues={getDefaultValuesHandler()}>
         {children}
       </Form>
       {button.name && (
-        <Flex justify="center" className="mg-t-20">
+        <Flex className="mg-t-20" justify="center">
           <Button
-            size="md"
-            type="primary"
             disabled={!button.onClick}
             onClick={button.onClick}
+            size="md"
+            type="primary"
           >
             <Typography size="lg">{button.name}</Typography>
           </Button>

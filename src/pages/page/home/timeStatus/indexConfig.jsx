@@ -1,59 +1,59 @@
-import { color } from '@/styles/variable/indexStyle';
 import {
   CheckCircleFilled,
-  ExclamationCircleFilled,
   CloseCircleFilled,
+  ExclamationCircleFilled,
 } from '@ant-design/icons';
+import { color } from '@/styles/variable/indexStyle';
 
 const style = {
-  fontSize: '16px',
   color: color.white,
+  fontSize: '16px',
 };
 
 const statusData = [
   {
-    title: 'Success',
-    title_cn: '正常',
-    name: 'normal',
-    status: 0,
     color: color.white,
     icon: <CheckCircleFilled style={{ ...style }} />,
+    name: 'normal',
+    status: 0,
+    title: 'Success',
+    title_cn: '正常',
   },
   {
-    title: 'Warning',
-    title_cn: '告警',
-    name: 'alarm',
-    status: 1,
     color: color.warningYellow,
     icon: (
       <ExclamationCircleFilled
         style={{ ...style, color: color.warningYellow }}
       />
     ),
+    name: 'alarm',
+    status: 1,
+    title: 'Warning',
+    title_cn: '告警',
   },
   {
-    title: 'Error',
-    status: 2,
-    name: 'fault',
     color: color.red,
-    title_cn: '故障',
     icon: <CloseCircleFilled style={{ ...style, color: color.red }} />,
+    name: 'fault',
+    status: 2,
+    title: 'Error',
+    title_cn: '故障',
   },
   {
-    title: 'Idle',
-    status: 3,
-    name: 'idle',
-    title_cn: '待機',
     color: color.buttonGray,
     icon: <CloseCircleFilled style={{ ...style, color: color.buttonGray }} />,
+    name: 'idle',
+    status: 3,
+    title: 'Idle',
+    title_cn: '待機',
   },
   {
-    title: 'No data',
-    status: 4,
-    name: 'no_data',
-    title_cn: '無資料',
     color: color.black,
     icon: <CloseCircleFilled style={{ ...style, color: color.black }} />,
+    name: 'no_data',
+    status: 4,
+    title: 'No data',
+    title_cn: '無資料',
   },
 ];
 

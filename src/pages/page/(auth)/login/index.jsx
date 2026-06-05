@@ -1,14 +1,14 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
-import { Flex, Form } from 'antd';
+import logoVertical from '@/assets/img/logo.png';
 import Button from '@/components/units/button';
 import Typography from '@/components/units/typography';
 import { renderField } from '@/components/widgets/modalForm/indexHelper';
-import { clearToken, postToken } from '@/slices/api/main/token/index';
-import { getAccountsInfo } from '@/slices/api/main/accounts/indexHelper';
 import { pagesPathName } from '@/router';
-import logoVertical from '@/assets/img/logo.png';
+import { getAccountsInfo } from '@/slices/api/main/accounts/indexHelper';
+import { clearToken, postToken } from '@/slices/api/main/token/index';
+import { Flex, Form } from 'antd';
 import { formFields } from './indexConfig';
 import ScopeStyle from '../indexStyle';
 
@@ -31,8 +31,8 @@ function Login() {
     const postTokenRes = await apiDispatch(
       postToken({
         data: {
-          username: values.username,
           password: values.password,
+          username: values.username,
         },
       }),
     ).unwrap();
@@ -48,10 +48,10 @@ function Login() {
   }
 
   return (
-    <ScopeStyle justify="center" align="center">
-      <Flex className="login-box" vertical align="center">
+    <ScopeStyle align="center" justify="center">
+      <Flex align="center" className="login-box" vertical>
         <div style={{ textAlign: 'center' }}>
-          <img src={logoVertical} alt="logo" className="main-logo" />
+          <img alt="logo" className="main-logo" src={logoVertical} />
         </div>
         <h2 className="subtitle">EMS 表後項目名稱</h2>
         <Typography size="sm">
@@ -69,16 +69,16 @@ function Login() {
               {renderField(item)}
             </Form.Item>
           ))}
-          <Flex align="center" justify="center" gap={32}>
+          <Flex align="center" gap={32} justify="center">
             <Button
-              type="primary"
-              virants="outline"
               htmlType="submit"
               size="md"
+              type="primary"
+              virants="outline"
             >
               登入
             </Button>
-            <Link to={pagesPathName.sendEmail.path} className="forgot-password">
+            <Link className="forgot-password" to={pagesPathName.sendEmail.path}>
               忘記密碼
             </Link>
           </Flex>

@@ -1,16 +1,16 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
-import { color } from '@/styles/variable/indexStyle';
-import { Col, Form, Row, Spin, Flex } from 'antd';
 import Button from '@/components/units/button';
+import Typography from '@/components/units/typography';
+import { Col, Flex, Form, Row, Spin } from 'antd';
+import { renderField } from './indexHelper';
 import {
   getFormUnit,
   getInitialValues,
   onReset,
   onSubmit,
 } from './indexHelper1';
-import { renderField } from './indexHelper';
 import ScopeStyle from './indexStyle';
-import Typography from '@/components/units/typography';
+import { color } from '@/styles/variable/indexStyle';
 
 /* 注意事項：
   1.onSuccess為表單驗證(modalForm元件內的驗證)，成功後要執行的function
@@ -24,15 +24,15 @@ function ModalForm({
     groupTitleSetting:[[要出現標題的list index,標題內容]] 例如[[2, "甲方"],[6, "乙方"]]
   */,
   isLoading,
-  list /*
+  isUpload /*
     list:{
       id,isHidden,isFullWidth,formItemAttr,type,selectProps,inputProps,datePickerProps
     }
   */,
-  isUpload,
+  list,
   modalAttr,
-  onFormReady,
   onFail,
+  onFormReady,
   onSuccess,
   styles,
 }) {
@@ -65,24 +65,17 @@ function ModalForm({
       closeIcon={false}
       forceRender
       {...modalAttr}
-      title={
-        <Typography size="lg" color={color.black}>
-          {modalAttr?.title}
-        </Typography>
-      }
       footer={[
-        <Flex key="modal-footer" justify="center" gutter={[16, 0]}>
+        <Flex gutter={[16, 0]} justify="center" key="modal-footer">
           <Button
-            size="md"
-            variant="default"
             className="btn-cancel"
             onClick={modalAttr?.onCancel}
+            size="md"
+            variant="default"
           >
             <Typography size="lg">{modalAttr?.cancelText}</Typography>
           </Button>
           <Button
-            type="primary"
-            size="md"
             className="btn-submit"
             onClick={() =>
               onSubmit(
@@ -93,24 +86,31 @@ function ModalForm({
                 dateFieldsRef.current,
               )
             }
+            size="md"
+            type="primary"
           >
             <Typography size="lg">{modalAttr?.okText}</Typography>
           </Button>
         </Flex>,
       ]}
-      width="70vw"
       style={{
         maxWidth: '805px',
         minWidth: '350px',
       }}
       styles={{
-        header: { textAlign: 'center' },
         footer: {
-          textAlign: 'center',
           direction: 'rtl',
+          textAlign: 'center',
         },
+        header: { textAlign: 'center' },
         ...modalAttr?.styles,
       }}
+      title={
+        <Typography color={color.black} size="lg">
+          {modalAttr?.title}
+        </Typography>
+      }
+      width="70vw"
     >
       {isLoading ? (
         <Spin />
@@ -126,7 +126,7 @@ function ModalForm({
             >
               {/* 為了讓每次開啟Modal時，scrollbar都在最上方 */}
               {modalAttr?.open && (
-                <Row gutter={[64, 0]} className="inner-wrap">
+                <Row className="inner-wrap" gutter={[64, 0]}>
                   {list.map((item, index) => {
                     const isTextarea = item.type === 'textarea';
 
@@ -144,17 +144,17 @@ function ModalForm({
 
                     const extraProps = isUpload
                       ? {
-                          valuePropName: 'fileList',
                           getValueFromEvent: (e) => e?.fileList,
+                          valuePropName: 'fileList',
                         }
                       : {};
 
                     return (
                       <Col
-                        key={item.id || index}
                         className={item.isHidden ? 'custom-d-none' : ''}
-                        xs={24}
+                        key={item.id || index}
                         lg={isFullWidth ? 24 : 12}
+                        xs={24}
                       >
                         <Form.Item {...item.formItemAttr} {...extraProps}>
                           {renderField(item)}

@@ -1,17 +1,17 @@
 const labelData = [
   {
-    title: '電壓',
     name: 'voltage',
+    title: '電壓',
     unit: 'V',
   },
   {
-    title: '電流',
     name: 'current',
+    title: '電流',
     unit: 'A',
   },
   {
-    title: '功率',
     name: 'power',
+    title: '功率',
     unit: 'kW',
   },
 ];

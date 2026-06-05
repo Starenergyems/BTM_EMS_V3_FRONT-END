@@ -1,53 +1,53 @@
-import { color } from '@/styles/variable/indexStyle';
-import { Flex } from 'antd';
 import Button from '@/components/units/button';
 import Typography from '@/components/units/typography';
+import { Flex } from 'antd';
 import ScopeStyle from '../modalForm/indexStyle';
+import { color } from '@/styles/variable/indexStyle';
 
-function ModalNormal({ modalAttr, styles, children }) {
+function ModalNormal({ children, modalAttr, styles }) {
   return (
     <ScopeStyle
       $customStyle={styles}
       closeIcon={false}
       forceRender
       {...modalAttr}
-      title={
-        <Typography size="lg" color={color.black}>
-          {modalAttr?.title}
-        </Typography>
-      }
       footer={[
-        <Flex key="modal-footer" justify="center">
+        <Flex justify="center" key="modal-footer">
           <Button
-            size="md"
             className="btn-cancel"
             onClick={modalAttr?.onCancel}
+            size="md"
           >
             <Typography size="lg">{modalAttr?.cancelText}</Typography>
           </Button>
           <Button
-            size="md"
-            type="primary"
             className="btn-submit"
             onClick={modalAttr?.onOk}
+            size="md"
+            type="primary"
           >
             <Typography size="lg">{modalAttr?.okText}</Typography>
           </Button>
         </Flex>,
       ]}
-      width="70vw"
       style={{
         maxWidth: '555px',
         minWidth: '350px',
       }}
       styles={{
-        header: { textAlign: 'center' },
         footer: {
-          textAlign: 'center',
           direction: 'rtl',
+          textAlign: 'center',
         },
+        header: { textAlign: 'center' },
         ...modalAttr?.styles,
       }}
+      title={
+        <Typography color={color.black} size="lg">
+          {modalAttr?.title}
+        </Typography>
+      }
+      width="70vw"
     >
       {children}
     </ScopeStyle>

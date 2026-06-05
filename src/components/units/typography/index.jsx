@@ -3,28 +3,28 @@ import { forwardRef } from 'react';
 import ScopeStyle from './indexStyle';
 
 function Typography({
-  className,
-  size,
-  color,
   children,
-  weight,
-  xs,
-  sm,
-  md,
+  className,
+  color,
   lg,
+  md,
+  size,
+  sm,
+  weight,
   xl,
+  xs,
   xxl,
 }) {
   return (
     <ScopeStyle
-      $size={size}
       $colors={color}
-      $weight={weight}
-      $xs={xs}
-      $sm={sm}
-      $md={md}
       $lg={lg}
+      $md={md}
+      $size={size}
+      $sm={sm}
+      $weight={weight}
       $xl={xl}
+      $xs={xs}
       $xxl={xxl}
     >
       <span className={className}>{children}</span>

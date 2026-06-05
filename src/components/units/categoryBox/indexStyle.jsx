@@ -1,6 +1,6 @@
+import styled, { css } from 'styled-components';
 import { hexToRgba } from '@/styles/function';
 import { color } from '@/styles/variable/indexStyle';
-import styled, { css } from 'styled-components';
 
 const style = styled.div`
   min-height: 100px;

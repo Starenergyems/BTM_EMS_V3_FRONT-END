@@ -1,7 +1,7 @@
 import AwardStatus from "./awardStatus";
+import DispatchCommandList from "./dispatchCommandList";
 import ServiceProduct from "./serviceProduct";
 import ScopeStyle from "./indexStyle";
-import DispatchCommandList from "./dispatchCommandList";
 
 function RealTimeSpinningReserve() {
   return (

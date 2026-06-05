@@ -1,43 +1,43 @@
 import toast from "react-hot-toast";
-import { Flex } from "antd";
 import { Icon } from "@iconify/react";
-import { color } from "@/styles/variable/indexStyle";
+import { Flex } from "antd";
 import ScopeStyle from "./indexStyle";
+import { color } from "@/styles/variable/indexStyle";
 
 function ShutdownModal({ isModalOpen, setModalOpen }) {
   return (
     <ScopeStyle
       cancelButtonProps={{
-        type: "primary",
         className: "btn-cancel",
+        type: "primary",
       }}
       centered
       className="modal-shutdown"
       closable={false}
+      okButtonProps={{
+        danger: true,
+        type: "primary",
+      }}
+      onCancel={() => setModalOpen(false)}
       onOk={() => {
         toast.success("已成功停機");
         setModalOpen(false);
       }}
       open={isModalOpen}
-      okButtonProps={{
-        type: "primary",
-        danger: true,
-      }}
-      onCancel={() => setModalOpen(false)}
       styles={{
-        header: { textAlign: "center" },
         footer: {
-          textAlign: "center",
           direction: "rtl",
+          textAlign: "center",
         },
+        header: { textAlign: "center" },
       }}
       title="緊急停機"
     >
       <Flex align="center" vertical>
         <Icon
-          icon="fluent:warning-16-regular"
           color={color.alertRed}
           fontSize={60}
+          icon="fluent:warning-16-regular"
         />
         <p>
           是否確定緊急停機

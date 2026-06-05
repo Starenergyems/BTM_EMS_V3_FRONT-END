@@ -7,7 +7,7 @@ import { endpoints } from '@/utils/endpoints';
 // 2. api function
 // 3. 一般function
 
-function useHelpers({ setState, range }) {
+function useHelpers({ range, setState }) {
   const getDatas = async (timeUnit) => {
     try {
       let data;
@@ -38,7 +38,7 @@ function useHelpers({ setState, range }) {
     datas,
     title = '報表資料',
   ) => {
-    let fileTemp, fileName;
+    let fileName, fileTemp;
 
     switch (range) {
       case 'day':
@@ -93,8 +93,8 @@ function useHelpers({ setState, range }) {
   };
 
   return {
-    getDatas,
     exportToExcelChartHandler,
+    getDatas,
   };
 }
 

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
-import { color } from '@/styles/variable/indexStyle';
 import { hexToRgba } from '@/styles/function';
+import { color } from '@/styles/variable/indexStyle';
 
 const style = styled.div`
   .calendar-wrap {

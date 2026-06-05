@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
+import { Position } from 'reactflow';
 import * as echarts from 'echarts';
+import { customLegendNameMap } from './indexConfig';
 import { hexToRgba } from '@/styles/function';
 import { color } from '@/styles/variable/indexStyle';
-import { customLegendNameMap } from './indexConfig';
-import { Position } from 'reactflow';
 
 // useHelpers 為最外層 function，function 內區塊的撰寫順序由上而下為：
 // 1. useCallback 需要相依的 function
@@ -12,8 +12,8 @@ import { Position } from 'reactflow';
 
 function useHelpers({ refs, setMainState }) {
   const {
-    realTimeSpinningReservePowerRef,
     realTimeSpinningReservePowerChartRef,
+    realTimeSpinningReservePowerRef,
   } = refs;
 
   /* Memoized Common Functions */
@@ -45,9 +45,9 @@ function useHelpers({ refs, setMainState }) {
       const dispatchPower = Math.floor(Math.random() * 60);
 
       result[i] = {
-        time: (h < 10 ? '0' + h : h) + ':' + (m < 10 ? '0' + m : m),
-        loadPower,
         dispatchPower,
+        loadPower,
+        time: (h < 10 ? '0' + h : h) + ':' + (m < 10 ? '0' + m : m),
       };
     }
     if (getDataType) {
@@ -89,8 +89,8 @@ function useHelpers({ refs, setMainState }) {
       // 為了給 table 元件作為 rowKey 的識別，因為 UI 的設計不符合一般 table 的資料結構
       return {
         ...prevState,
-        serviceProductTableData: [obj],
         serviceProductData: fetchData.realTimeSpinningReserve,
+        serviceProductTableData: [obj],
       };
     });
   }, [generateMinuteIntervals, setMainState]);
@@ -99,24 +99,24 @@ function useHelpers({ refs, setMainState }) {
   function getSpmTableColumns() {
     const hourList = [...Array(24)].map((_item, index) => {
       return {
-        title: index,
         align: 'center',
-        width: 45,
-        render: (value) => value[`${index}:00`] ?? 'X',
         onCell: (value) => ({
           style: {
             color: value[`${index}:00`] != null ? color.lightBlue : color.gray,
           },
         }),
+        render: (value) => value[`${index}:00`] ?? 'X',
+        title: index,
+        width: 45,
       };
     });
     return [
       {
-        title: '整點',
         align: 'center',
         fixed: 'left',
-        width: 80,
         render: () => '執行率',
+        title: '整點',
+        width: 80,
       },
       ...hourList,
     ];
@@ -142,129 +142,35 @@ function useHelpers({ refs, setMainState }) {
   // 服務商品圖設定檔
   const getRealTimeSpinningReservePowerOption = useCallback(() => {
     return {
-      tooltip: {
-        trigger: 'axis',
-        backgroundColor: color.themeBlack,
-        borderColor: 'transparent',
-        textStyle: {
-          color: color.white,
-        },
-        formatter(params) {
-          const numberFormat = new Intl.NumberFormat('en-US', {
-            maximumFractionDigits: 3,
-          });
-          if (Array.isArray(params)) {
-            let tooltipContent = `${params[0].axisValue}`;
-            const template = (item, unitStr) => {
-              if (item) {
-                return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:130px;"><span>${
-                  item.marker
-                } ${
-                  customLegendNameMap[item.seriesName] || item.seriesName
-                }</span> <span class="value">${numberFormat.format(
-                  item.data,
-                )} ${unitStr}</span></div>`;
-              }
-            };
-            params.forEach((item) => {
-              tooltipContent += template(item, 'kW');
-              if (!item.data && item.data !== 0) {
-                tooltipContent = '';
-              }
-            });
-            return tooltipContent;
-          }
-          return '';
-        },
-      },
       grid: {
-        top: 60,
-        left: 10,
-        right: 38,
         bottom: 70,
         containLabel: true,
+        left: 10,
+        right: 38,
+        top: 60,
       },
       legend: {
+        borderRadius: 5,
+        bottom: 10,
         data: ['cbl', 'loadCurve', 'contribution'],
+        formatter: (name) => {
+          return customLegendNameMap[name] || name;
+        },
+        icon: 'roundRect',
+        itemGap: 30,
+        itemHeight: 10,
+        itemWidth: 35,
+        padding: 10,
         selected: Object.keys(customLegendNameMap).reduce((acc, key) => {
           acc[key] = true;
           return acc;
         }, {}),
-        icon: 'roundRect',
-        itemWidth: 35,
-        itemHeight: 10,
-        itemGap: 30,
-        borderRadius: 5,
-        padding: 10,
-        bottom: 10,
         show: false,
-        formatter: (name) => {
-          return customLegendNameMap[name] || name;
-        },
-      },
-      xAxis: {
-        type: 'category',
-        splitLine: { show: false },
-        axisTick: {
-          show: false,
-        },
-        axisLabel: {
-          color: color.white,
-          fontSize: 14,
-          interval: function (index, value) {
-            // 根據容器寬度動態計算顯示間隔
-            const containerWidth =
-              realTimeSpinningReservePowerRef.current?.offsetWidth || 1000;
-            const totalLabels = 24; // 24 小時
-            const labelWidth = 50; // 每個標籤大約佔用的寬度
-            const maxLabels = Math.floor(containerWidth / labelWidth);
-            const interval = Math.ceil(totalLabels / maxLabels);
-
-            // 只顯示整點且符合間隔
-            return value.endsWith(':00') && index % (interval * 60) === 0;
-          },
-          formatter: function (value) {
-            return value.endsWith(':00') ? value : '';
-          },
-          padding: [10, 0, 0, 0],
-        },
-        data: generateMinuteIntervals('23:59', 'time'),
-      },
-      yAxis: {
-        min: 0,
-        max: 1200,
-        inerval: 200,
-        name: '容量 (kW)',
-        nameLocation: 'end',
-        nameTextStyle: {
-          color: color.white,
-          fontWeight: 'lighter',
-          fontSize: 14,
-          verticalAlign: 'top',
-          padding: [-25, 0, 10, 0],
-        },
-        type: 'value',
-        axisLabel: {
-          color: color.white,
-          fontSize: 14,
-          padding: [0, 5, 0, 0],
-        },
-        splitLine: {
-          lineStyle: {
-            color: color.darkGray,
-            type: 'dashed',
-          },
-        },
       },
       series: [
         // 1. cbl - 白色線條在最上方
         {
-          name: 'cbl',
-          type: 'line',
-          smooth: true,
-          symbol: 'none',
-          symbolSize: 5,
-          sampling: 'average',
+          data: [],
           itemStyle: {
             color: color.white,
           },
@@ -273,7 +179,6 @@ function useHelpers({ refs, setMainState }) {
             width: 2,
           },
           markLine: {
-            symbol: 'none',
             data: [
               {
                 name: '調度指令下達',
@@ -301,47 +206,39 @@ function useHelpers({ refs, setMainState }) {
                 },
               },
             ],
+            symbol: 'none',
           },
-          data: [],
+          name: 'cbl',
+          sampling: 'average',
+          smooth: true,
+          symbol: 'none',
+          symbolSize: 5,
+          type: 'line',
         },
         // 2. realTimeSpinningReserve - 底部系列，帶面積填充
         {
-          name: 'loadCurve',
-          type: 'line',
-          smooth: true,
-          stack: 'total', // 使用 stack
-          symbol: 'none',
-          symbolSize: 5,
-          sampling: 'average',
-          itemStyle: {
-            color: '#0770FF',
-          },
-          lineStyle: {
-            width: 2,
-            color: '#0770FF',
-          },
           // markArea: {
           //   ...markStyle,
           //   data: [[{ name: "10:08", xAxis: "10:08" }, { xAxis: "10:08" }]],
           // },
           data: [],
+          itemStyle: {
+            color: '#0770FF',
+          },
+          lineStyle: {
+            color: '#0770FF',
+            width: 2,
+          },
+          name: 'loadCurve',
+          sampling: 'average',
+          smooth: true,
+          stack: 'total', // 使用 stack
+          symbol: 'none',
+          symbolSize: 5,
+          type: 'line',
         },
         // 3. 差值系列 (cbl - loadCurve) - 填充兩者之間的區域
         {
-          name: 'contribution',
-          type: 'line',
-          smooth: true,
-          stack: 'total', // 堆疊在 loadCurve 上
-          symbol: 'none',
-          symbolSize: 5,
-          sampling: 'average',
-          itemStyle: {
-            color: 'rgba(213,72,120,0.8)',
-          },
-          lineStyle: {
-            width: 0, // 隱藏這條線
-            color: 'transparent',
-          },
           // markArea: {
           //   ...markStyle,
           //   data: [[{ name: "10:08", xAxis: "10:08" }, { xAxis: "10:08" }]],
@@ -349,18 +246,121 @@ function useHelpers({ refs, setMainState }) {
           areaStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
               {
-                offset: 0,
                 color: 'rgba(213,72,120,0.8)',
+                offset: 0,
               },
               {
-                offset: 1,
                 color: 'rgba(213,72,120,0.3)',
+                offset: 1,
               },
             ]),
           },
           data: [], // 需要計算 cbl - realTimeSpinningReserve 的差值
+          itemStyle: {
+            color: 'rgba(213,72,120,0.8)',
+          },
+          lineStyle: {
+            color: 'transparent',
+            width: 0, // 隱藏這條線
+          },
+          name: 'contribution',
+          sampling: 'average',
+          smooth: true,
+          stack: 'total', // 堆疊在 loadCurve 上
+          symbol: 'none',
+          symbolSize: 5,
+          type: 'line',
         },
       ],
+      tooltip: {
+        backgroundColor: color.themeBlack,
+        borderColor: 'transparent',
+        formatter(params) {
+          const numberFormat = new Intl.NumberFormat('en-US', {
+            maximumFractionDigits: 3,
+          });
+          if (Array.isArray(params)) {
+            let tooltipContent = `${params[0].axisValue}`;
+            const template = (item, unitStr) => {
+              if (item) {
+                return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:130px;"><span>${
+                  item.marker
+                } ${
+                  customLegendNameMap[item.seriesName] || item.seriesName
+                }</span> <span class="value">${numberFormat.format(
+                  item.data,
+                )} ${unitStr}</span></div>`;
+              }
+            };
+            params.forEach((item) => {
+              tooltipContent += template(item, 'kW');
+              if (!item.data && item.data !== 0) {
+                tooltipContent = '';
+              }
+            });
+            return tooltipContent;
+          }
+          return '';
+        },
+        textStyle: {
+          color: color.white,
+        },
+        trigger: 'axis',
+      },
+      xAxis: {
+        axisLabel: {
+          color: color.white,
+          fontSize: 14,
+          formatter: function (value) {
+            return value.endsWith(':00') ? value : '';
+          },
+          interval: function (index, value) {
+            // 根據容器寬度動態計算顯示間隔
+            const containerWidth =
+              realTimeSpinningReservePowerRef.current?.offsetWidth || 1000;
+            const totalLabels = 24; // 24 小時
+            const labelWidth = 50; // 每個標籤大約佔用的寬度
+            const maxLabels = Math.floor(containerWidth / labelWidth);
+            const interval = Math.ceil(totalLabels / maxLabels);
+
+            // 只顯示整點且符合間隔
+            return value.endsWith(':00') && index % (interval * 60) === 0;
+          },
+          padding: [10, 0, 0, 0],
+        },
+        axisTick: {
+          show: false,
+        },
+        data: generateMinuteIntervals('23:59', 'time'),
+        splitLine: { show: false },
+        type: 'category',
+      },
+      yAxis: {
+        axisLabel: {
+          color: color.white,
+          fontSize: 14,
+          padding: [0, 5, 0, 0],
+        },
+        inerval: 200,
+        max: 1200,
+        min: 0,
+        name: '容量 (kW)',
+        nameLocation: 'end',
+        nameTextStyle: {
+          color: color.white,
+          fontSize: 14,
+          fontWeight: 'lighter',
+          padding: [-25, 0, 10, 0],
+          verticalAlign: 'top',
+        },
+        splitLine: {
+          lineStyle: {
+            color: color.darkGray,
+            type: 'dashed',
+          },
+        },
+        type: 'value',
+      },
     };
   }, [generateMinuteIntervals, realTimeSpinningReservePowerRef]);
 
@@ -389,8 +389,8 @@ function useHelpers({ refs, setMainState }) {
     const option = chart.getOption();
     const isSelected = !option.legend[0].selected[name];
     chart.dispatchAction({
-      type: 'legendToggleSelect',
       name,
+      type: 'legendToggleSelect',
     });
     setMainState((prevState) => {
       return {
@@ -405,42 +405,42 @@ function useHelpers({ refs, setMainState }) {
 
   return {
     customLegendOnClick,
+    getRealTimeSpinningReservePowerOption,
     getServiceProductData,
     getSpmTableColumns,
-    getRealTimeSpinningReservePowerOption,
     setRealTimeSpinningReservePowerChart,
     setTableLoading,
   };
 }
 
 const markSolidStyle = {
-  lineStyle: {
-    color: color.white,
-    width: 2,
-    type: 'solid',
-  },
   label: {
-    show: true,
     color: color.white,
     fontSize: 18,
     formatter: '{b}',
     offset: [0, 0],
+    show: true,
+  },
+  lineStyle: {
+    color: color.white,
+    type: 'solid',
+    width: 2,
   },
 };
 
 const markDashedStyle = {
-  lineStyle: {
-    color: color.red,
-    width: 2,
-    type: 'dashed',
-  },
   label: {
-    show: true,
-    position: 'start',
     color: color.red,
     fontSize: 18,
     formatter: '{b}',
     offset: [0, 35],
+    position: 'start',
+    show: true,
+  },
+  lineStyle: {
+    color: color.red,
+    type: 'dashed',
+    width: 2,
   },
 };
 

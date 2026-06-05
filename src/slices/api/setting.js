@@ -1,26 +1,26 @@
-import axios from 'axios';
 import toast from 'react-hot-toast';
+import axios from 'axios';
 import camelcaseKeys from 'camelcase-keys';
-import {
-  restrictMultipleToken,
-  postRefreshToken,
-  clearToken,
-} from '@/slices/api/main/token';
 import { pagesPathName, router } from '@/router';
+import {
+  clearToken,
+  postRefreshToken,
+  restrictMultipleToken,
+} from '@/slices/api/main/token';
 import { delay } from '@/utils/common';
 
 const { VITE_API_BASEURL, VITE_WEB_URL } = import.meta.env;
 
 const statusCode = {
   error: 0,
-  success: 1,
-  missingParameters: 2,
   invalidParameters: 3,
+  missingParameters: 2,
   noPermission: 4,
-  orderIsClosed: 5,
-  orderNotFound: 6,
   orderCannotDelete: 7,
+  orderIsClosed: 5,
   orderIsInProgress: 8,
+  orderNotFound: 6,
+  success: 1,
 };
 
 //本機開發使用vite proxy，因此使用相對路徑即可，dev及production使用絕對路徑
@@ -34,10 +34,10 @@ const baseURL = VITE_API_BASEURL;
 // 初始化設定
 const api = axios.create({
   baseURL,
-  timeout: 60000,
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 60000,
 });
 
 // request 攔截器
@@ -67,7 +67,7 @@ api.interceptors.response.use(
     // if (contentType === "application/json") {
     //   response.data = camelcaseKeys(response.data, { deep: true });
     // }
-    const { statusCode: status, message } = response.data;
+    const { message, statusCode: status } = response.data;
     if (status && status !== statusCode.success) {
       showErrorToast(`${message}`);
       return Promise.reject(message);
@@ -96,20 +96,6 @@ api.interceptors.response.use(
   },
 );
 
-//error toast處理
-function showErrorToast(message) {
-  const errorToastId = 'error-toast';
-  toast.dismiss(errorToastId);
-  camelcaseKeys;
-  toast.error(message, {
-    id: errorToastId,
-  });
-}
-async function handleMultipleToken() {
-  const { store } = await import('@/store');
-  const dispatch = store.dispatch;
-  dispatch(restrictMultipleToken());
-}
 async function execute401Error(originalRequest) {
   const { store } = await import('@/store');
   const dispatch = store.dispatch;
@@ -127,6 +113,20 @@ async function execute401Error(originalRequest) {
     showErrorToast('無權限登入');
     router.navigate(pagesPathName.login.path);
   }
+}
+async function handleMultipleToken() {
+  const { store } = await import('@/store');
+  const dispatch = store.dispatch;
+  dispatch(restrictMultipleToken());
+}
+//error toast處理
+function showErrorToast(message) {
+  const errorToastId = 'error-toast';
+  toast.dismiss(errorToastId);
+  camelcaseKeys;
+  toast.error(message, {
+    id: errorToastId,
+  });
 }
 const fetchInstance = axios;
 export { api, fetchInstance };

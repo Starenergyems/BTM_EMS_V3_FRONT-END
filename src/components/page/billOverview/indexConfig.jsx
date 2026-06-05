@@ -1,152 +1,152 @@
 import { color } from '@/styles/variable/indexStyle';
 
 const selectOptions = [
-  { value: 'day', label: 'Day' },
-  { value: 'year', label: 'Month' },
+  { label: 'Day', value: 'day' },
+  { label: 'Month', value: 'year' },
 ];
 
 const yAxisLabels = [
   {
     name: 'kWh',
-    title: '電量(kWh)',
     position: 'left',
+    title: '電量(kWh)',
   },
   {
     name: 'ntd',
-    title: '效益(NTD)',
     position: 'right',
+    title: '效益(NTD)',
   },
 ];
 
 const systemConfig = {
-  solar: {
-    color: color.warningYellow,
+  charger: {
+    color: color.brightGreen,
+    config: [
+      {
+        icon: '',
+        name: 'charger_acc_kwh',
+        title: '總累積用電量(kWh)',
+      },
+      {
+        icon: '',
+        name: 'charger_acc_arbitrage',
+        title: '總累積成本($NT)',
+      },
+      {
+        icon: 'charger',
+        name: 'charger_acc_carbon',
+        title: '總累積排碳量(kg)',
+      },
+    ],
     legendNameMap: [
       {
-        name: 'solar_kwh_supply',
+        bgColor: color.brightGreen,
+        isGradient: false,
+        name: 'charger_kwh_demand',
         title: '累積電量',
-        bgColor: color.warningYellow,
         unit: 'kWh',
       },
       {
-        name: 'solar_arbitrage_supply',
-        title: '累積效益',
-        bgColor: color.brightGreen,
+        bgColor: {
+          colorStops: [
+            { color: color.darkLegendGray, offset: 1 },
+            { color: color.lightLegendGray, offset: 0 },
+          ],
+          type: 'linear',
+          x: 0,
+          x2: 0,
+          y: 0,
+          y2: 1,
+        },
+        isGradient: true,
+        name: 'charger_arbitrage_demand',
+        title: '累積成本',
         unit: 'NTD',
-      },
-    ],
-    config: [
-      {
-        title: '總累積發電量(kWh)',
-        name: 'solar_acc_kwh',
-        icon: '',
-      },
-      {
-        title: '總累積效益($NT)',
-        name: 'solar_acc_arbitrage',
-        icon: '',
-      },
-      {
-        title: '總累積減碳量(kg)',
-        name: 'solar_acc_carbon_reduction',
-        icon: 'solar',
       },
     ],
   },
-  charger: {
-    color: color.brightGreen,
+  solar: {
+    color: color.warningYellow,
+    config: [
+      {
+        icon: '',
+        name: 'solar_acc_kwh',
+        title: '總累積發電量(kWh)',
+      },
+      {
+        icon: '',
+        name: 'solar_acc_arbitrage',
+        title: '總累積效益($NT)',
+      },
+      {
+        icon: 'solar',
+        name: 'solar_acc_carbon_reduction',
+        title: '總累積減碳量(kg)',
+      },
+    ],
     legendNameMap: [
       {
-        name: 'charger_kwh_demand',
+        bgColor: color.warningYellow,
+        name: 'solar_kwh_supply',
         title: '累積電量',
-        isGradient: false,
-        bgColor: color.brightGreen,
         unit: 'kWh',
       },
       {
-        name: 'charger_arbitrage_demand',
-        title: '累積成本',
-        isGradient: true,
+        bgColor: color.brightGreen,
+        name: 'solar_arbitrage_supply',
+        title: '累積效益',
         unit: 'NTD',
-        bgColor: {
-          type: 'linear',
-          x: 0,
-          y: 0,
-          x2: 0,
-          y2: 1,
-          colorStops: [
-            { offset: 1, color: color.darkLegendGray },
-            { offset: 0, color: color.lightLegendGray },
-          ],
-        },
-      },
-    ],
-    config: [
-      {
-        title: '總累積用電量(kWh)',
-        name: 'charger_acc_kwh',
-        icon: '',
-      },
-      {
-        title: '總累積成本($NT)',
-        name: 'charger_acc_arbitrage',
-        icon: '',
-      },
-      {
-        title: '總累積排碳量(kg)',
-        name: 'charger_acc_carbon',
-        icon: 'charger',
       },
     ],
   },
   storage: {
     color: color.lightBlue,
+    config: [
+      {
+        name: 'battery_acc_discharge_kwh',
+        title: '總累積供電量(kWh)',
+      },
+      {
+        name: 'battery_acc_charge_kwh',
+        title: '總累積充電量(kWh)',
+      },
+      {
+        name: 'battery_acc_arbitrage',
+        title: '總累積效益($NT)',
+      },
+      {
+        name: 'battery_acc_charge_arbitrage',
+        title: '總累積成本($NT)',
+      },
+    ],
     icon: 'la:car-battery',
     legendNameMap: [
       {
+        bgColor: color.warningYellow,
         name: 'battery_kwh_supply',
         title: '累積放電',
-        bgColor: color.warningYellow,
         unit: 'kWh',
       },
       {
+        bgColor: color.brightGreen,
         name: 'battery_arbitrage_supply',
         title: '累積收入',
-        bgColor: color.brightGreen,
         unit: 'NTD',
       },
       {
+        bgColor: color.lightBlue,
         name: 'battery_kwh_demand',
         title: '累積充電',
-        bgColor: color.lightBlue,
         unit: 'kWh',
       },
       {
+        bgColor: color.darkLegendGray,
         name: 'battery_arbitrage_demand',
         title: '累積成本',
-        bgColor: color.darkLegendGray,
         unit: 'NTD',
-      },
-    ],
-    config: [
-      {
-        title: '總累積供電量(kWh)',
-        name: 'battery_acc_discharge_kwh',
-      },
-      {
-        title: '總累積充電量(kWh)',
-        name: 'battery_acc_charge_kwh',
-      },
-      {
-        title: '總累積效益($NT)',
-        name: 'battery_acc_arbitrage',
-      },
-      {
-        title: '總累積成本($NT)',
-        name: 'battery_acc_charge_arbitrage',
       },
     ],
   },
 };
 
-export { systemConfig, selectOptions, yAxisLabels };
+export { selectOptions, systemConfig, yAxisLabels };

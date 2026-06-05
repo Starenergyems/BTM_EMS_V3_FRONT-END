@@ -1,17 +1,16 @@
-import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { Flex, Form, Typography } from 'antd';
-
+import { useLocation, useNavigate } from 'react-router-dom';
+import logoEng from '@/assets/img/logo-with-eng-word.png';
 import Button from '@/components/units/button';
-import { clearToken, postToken } from '@/slices/api/main/token/index';
-import { getAccountsInfo } from '@/slices/api/main/accounts/indexHelper';
 import { renderField } from '@/components/widgets/modalForm/indexHelper';
 import { pagesPathName } from '@/router';
-import logoEng from '@/assets/img/logo-with-eng-word.png';
-import ScopeStyle from '../indexStyle';
+import { getAccountsInfo } from '@/slices/api/main/accounts/indexHelper';
+import { clearToken, postToken } from '@/slices/api/main/token/index';
+import { Flex, Form, Typography } from 'antd';
+import Password from 'antd/lib/input/Password';
 import { GoBack } from '../components/goBack';
 import { formFields } from './indexConfig';
-import Password from 'antd/lib/input/Password';
+import ScopeStyle from '../indexStyle';
 
 function SendEmail() {
   const dispatch = useDispatch();
@@ -49,10 +48,10 @@ function SendEmail() {
   }
 
   return (
-    <ScopeStyle justify="center" align="center">
-      <Flex className="login-box" vertical align="center">
+    <ScopeStyle align="center" justify="center">
+      <Flex align="center" className="login-box" vertical>
         <Typography.Text style={{ textAlign: 'center' }}>
-          <img src={logoEng} alt="logo" className="logo" />
+          <img alt="logo" className="logo" src={logoEng} />
         </Typography.Text>
         <h2 className="subtitle">重置密碼</h2>
         <Form
@@ -68,8 +67,8 @@ function SendEmail() {
             </Form.Item>
           ))}
 
-          <Flex align="center" justify="center" gap={32}>
-            <Button type="primary" size="md" htmlType="submit">
+          <Flex align="center" gap={32} justify="center">
+            <Button htmlType="submit" size="md" type="primary">
               送出
             </Button>
             <GoBack />

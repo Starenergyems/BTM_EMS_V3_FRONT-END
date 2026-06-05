@@ -1,5 +1,5 @@
-import { Tooltip as AntdTooltip } from "antd";
 import { Icon } from "@iconify/react";
+import { Tooltip as AntdTooltip } from "antd";
 import { GlobalStyle, ScopeStyle } from "@/components/units/tooltip/indexStyle";
 import { color } from "@/styles/variable/indexStyle";
 
@@ -19,8 +19,8 @@ function Tooltip({
   };
   return (
     <ScopeStyle
-      className={`styled-container-tooltip ${className ?? ""}`}
       $tooltipAttr={tooltipAttr}
+      className={`styled-container-tooltip ${className ?? ""}`}
     >
       <AntdTooltip placement="bottomRight" title={title} {...tooltipAttr}>
         {/* 這個容器不加會有findDOMNode is deprecated的錯誤，屬於ant design設計問題的解決方式*/}

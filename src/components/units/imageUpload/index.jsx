@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Image, Upload } from "antd";
 import { Icon } from "@iconify/react";
-import ScopeStyle from "./indexStyle";
+import { Image, Upload } from "antd";
 import { handleChange, handlePreview } from "./indexHelper";
+import ScopeStyle from "./indexStyle";
 import { color } from "@/styles/variable/indexStyle";
 /* 
   type為read
@@ -19,9 +19,9 @@ import { color } from "@/styles/variable/indexStyle";
 function ImageUpload({
   btnUpload,
   className,
-  imageWidth = 36,
   imageHeight = 36,
   imagePreviewGroupAttr,
+  imageWidth = 36,
   list,
   removeDisabledIndexs = [],
   type = "edit",
@@ -48,14 +48,14 @@ function ImageUpload({
 
   return (
     <ScopeStyle
+      $fileListLength={fileList.length}
+      $imageHeight={imageHeight}
+      $imageWidth={imageWidth}
+      $removeDisabledIndexs={removeDisabledIndexs}
+      $type={type}
       className={`styled-container-image-upload type-${type} ${
         className ?? ""
       }`}
-      $type={type}
-      $fileListLength={fileList.length}
-      $imageWidth={imageWidth}
-      $imageHeight={imageHeight}
-      $removeDisabledIndexs={removeDisabledIndexs}
     >
       {type === "read" && (
         <Image.PreviewGroup {...imagePreviewGroupAttr}>
@@ -64,17 +64,17 @@ function ImageUpload({
               const { imageAttr } = item;
               return (
                 <Image
-                  width={36}
                   height={36}
                   key={index}
                   preview={{
                     mask: (
                       <Icon
-                        icon="lucide:eye"
                         fontSize={(imageAttr?.width || imageWidth) / 2}
+                        icon="lucide:eye"
                       />
                     ),
                   }}
+                  width={36}
                   {...imageAttr}
                 />
               );
@@ -106,9 +106,9 @@ function ImageUpload({
                 {btnUpload || (
                   <span className="btn-upload">
                     <Icon
-                      icon="material-symbols:upload"
                       color={color.white}
                       fontSize={20}
+                      icon="material-symbols:upload"
                     />
                   </span>
                 )}
@@ -119,10 +119,10 @@ function ImageUpload({
             <Image.PreviewGroup
               preview={{
                 current: previewCurrentIndex,
-                onVisibleChange: (visible) => setPreviewOpen(visible),
                 onChange: (current) => {
                   setPreviewCurrentIndex(current);
                 },
+                onVisibleChange: (visible) => setPreviewOpen(visible),
                 visible: previewOpen,
               }}
             >

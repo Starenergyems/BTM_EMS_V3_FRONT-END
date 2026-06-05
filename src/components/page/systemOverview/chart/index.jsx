@@ -1,24 +1,24 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { systemConfig } from '@/components/page/systemOverview/indexConfig';
+import ChartResetDownload from '@/components/units/chartResetDownload';
+import { InfoCard } from '@/components/units/infoCard';
+import LegendBage from '@/components/units/legendBage';
+import TransparentCard from '@/components/units/transparentCard';
 import { useEchartAutoResize } from '@/hooks/useEchartAutoResize';
 import {
   dataZoomChangeHandler,
+  fullTimeAxisHandler,
   getNewDatasHandler,
   noDataHandler,
-  fullTimeAxisHandler,
 } from '@/utils/chart';
 import { isToday } from '@/utils/date';
-import { Flex, Row, Col } from 'antd';
-import LegendBage from '@/components/units/legendBage';
-import ChartResetDownload from '@/components/units/chartResetDownload';
-import { systemConfig } from '@/components/page/systemOverview/indexConfig';
-import TransparentCard from '@/components/units/transparentCard';
-import { InfoCard } from '@/components/units/infoCard';
-import ScopeStyle from './indexStyle';
-import { useHelpers } from './indexHelper';
+import { Col, Flex, Row } from 'antd';
 import useReducerStore from '../store/useReducerStore';
+import { useHelpers } from './indexHelper';
+import ScopeStyle from './indexStyle';
 
-export const Chart = ({ name, data, isPending }) => {
+export const Chart = ({ data, isPending, name }) => {
   const store = useReducerStore();
   const intervalStore = useSelector((state) => state.layout);
   const timerRef = useRef(null);
@@ -54,13 +54,13 @@ export const Chart = ({ name, data, isPending }) => {
     [fullTimeAxis],
   );
 
-  const { customLegendOnClick, getChartOption, setChart, getNewDatas } =
+  const { customLegendOnClick, getChartOption, getNewDatas, setChart } =
     useHelpers({
-      refs: {
-        printRef,
-        printChartRef,
-      },
       name,
+      refs: {
+        printChartRef,
+        printRef,
+      },
     });
 
   const option = useMemo(() => getChartOption(), [getChartOption]);
@@ -94,25 +94,25 @@ export const Chart = ({ name, data, isPending }) => {
 
       const newOption = {
         ...option,
+        series: JSON.parse(JSON.stringify(option.series)),
         xAxis: {
           ...option.xAxis,
           // data: data.chartData.map((item) => item.time),
           data: fullTimeAxis,
         },
-        series: JSON.parse(JSON.stringify(option.series)),
       };
 
       newOption.series = [
         {
-          name: systemConfig?.[name]?.legendNameMap?.[0]?.name,
-          type: 'line',
-          symbol: 'none', // 不顯示折線圖的點
-          smooth: true, // 平滑曲線
           data: seriesData,
           lineStyle: {
             color: systemConfig?.[name]?.legendNameMap?.[0]?.bgColor,
             width: 3,
           },
+          name: systemConfig?.[name]?.legendNameMap?.[0]?.name,
+          smooth: true, // 平滑曲線
+          symbol: 'none', // 不顯示折線圖的點
+          type: 'line',
         },
       ];
 
@@ -194,20 +194,19 @@ export const Chart = ({ name, data, isPending }) => {
       <TransparentCard theme="dark">
         <Flex className="mg-t-15 mg-r-30" justify="end">
           <ChartResetDownload
-            setIsReset={setIsReset}
-            setState={setState}
+            chartDatas={allChartData}
             legendNameMap={systemConfig?.[name]?.legendNameMap}
             printChartRef={printChartRef}
-            chartDatas={allChartData}
+            setIsReset={setIsReset}
+            setState={setState}
           />
         </Flex>
 
-        <div ref={printRef} className="chart-wrapper"></div>
+        <div className="chart-wrapper" ref={printRef}></div>
         <Flex className="mg-y-15" justify="center">
           <LegendBage
-            item={systemConfig?.[name]?.legendNameMap?.[0]}
-            size="md"
             active={isSelected}
+            item={systemConfig?.[name]?.legendNameMap?.[0]}
             onClick={() => {
               customLegendOnClick(
                 systemConfig?.[name]?.legendNameMap?.[0]?.name,
@@ -215,18 +214,19 @@ export const Chart = ({ name, data, isPending }) => {
                 setState,
               );
             }}
+            size="md"
           />
         </Flex>
       </TransparentCard>
-      <Row gutter={[24, 24]} className="mg-t-20">
+      <Row className="mg-t-20" gutter={[24, 24]}>
         {systemConfig?.[name] &&
           systemConfig[name].config.map((item, itemIndex) => (
-            <Col key={`card_${itemIndex}`} xs={24} lg={8}>
+            <Col key={`card_${itemIndex}`} lg={8} xs={24}>
               <InfoCard
+                color={systemConfig?.[name]?.color}
+                icon={null}
                 title={item.title}
                 value={data?.[item.name]}
-                icon={null}
-                color={systemConfig?.[name]?.color}
               />
             </Col>
           ))}

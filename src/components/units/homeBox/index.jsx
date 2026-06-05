@@ -1,6 +1,6 @@
 import ScopeStyle from "./indexStyle";
 
-function HomeBox({ title, children, className }) {
+function HomeBox({ children, className, title }) {
   return (
     <ScopeStyle>
       <div className={`home-box ${className}`}>

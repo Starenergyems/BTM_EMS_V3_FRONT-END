@@ -13,37 +13,6 @@ function fieldForbiddenKeyin() {
 }
 
 /**
- * 欄位只允許數字
- * @param {number | string} value 輸入的值
- * @param {object} 選項參數
- * @param {boolean} options.isMinusAllowed - 是否允許輸入負數
- * @returns 過濾完後的字串值
- */
-function fieldRestrictToNumber(
-  value,
-  { isMinusAllowed } = { isMinusAllowed: false }
-) {
-  let newValue = value;
-  if (isMinusAllowed) {
-    if (newValue.startsWith("-")) {
-      newValue = "-" + newValue.slice(1).replace(regexRule.number, ""); // 保證負號只在開頭
-    } else {
-      newValue = newValue.replace(regexRule.number, "");
-    }
-  } else {
-    newValue = newValue.replace(regexRule.number, "");
-  }
-  if (newValue !== "0") {
-    if (newValue === "00") {
-      newValue = "0";
-    } else {
-      newValue = newValue.replace(/^0+/, "");
-    }
-  }
-  return newValue || "";
-}
-
-/**
  * 欄位只允許小數點的數字
  * @param {number | string} value 輸入的值
  * @param {object} 選項參數
@@ -75,4 +44,35 @@ function fieldRestrictToDecimal(
   return newValue || "";
 }
 
-export { fieldForbiddenKeyin, fieldRestrictToNumber, fieldRestrictToDecimal };
+/**
+ * 欄位只允許數字
+ * @param {number | string} value 輸入的值
+ * @param {object} 選項參數
+ * @param {boolean} options.isMinusAllowed - 是否允許輸入負數
+ * @returns 過濾完後的字串值
+ */
+function fieldRestrictToNumber(
+  value,
+  { isMinusAllowed } = { isMinusAllowed: false }
+) {
+  let newValue = value;
+  if (isMinusAllowed) {
+    if (newValue.startsWith("-")) {
+      newValue = "-" + newValue.slice(1).replace(regexRule.number, ""); // 保證負號只在開頭
+    } else {
+      newValue = newValue.replace(regexRule.number, "");
+    }
+  } else {
+    newValue = newValue.replace(regexRule.number, "");
+  }
+  if (newValue !== "0") {
+    if (newValue === "00") {
+      newValue = "0";
+    } else {
+      newValue = newValue.replace(/^0+/, "");
+    }
+  }
+  return newValue || "";
+}
+
+export { fieldForbiddenKeyin, fieldRestrictToDecimal, fieldRestrictToNumber };

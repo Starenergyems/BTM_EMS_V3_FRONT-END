@@ -1,19 +1,19 @@
+import { useState } from "react";
 import { Table } from "antd";
 import { useHelpers } from "./indexHelper";
 import ScopeStyle from "./indexStyle";
-import { useState } from "react";
 
 function DispatchCommandList() {
   const [mainState, setMainState] = useState({
     dispatchCommandTableData: [
       {
-        notificationTime: "2025-08-06T00:38:42.472204Z",
-        serviceStart: "2025-08-06T00:48:42.472204Z",
-        serviceEnd: "2025-08-06T01:48:42.472204Z",
-        prev5minAvgPower: 72,
         fullResponseTime: 4,
-        spm: 100,
+        notificationTime: "2025-08-06T00:38:42.472204Z",
+        prev5minAvgPower: 72,
+        serviceEnd: "2025-08-06T01:48:42.472204Z",
         serviceEnergy: 56,
+        serviceStart: "2025-08-06T00:48:42.472204Z",
+        spm: 100,
       },
     ],
     isDispatchCommandTableLoading: false,

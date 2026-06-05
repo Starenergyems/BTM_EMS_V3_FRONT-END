@@ -1,7 +1,7 @@
-import { Flex, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { pagesPathName } from '@/router';
 import logoEng from '@/assets/img/logo-with-eng-word.png';
+import { pagesPathName } from '@/router';
+import { Flex, Typography } from 'antd';
 import { GoBack } from '../components/goBack/index';
 import ScopeStyle from '../indexStyle';
 
@@ -13,10 +13,10 @@ function ResetSuccess() {
   }
 
   return (
-    <ScopeStyle justify="center" align="center">
-      <Flex className="login-box" vertical align="center">
+    <ScopeStyle align="center" justify="center">
+      <Flex align="center" className="login-box" vertical>
         <Typography.Text style={{ textAlign: 'center' }}>
-          <img src={logoEng} alt="logo" className="logo" />
+          <img alt="logo" className="logo" src={logoEng} />
         </Typography.Text>
         <h2 className="subtitle">變更成功</h2>
         <GoBack type="primary"/>

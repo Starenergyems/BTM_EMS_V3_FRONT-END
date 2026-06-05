@@ -1,8 +1,7 @@
-import { useCallback } from 'react';
 import { Icon } from '@iconify/react';
-import { color } from '@/styles/variable/indexStyle';
 import { alertOptions } from '@/components/page/alarmOverview/indexConfig';
 import { flowDatas } from '@/pages/page/home/flow/indexConfig';
+import { color } from '@/styles/variable/indexStyle';
 
 // useHelpers 為最外層 function，function 內區塊的撰寫順序由上而下為：
 // 1. useCallback 需要相依的 function
@@ -15,62 +14,62 @@ function useHelpers({ name }) {
   function getColumnDatas() {
     return [
       {
-        dataIndex: 'level',
-        title: '燈號',
         align: 'center',
-        sorter: true,
+        dataIndex: 'level',
         render: (value) => {
           const renderColor = alertOptions[value]?.color || color.black;
 
           return (
             <Icon
-              icon="si:alert-line"
               color={renderColor}
               fontSize={24}
-              style={{ width: '24px', height: '24px' }}
+              icon="si:alert-line"
+              style={{ height: '24px', width: '24px' }}
             />
           );
         },
+        sorter: true,
+        title: '燈號',
       },
       {
-        dataIndex: 'type',
-        title: '種類',
         align: 'center',
+        dataIndex: 'type',
         // sorter: true,
         render: (value) =>
           flowDatas.find((flow) => flow.titleEn === value)?.title || '--',
+        title: '種類',
       },
       {
+        align: 'center',
         dataIndex: 'id',
-        title: '編號',
-        align: 'center',
+        render: (value) => value || '--',
         sorter: true,
-        render: (value) => value || '--',
+        title: '編號',
       },
       {
+        align: 'center',
         dataIndex: 'value',
+        render: (value) => value || '--',
         title: '數值',
-        align: 'center',
-        render: (value) => value || '--',
       },
       {
+        align: 'center',
         dataIndex: 'content',
-        title: '告警原因',
-        align: 'center',
         render: (value) => value || '--',
+        title: '告警原因',
       },
       {
-        dataIndex: 'occurence_time',
-        title: '起始時間',
         align: 'center',
+        dataIndex: 'occurence_time',
         render: (value) => value || '--',
+        title: '起始時間',
       },
       name === 'historic'
         ? {
-            dataIndex: 'recover_time',
-            title: '復歸時間',
             align: 'center',
+            dataIndex: 'recover_time',
             render: (value) => value || '--',
+            title: '復歸時間',
           }
         : {},
     ];

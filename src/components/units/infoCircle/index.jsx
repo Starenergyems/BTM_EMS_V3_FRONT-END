@@ -1,6 +1,6 @@
 import ScopeStyle from "./indexStyle";
 
-function InfoCircle({ text, textColor, title, className }) {
+function InfoCircle({ className, text, textColor, title }) {
   return (
     <ScopeStyle
       $textColor={textColor}

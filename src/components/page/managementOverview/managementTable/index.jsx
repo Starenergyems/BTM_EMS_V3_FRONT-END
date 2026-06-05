@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useBoolean } from '@/hooks/useBoolean';
-import { Table, Flex } from 'antd';
-import Button from '@/components/units/button';
-import { omRole } from '@/slices/api/main/accounts';
 import { Select } from '@/components/units';
-import { ModalOverview } from './modalOverview';
-
+import Button from '@/components/units/button';
+import { useBoolean } from '@/hooks/useBoolean';
+import { omRole } from '@/slices/api/main/accounts';
+import { Flex, Table } from 'antd';
 import { useHelpers } from './indexHelper';
+import { ModalOverview } from './modalOverview';
 
 function ManagementTable({ data, name, onChange }) {
   const toggle = useBoolean(false);
@@ -20,11 +19,11 @@ function ManagementTable({ data, name, onChange }) {
   const isPermissionManagement = name === 'permissionManagement';
 
   const { getColumnDatas, handleSelectChange } = useHelpers({
-    state,
-    setState,
     name,
-    toggle,
     setisEdit,
+    setState,
+    state,
+    toggle,
   });
 
   const selectOptions = Object.keys(omRole).map((key) => ({
@@ -36,20 +35,20 @@ function ManagementTable({ data, name, onChange }) {
   return (
     <>
       {isPermissionManagement && (
-        <Flex justify="space-between" align="center">
+        <Flex align="center" justify="space-between">
           <Select
-            size="sm"
-            placeholder="選擇角色名稱"
-            options={selectOptions}
-            onChange={handleSelectChange}
             className="mg-y-20"
+            onChange={handleSelectChange}
+            options={selectOptions}
+            placeholder="選擇角色名稱"
+            size="sm"
           />
           <Button
-            type="primary"
             onClick={() => {
               setisEdit(false);
               toggle.onTrue();
             }}
+            type="primary"
           >
             新增帳號
           </Button>
@@ -59,22 +58,22 @@ function ManagementTable({ data, name, onChange }) {
         columns={getColumnDatas()}
         dataSource={isPermissionManagement ? state.filteredDatas : data}
         loading={state.isLoading}
+        onChange={onChange}
         pagination={{
-          showTotal: (total) => `總共 ${Math.ceil(total / 10)} 頁`,
           pageSize: 10,
           position: ['bottomCenter'],
+          showTotal: (total) => `總共 ${Math.ceil(total / 10)} 頁`,
         }}
         rowClassName="custom-no-hover"
         rowKey="id"
         scroll={{
           x: 'max-content',
         }}
-        onChange={onChange}
         style={{
           '--nodata-overflow': data?.length === 0 ? 'hidden' : 'auto hidden',
         }}
       />
-      <ModalOverview toggle={toggle} isEdit={isEdit} />
+      <ModalOverview isEdit={isEdit} toggle={toggle} />
     </>
   );
 }

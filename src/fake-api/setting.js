@@ -1,21 +1,21 @@
 export const limit = {
-  reverse: 4,
-  over: 83,
+  charge_mode: 'Average Dispatch',
   contract: 201,
-  real: 3.69,
+  gridP_max_soc: 50,
+  keep_soc: 27,
   max_soc: 90,
   min_soc: 13,
-  charge_mode: 'Average Dispatch',
-  keep_soc: 27,
-  gridP_max_soc: 50,
+  over: 83,
+  real: 3.69,
+  reverse: 4,
 };
 
 export const switchData = {
-  max_price: false ,
+  backup: false ,
+  charger_switch: true,
+  gridP_switch: false,
+  max_price: false,
   prevent_over: false,
   prevent_reverse: true,
-  backup: false,
-  gridP_switch: false,
   solar_switch: true,
-  charger_switch: true,
 };

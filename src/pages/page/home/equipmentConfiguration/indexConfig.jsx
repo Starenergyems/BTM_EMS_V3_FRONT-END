@@ -1,80 +1,80 @@
 const equipmentDatas = [
   {
-    name: 'gridP',
-    title: '台電電網',
+    children: [
+      {
+        name: 'contract_value',
+        title: '契約容量',
+        unit: 'kW',
+      },
+    ],
     col: 7,
     icon: 'mingcute:earth-3-line',
     iconSize: 22,
-    children: [
-      {
-        title: '契約容量',
-        name: 'contract_value',
-        unit: 'kW',
-      },
-    ],
+    name: 'gridP',
+    title: '台電電網',
   },
   {
-    name: 'batteryP',
-    title: '儲能系統',
-    col: 17,
-    icon: 'fa6-solid:car-battery',
-    iconSize: 20,
     children: [
       {
-        title: '總功率',
         name: 'battery_total_kw',
+        title: '總功率',
         unit: 'kW',
       },
       {
-        title: '總電池容量',
         name: 'battery_total_kwh',
+        title: '總電池容量',
         unit: 'kWh',
       },
       {
-        title: '設備數量',
         name: 'battery_total_number',
+        title: '設備數量',
         unit: '台',
       },
     ],
+    col: 17,
+    icon: 'fa6-solid:car-battery',
+    iconSize: 20,
+    name: 'batteryP',
+    title: '儲能系統',
   },
   {
-    name: 'solarP',
-    title: '太陽能',
-    col: 12,
-    icon: 'flowbite:sun-solid',
-    iconSize: 22,
     children: [
       {
-        title: '最高發電功率',
         name: 'solar_total_kw',
+        title: '最高發電功率',
         unit: 'kWp',
       },
       {
-        title: '設備數量',
         name: 'solar_total_number',
+        title: '設備數量',
         unit: '片',
       },
     ],
+    col: 12,
+    icon: 'flowbite:sun-solid',
+    iconSize: 22,
+    name: 'solarP',
+    title: '太陽能',
   },
   {
-    name: 'chargerP',
-    title: '充電樁',
-    col: 12,
-    unit: 'kW',
-    icon: 'material-symbols:ev-charger-rounded',
-    iconSize: 24,
     children: [
       {
-        title: '總充電功率',
         name: 'charger_total_kw',
+        title: '總充電功率',
         unit: 'kW',
       },
       {
-        title: '設備數量',
         name: 'charger_total_number',
+        title: '設備數量',
         unit: '樁',
       },
     ],
+    col: 12,
+    icon: 'material-symbols:ev-charger-rounded',
+    iconSize: 24,
+    name: 'chargerP',
+    title: '充電樁',
+    unit: 'kW',
   },
 ];
 

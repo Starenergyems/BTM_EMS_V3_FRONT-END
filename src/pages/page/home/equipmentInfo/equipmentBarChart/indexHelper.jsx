@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
+import { equipmentInfoDatas } from '@/pages/page/home/equipmentInfo/indexConfig';
+import { chartOptions, customLegendOnClick, handleChart } from '@/utils/chart';
 // import * as echarts from 'echarts';
 import { color } from '@/styles/variable/indexStyle';
-import { chartOptions, customLegendOnClick, handleChart } from '@/utils/chart';
-import { equipmentInfoDatas } from '@/pages/page/home/equipmentInfo/indexConfig';
 
 // useHelpers 為最外層 function，function 內區塊的撰寫順序由上而下為：
 // 1. useCallback 需要相依的 function
@@ -12,7 +12,7 @@ import { equipmentInfoDatas } from '@/pages/page/home/equipmentInfo/indexConfig'
 const legendNameMap = equipmentInfoDatas.filter((item) => item.name !== '');
 
 function useHelpers({ refs }) {
-  const { printRef, printChartRef } = refs;
+  const { printChartRef, printRef } = refs;
 
   const defaultChartOptions = chartOptions(legendNameMap);
 
@@ -26,38 +26,36 @@ function useHelpers({ refs }) {
       ...defaultChartOptions,
       grid: {
         ...defaultChartOptions.grid,
-        right: 35,
-        bottom: 10,
         borderWidth: 0,
+        bottom: 10,
+        right: 35,
       },
       legend: {
         show: false,
       },
       xAxis: {
-        type: 'value',
         axisLabel: {
-          rotate: labelRotate,
           color: color.white,
           fontSize: 14,
+          rotate: labelRotate,
         },
         axisTick: {
-          show: true,
           alignWithLabel: true,
-
           lineStyle: {
             color: color.white,
           },
+
+          show: true,
         },
         splitLine: {
-          show: true,
           lineStyle: {
             color: '#808080',
           },
+          show: true,
         },
+        type: 'value',
       },
       yAxis: {
-        type: 'category',
-        inverse: true,
         axisLabel: {
           color: color.white,
           fontSize: 12,
@@ -66,6 +64,8 @@ function useHelpers({ refs }) {
         axisTick: {
           show: false,
         },
+        inverse: true,
+        type: 'category',
       },
     };
   }, [printRef]);
@@ -79,9 +79,9 @@ function useHelpers({ refs }) {
   );
 
   return {
-    legendNameMap,
     customLegendOnClick,
     getChartOption,
+    legendNameMap,
     setChart,
   };
 }

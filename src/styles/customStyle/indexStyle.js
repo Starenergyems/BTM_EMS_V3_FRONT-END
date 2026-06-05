@@ -1,7 +1,51 @@
 import { css } from "styled-components";
-import notoSans from "@/assets/font/NotoSans-VariableFont_wdth,wght.ttf";
 import notoSansItalic from "@/assets/font/NotoSans-Italic-VariableFont_wdth,wght.ttf";
+import notoSans from "@/assets/font/NotoSans-VariableFont_wdth,wght.ttf";
 import { color } from "@/styles/variable/indexStyle";
+
+//自定義全域樣式
+function commonStyle() {
+  return css`
+    @font-face {
+      font-family: "Noto Sans";
+      src: url(${notoSans});
+      font-display: swap;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: "Noto Sans";
+      src: url(${notoSansItalic});
+      font-display: swap;
+      font-style: italic;
+    }
+    :root {
+      --font-family: "Noto Sans";
+      --font-size: 16px;
+      font-size: var(--font-size);
+    }
+    body {
+      font-family: var(--font-family);
+      color: ${color.white};
+      background: linear-gradient(
+        180deg,
+        ${color.themeBlue} 0%,
+        ${color.themeBlack} 100%
+      );
+    }
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    .clearfix {
+      &::after {
+        display: block;
+        clear: both;
+        content: "";
+      }
+    }
+  `;
+}
 
 //自定義加上className 即可調整寬度百分比
 function customHeight() {
@@ -15,7 +59,6 @@ function customHeight() {
   }
   return style;
 }
-
 //自定義加上className 即可調整margin間距，例如：mg-t-20、mg-t-20-minus
 function customMargin(maxNumber = 50) {
   const handleStaticMarginTypography = (marginTypography) => {
@@ -23,22 +66,6 @@ function customMargin(maxNumber = 50) {
     for (const type in marginTypography) {
       const direction = type.substring(3, 4);
       switch (direction) {
-        case "t": {
-          style += `
-            .${type}{
-              margin-top:${marginTypography[type]};
-            }
-          `;
-          break;
-        }
-        case "r": {
-          style += `
-            .${type}{
-              margin-right:${marginTypography[type]};
-            }
-          `;
-          break;
-        }
         case "b": {
           style += `
             .${type}{
@@ -51,6 +78,22 @@ function customMargin(maxNumber = 50) {
           style += `
             .${type}{
                 margin-left:${marginTypography[type]};
+            }
+          `;
+          break;
+        }
+        case "r": {
+          style += `
+            .${type}{
+              margin-right:${marginTypography[type]};
+            }
+          `;
+          break;
+        }
+        case "t": {
+          style += `
+            .${type}{
+              margin-top:${marginTypography[type]};
             }
           `;
           break;
@@ -136,22 +179,6 @@ function customPadding(maxNumber = 50) {
     for (const type in paddingTypography) {
       const direction = type.substring(3, 4);
       switch (direction) {
-        case "t": {
-          style += `
-            .${type}{
-              padding-top:${paddingTypography[type]};
-            }
-          `;
-          break;
-        }
-        case "r": {
-          style += `
-            .${type}{
-              padding-right:${paddingTypography[type]};
-            }
-          `;
-          break;
-        }
         case "b": {
           style += `
             .${type}{
@@ -164,6 +191,22 @@ function customPadding(maxNumber = 50) {
           style += `
             .${type}{
               padding-left:${paddingTypography[type]};
+            }
+          `;
+          break;
+        }
+        case "r": {
+          style += `
+            .${type}{
+              padding-right:${paddingTypography[type]};
+            }
+          `;
+          break;
+        }
+        case "t": {
+          style += `
+            .${type}{
+              padding-top:${paddingTypography[type]};
             }
           `;
           break;
@@ -227,49 +270,6 @@ function customPadding(maxNumber = 50) {
     }
     .pd-l-auto {
       padding-left: auto;
-    }
-  `;
-}
-//自定義全域樣式
-function commonStyle() {
-  return css`
-    @font-face {
-      font-family: "Noto Sans";
-      src: url(${notoSans});
-      font-display: swap;
-      font-style: normal;
-    }
-    @font-face {
-      font-family: "Noto Sans";
-      src: url(${notoSansItalic});
-      font-display: swap;
-      font-style: italic;
-    }
-    :root {
-      --font-family: "Noto Sans";
-      --font-size: 16px;
-      font-size: var(--font-size);
-    }
-    body {
-      font-family: var(--font-family);
-      color: ${color.white};
-      background: linear-gradient(
-        180deg,
-        ${color.themeBlue} 0%,
-        ${color.themeBlack} 100%
-      );
-    }
-    ul {
-      list-style-type: none;
-      padding-left: 0;
-      margin: 0;
-    }
-    .clearfix {
-      &::after {
-        display: block;
-        clear: both;
-        content: "";
-      }
     }
   `;
 }

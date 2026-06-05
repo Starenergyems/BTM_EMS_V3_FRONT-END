@@ -1,27 +1,27 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { isToday } from '@/utils/date';
-import { Flex, Row, Col } from 'antd';
+import ChartResetDownload from '@/components/units/chartResetDownload';
+import DatePicker from '@/components/units/datePicker';
+import HomeBox from '@/components/units/homeBox';
+import LegendBage from '@/components/units/legendBage';
+import TransparentCard from '@/components/units/transparentCard';
 import { useEchartAutoResize } from '@/hooks/useEchartAutoResize';
 import {
   dataZoomChangeHandler,
+  fullTimeAxisHandler,
   getNewDatasHandler,
   noDataHandler,
-  fullTimeAxisHandler,
 } from '@/utils/chart';
-import HomeBox from '@/components/units/homeBox';
-import DatePicker from '@/components/units/datePicker';
-import LegendBage from '@/components/units/legendBage';
-import TransparentCard from '@/components/units/transparentCard';
-import ChartResetDownload from '@/components/units/chartResetDownload';
+import { isToday } from '@/utils/date';
+import { Col, Flex, Row } from 'antd';
 
-import ScopeStyle from './indexStyle';
-import { useHelpers } from './indexHelper';
-import { customLegendNameMap, trendNameMap } from './indexConfig';
-import InfoBox from './infoBox/index';
 import useReducerStore from '../store/useReducerStore';
+import { customLegendNameMap, trendNameMap } from './indexConfig';
+import { useHelpers } from './indexHelper';
+import InfoBox from './infoBox/index';
+import ScopeStyle from './indexStyle';
 
-function TrendChart({ isPending, trendDatas, chartDatas }) {
+function TrendChart({ chartDatas, isPending, trendDatas }) {
   const store = useReducerStore();
   const intervalStore = useSelector((state) => state.layout);
 
@@ -69,13 +69,13 @@ function TrendChart({ isPending, trendDatas, chartDatas }) {
   const {
     customLegendOnClick,
     getChartOption,
-    setChart,
-    onChange,
     getNewDatas,
+    onChange,
+    setChart,
   } = useHelpers({
     refs: {
-      printRef,
       printChartRef,
+      printRef,
     },
   });
 
@@ -88,9 +88,9 @@ function TrendChart({ isPending, trendDatas, chartDatas }) {
     }
 
     if (isPending) {
-      printChartRef.current.showLoading();
+      printChartRef.current?.showLoading();
     } else {
-      printChartRef.current.hideLoading();
+      printChartRef.current?.hideLoading();
     }
   }, [isPending]);
 
@@ -100,10 +100,6 @@ function TrendChart({ isPending, trendDatas, chartDatas }) {
       const seriesData = mapDataToTimeAxis(allChartData);
       const newOption = {
         ...chartOption,
-        xAxis: {
-          ...chartOption.xAxis,
-          data: fullTimeAxis,
-        },
         series: [
           ...chartOption.series.map((s, idx) => ({
             ...s,
@@ -114,13 +110,17 @@ function TrendChart({ isPending, trendDatas, chartDatas }) {
             markLine: {
               ...chartOption.series[chartOption.series.length - 1].markLine,
               data: [
-                { yAxis: 10, name: '防逆流' }, // 第一條線
-                { yAxis: 45, name: '防超約' }, // 第二條線 (不等距)
-                { yAxis: 55, name: '契約容量' }, // 第三條線
+                { name: '防逆流', yAxis: 10 }, // 第一條線
+                { name: '防超約', yAxis: 45 }, // 第二條線 (不等距)
+                { name: '契約容量', yAxis: 55 }, // 第三條線
               ],
             },
           },
         ],
+        xAxis: {
+          ...chartOption.xAxis,
+          data: fullTimeAxis,
+        },
       };
 
       setChart(newOption);
@@ -194,18 +194,18 @@ function TrendChart({ isPending, trendDatas, chartDatas }) {
   return (
     <ScopeStyle>
       <HomeBox title="當日用電趨勢圖">
-        <Flex justify="space-between" align="center" wrap gap={10}>
-          <DatePicker size="sm" bgColor="semitransparent" onChange={onChange} />
+        <Flex align="center" gap={10} justify="space-between" wrap>
+          <DatePicker bgColor="semitransparent" onChange={onChange} size="sm" />
           <ChartResetDownload
-            setIsReset={setIsReset}
-            setState={setState}
+            chartDatas={allChartData}
             legendNameMap={customLegendNameMap}
             printChartRef={printChartRef}
-            chartDatas={allChartData}
+            setIsReset={setIsReset}
+            setState={setState}
           />
         </Flex>
         <TransparentCard className="mg-t-10">
-          <div ref={printRef} className="chart-wrapper"></div>
+          <div className="chart-wrapper" ref={printRef}></div>
           <Flex className="custom-legend" gap={16} justify="center" wrap>
             {chartOption.legend.data.map((item, index) => {
               const idxItem = customLegendNameMap.find(
@@ -214,23 +214,23 @@ function TrendChart({ isPending, trendDatas, chartDatas }) {
               const isSelected = state?.customLegend?.[item] !== false;
               return (
                 <LegendBage
-                  key={`${item.name}${index}`}
-                  item={idxItem}
-                  size="md"
                   active={isSelected}
+                  item={idxItem}
+                  key={`${item.name}${index}`}
                   onClick={() => {
                     customLegendOnClick(item, printChartRef.current, setState);
                   }}
+                  size="md"
                 />
               );
             })}
           </Flex>
         </TransparentCard>
-        <Row gutter={[8, 8]} className="mg-t-8">
+        <Row className="mg-t-8" gutter={[8, 8]}>
           {trendNameMap.map((item, index) => {
             const finalValue = newData ? newData : trendDatas;
             return (
-              <Col xs={24} md={6} key={index}>
+              <Col key={index} md={6} xs={24}>
                 <InfoBox
                   info={
                     item.name === 'season'

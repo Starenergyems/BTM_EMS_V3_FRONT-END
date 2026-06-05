@@ -1,6 +1,6 @@
 import * as styled from 'styled-components';
-import { color } from '@/styles/variable/indexStyle';
 import { hexToRgba } from '@/styles/function';
+import { color } from '@/styles/variable/indexStyle';
 
 //select下拉選單樣式
 //發現createGlobalStyle不使用styled.createGlobalStyle的方式，prettier會沒效果

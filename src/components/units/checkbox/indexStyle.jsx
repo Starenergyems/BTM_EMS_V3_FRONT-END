@@ -1,5 +1,5 @@
-import { Checkbox } from "antd";
 import styled, { css } from "styled-components";
+import { Checkbox } from "antd";
 import { color } from "@/styles/variable/indexStyle";
 
 const commonStyle = css`
@@ -26,4 +26,4 @@ const CheckboxGroupStyle = styled(Checkbox.Group)`
   ${commonStyle}
 `;
 
-export { CheckboxStyle, CheckboxGroupStyle };
+export { CheckboxGroupStyle, CheckboxStyle };

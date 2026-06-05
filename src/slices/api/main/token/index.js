@@ -1,8 +1,8 @@
+import toast from "react-hot-toast";
 import { createSlice } from "@reduxjs/toolkit";
 import { pagesPathName, router } from "@/router";
-import toast from "react-hot-toast";
-import { postToken, postRefreshToken } from "./indexHelper";
 import { postAccountsMicrosoftExchangeToken } from "../accounts/indexHelper";
+import { postRefreshToken, postToken } from "./indexHelper";
 
 //state初始值
 const initialState = {
@@ -11,26 +11,6 @@ const initialState = {
 };
 
 const tokenSlice = createSlice({
-  name: "token",
-  initialState,
-  reducers: {
-    clearToken(state) {
-      state.access = "";
-      state.refresh = "";
-      localStorage.removeItem("access");
-      localStorage.removeItem("refresh");
-    },
-    restrictMultipleToken(state) {
-      const accessToken = localStorage.getItem("access");
-      if (state.access && accessToken && state.access !== accessToken) {
-        state.access = "";
-        state.refresh = "";
-        router.navigate(pagesPathName.login.path);
-        toast.dismiss();
-        toast.error("請勿開啟多個視窗進行登入操作");
-      }
-    },
-  },
   extraReducers(builder) {
     builder.addCase(postToken.fulfilled, (state, action) => {
       const { access, refresh } = action.payload;
@@ -65,8 +45,28 @@ const tokenSlice = createSlice({
       }
     );
   },
+  initialState,
+  name: "token",
+  reducers: {
+    clearToken(state) {
+      state.access = "";
+      state.refresh = "";
+      localStorage.removeItem("access");
+      localStorage.removeItem("refresh");
+    },
+    restrictMultipleToken(state) {
+      const accessToken = localStorage.getItem("access");
+      if (state.access && accessToken && state.access !== accessToken) {
+        state.access = "";
+        state.refresh = "";
+        router.navigate(pagesPathName.login.path);
+        toast.dismiss();
+        toast.error("請勿開啟多個視窗進行登入操作");
+      }
+    },
+  },
 });
 
-export { postToken, postRefreshToken };
+export { postRefreshToken, postToken };
 export const { clearToken, restrictMultipleToken } = tokenSlice.actions;
 export default tokenSlice.reducer;

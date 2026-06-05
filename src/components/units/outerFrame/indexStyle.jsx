@@ -1,6 +1,6 @@
 import styled from 'styled-components';
-import { color } from '@/styles/variable/indexStyle';
 import { customScollbar } from '@/styles/customStyle/indexStyle';
+import { color } from '@/styles/variable/indexStyle';
 
 const ScopeStyle = styled.div`
   margin-bottom: 20px;

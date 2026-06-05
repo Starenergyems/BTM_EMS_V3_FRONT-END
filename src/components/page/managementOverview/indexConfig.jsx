@@ -1,23 +1,23 @@
-import { color } from '@/styles/variable/indexStyle';
 import { flowDatas } from '@/pages/page/home/flow/indexConfig';
+import { color } from '@/styles/variable/indexStyle';
 
 const selectOptions = [
   {
-    value: '',
     label: '全部',
+    value: '',
   },
   ...(flowDatas?.map((flow) => ({
-    value: flow.titleEn,
     label: flow.title,
+    value: flow.titleEn,
   })) || []),
 ];
 
 export const alertOptions = {
-  Fault: {
-    color: color.red,
-  },
   Alarm: {
     color: color.warningYellow,
+  },
+  Fault: {
+    color: color.red,
   },
 };
 

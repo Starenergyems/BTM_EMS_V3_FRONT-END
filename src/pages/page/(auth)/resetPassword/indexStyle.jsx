@@ -1,7 +1,7 @@
-import { Flex } from "antd";
 import styled from "styled-components";
-import { color } from "@/styles/variable/indexStyle";
 import bg from '@/assets/img/login_bg.jpg';
+import { Flex } from "antd";
+import { color } from "@/styles/variable/indexStyle";
 
 const style = styled(Flex)`
   position: fixed;

@@ -1,9 +1,9 @@
-import { color } from '@/styles/variable/indexStyle';
-import Typography from '@/components/units/typography';
 import TransparentCard from '@/components/units/transparentCard';
-
+import Typography from '@/components/units/typography';
 import { batteryConfig, unitName } from './indexConfig';
+
 import { ScopeStyle } from './indexStyle';
+import { color } from '@/styles/variable/indexStyle';
 
 export const Battery = ({ data }) => {
   const percentageHandler = (value) => {
@@ -21,7 +21,7 @@ export const Battery = ({ data }) => {
     <ScopeStyle>
       <TransparentCard>
         <div className="battery-content">
-          <Typography size="sm" className="battery-title">
+          <Typography className="battery-title" size="sm">
             契約容量現況
           </Typography>
           {Object.entries(batteryConfig).map(([key, value]) => (
@@ -30,12 +30,12 @@ export const Battery = ({ data }) => {
               key={key}
               style={{ top: `${percentageHandler(data?.[key])}%` }}
             >
-              <Typography size="sm" className="item item-value">
+              <Typography className="item item-value" size="sm">
                 {data?.[key]}
                 {unitName}
               </Typography>
               <div className="line"></div>
-              <Typography size="sm" className="item item-label">
+              <Typography className="item item-label" size="sm">
                 {value}
               </Typography>
             </div>
@@ -45,9 +45,9 @@ export const Battery = ({ data }) => {
             style={{ height: `${100 - percentageHandler(data?.real) + 2}%` }}
           >
             <Typography
-              size="sm"
-              color={color.lightBlue}
               className="battery-label"
+              color={color.lightBlue}
+              size="sm"
             >
               {data?.real}
               {unitName}

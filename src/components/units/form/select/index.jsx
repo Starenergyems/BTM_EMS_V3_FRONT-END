@@ -9,8 +9,8 @@ function FormSelect(
   {
     className,
     errorMessage,
-    isInvalid,
     inputAttr = {},
+    isInvalid,
     themecategory,
     ...forwardRefProps
   },
@@ -19,8 +19,8 @@ function FormSelect(
   const componentProps = { ...inputAttr, ...forwardRefProps };
   return (
     <ScopeStyle
-      className={`styled-container-select ${className ?? ''}`}
       $themecategory={themecategory}
+      className={`styled-container-select ${className ?? ''}`}
     >
       <AntdSelect {...componentProps} ref={ref} />
       {(isInvalid || inputAttr?.status === 'error') && (

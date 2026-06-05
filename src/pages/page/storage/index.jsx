@@ -1,11 +1,11 @@
-import { pagesPathName } from '@/router';
 import { SystemOverview } from '@/components/page/systemOverview';
+import { pagesPathName } from '@/router';
 
 function storage() {
-  const { routeName, pathName, pathNameEN } = pagesPathName.storage;
+  const { pathName, pathNameEN, routeName } = pagesPathName.storage;
 
   return (
-    <SystemOverview title={pathName} titleEn={pathNameEN} name={routeName} />
+    <SystemOverview name={routeName} title={pathName} titleEn={pathNameEN} />
   );
 }
 

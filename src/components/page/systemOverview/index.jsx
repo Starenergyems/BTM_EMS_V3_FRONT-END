@@ -1,19 +1,19 @@
-import { useState, useEffect, useTransition } from 'react';
-import { Row, Col } from 'antd';
-import { PageBox } from '@/components/units';
-import HomeBox from '@/components/units/homeBox';
-import ScopeStyle from './indexStyle';
-import { statusData } from '@/pages/page/home/timeStatus/indexConfig';
-import DatePicker from '@/components/units/datePicker';
-import Typography from '@/components/units/typography';
+import { useEffect, useState, useTransition } from 'react';
 import { Chart } from '@/components/page/systemOverview/chart';
 import { Item } from '@/components/page/systemOverview/item';
+import { PageBox } from '@/components/units';
+import DatePicker from '@/components/units/datePicker';
+import HomeBox from '@/components/units/homeBox';
+import Typography from '@/components/units/typography';
+import { statusData } from '@/pages/page/home/timeStatus/indexConfig';
+import { Col, Row } from 'antd';
 import { systemConfig } from './indexConfig';
 import { useHelpers } from './indexHelper';
+import ScopeStyle from './indexStyle';
 
 const newStatusData = statusData.slice(0, 4);
 
-export const SystemOverview = ({ title, titleEn, name }) => {
+export const SystemOverview = ({ name, title, titleEn }) => {
   const [isPending, startTransition] = useTransition();
   const [state, setState] = useState({});
   const [infoState, setInfoState] = useState({});
@@ -21,8 +21,8 @@ export const SystemOverview = ({ title, titleEn, name }) => {
 
   const { getDatas, getInfoDatas } = useHelpers({
     name, // api url
-    setState,
     setInfoState,
+    setState,
   });
 
   useEffect(() => {
@@ -50,19 +50,19 @@ export const SystemOverview = ({ title, titleEn, name }) => {
         <HomeBox title={`${title}供電趨勢圖`}>
           <DatePicker
             className="mg-t-20 mg-b-20"
-            size="sm"
             onChange={onChange}
+            size="sm"
           />
-          <Chart name={name} data={state} isPending={isPending} />
+          <Chart data={state} isPending={isPending} name={name} />
         </HomeBox>
-        <HomeBox title={'各設備資訊總覽'} className="mg-t-40">
-          <Row gutter={[16, 16]} className="mg-t-30">
+        <HomeBox className="mg-t-40" title={'各設備資訊總覽'}>
+          <Row className="mg-t-30" gutter={[16, 16]}>
             {newStatusData?.map((status) => (
-              <Col key={status.title} xs={24} md={12} lg={6}>
+              <Col key={status.title} lg={6} md={12} xs={24}>
                 <div className="system-label">
                   <Typography size="lg">{status.title_cn} INV</Typography>
                   <div className="status-value">
-                    <Typography size="xl" color={status.color}>
+                    <Typography color={status.color} size="xl">
                       {infoState?.overview?.[status.name] || 0}
                     </Typography>
                     <Typography size="xl">/</Typography>
@@ -74,10 +74,10 @@ export const SystemOverview = ({ title, titleEn, name }) => {
               </Col>
             ))}
           </Row>
-          <Row gutter={[16, 16]} className="mg-t-30">
+          <Row className="mg-t-30" gutter={[16, 16]}>
             {infoState?.value?.map((info, idx) => (
-              <Col key={`${info.name}_${idx}`} xs={24} md={12} lg={6}>
-                <Item icon={systemConfig?.[name]?.icon} data={info} />
+              <Col key={`${info.name}_${idx}`} lg={6} md={12} xs={24}>
+                <Item data={info} icon={systemConfig?.[name]?.icon} />
               </Col>
             ))}
           </Row>

@@ -18,7 +18,7 @@ const AddTextButton = () => {
   return (
     <button
       onClick={() => {
-        dispatch({ type: 'text', payload: 'new text' });
+        dispatch({ payload: 'new text', type: 'text' });
       }}
     >
       Change Text

@@ -4,11 +4,11 @@ import { GlobalStyle, ScopeStyle } from "@/components/units/select/indexStyle";
 
 function Select(
   {
-    size,
     className,
     errorMessage,
     isInvalid,
     selectAttr,
+    size,
     themecategory,
     ...forwardRefProps
   },
@@ -17,9 +17,9 @@ function Select(
   const selectProps = { ...selectAttr, ...forwardRefProps };
   return (
     <ScopeStyle
-      className={`styled-container-select ${className ?? ''}`}
-      $themecategory={themecategory}
       $size={size}
+      $themecategory={themecategory}
+      className={`styled-container-select ${className ?? ''}`}
     >
       <AntdSelect {...selectProps} ref={ref} />
       {(isInvalid || selectAttr?.status === 'error') && (

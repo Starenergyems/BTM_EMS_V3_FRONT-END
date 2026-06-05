@@ -11,7 +11,7 @@ const getAccountsInfo = createAsyncThunk(
 //Microsoft登入後的access token轉為平常在使用的access token
 const postAccountsMicrosoftExchangeToken = createAsyncThunk(
   "accounts/postAccountsMicrosoftExchangeToken",
-  async ({ data, config }) => {
+  async ({ config, data }) => {
     const fetchData = await api.post(
       "accounts/microsoft/exchange_token",
       data,
@@ -23,7 +23,7 @@ const postAccountsMicrosoftExchangeToken = createAsyncThunk(
 //忘記密碼重設驗證信前，帳號驗證
 const postAccountsSendResetEmail = createAsyncThunk(
   "accounts/postAccountsSendResetEmail",
-  async ({ data, config }) => {
+  async ({ config, data }) => {
     const fetchData = await api.post("accounts/send_reset_email", data, config);
     return fetchData.data;
   }
@@ -31,7 +31,7 @@ const postAccountsSendResetEmail = createAsyncThunk(
 //密碼重設
 const postAccountsPasswordReset = createAsyncThunk(
   "accounts/postAccountsPasswordReset",
-  async ({ data, config }) => {
+  async ({ config, data }) => {
     const fetchData = await api.post("accounts/password_reset", data, config);
     return fetchData.data;
   }

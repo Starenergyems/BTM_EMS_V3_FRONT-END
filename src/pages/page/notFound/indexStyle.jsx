@@ -1,5 +1,5 @@
-import { absoluteCenter } from "@/styles/variable/indexStyle";
 import styled from "styled-components";
+import { absoluteCenter } from "@/styles/variable/indexStyle";
 
 const style = styled.div`
   .container {

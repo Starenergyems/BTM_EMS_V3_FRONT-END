@@ -11,9 +11,9 @@ function FormSwitch(
   componentProps.value = inputAttr.value ?? forwardRefProps.value;
   return (
     <ScopeStyle
-      className={`styled-container-input ${className ?? ''}`}
-      $status={inputAttr?.status}
       $isInvalid={isInvalid}
+      $status={inputAttr?.status}
+      className={`styled-container-input ${className ?? ''}`}
     >
       <AntdSwitch {...componentProps} ref={ref} />
       {(isInvalid || inputAttr?.status === 'error') && (

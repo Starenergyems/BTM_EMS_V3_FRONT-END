@@ -1,27 +1,28 @@
 import { useEffect, useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { useMsal } from '@azure/msal-react';
 import { useLocation } from 'react-router-dom';
-import { color } from '@/styles/variable/indexStyle';
-import { Layout, Menu } from 'antd';
-import { getAccountsInfo } from '@/slices/api/main/accounts/indexHelper';
+import { useMsal } from '@azure/msal-react';
 import logoSrc from '@/assets/img/logo.png';
 import logoWithWordSrc from '@/assets/img/logoWithWord.png';
-import ShutdownModal from './shutdownModal';
+import Chatbot from '@/components/chatbot';
+import { getAccountsInfo } from '@/slices/api/main/accounts/indexHelper';
+import { Layout, Menu } from 'antd';
 import { useHelpers } from './indexHelper';
+import ShutdownModal from './shutdownModal';
 import ScopeStyle from './indexStyle';
+import { color } from '@/styles/variable/indexStyle';
 
 function PageIndex() {
   const apiDispatch = useDispatch();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const accountsState = useSelector((state) => state.apiAccounts);
-  const layoutState = useSelector((state) => state.layout);
   const menuState = useSelector((state) => state.menu);
+
   const tokenState = useSelector((state) => state.apiToken);
-  const { instance, accounts: mcalAccounts } = useMsal();
+  const { accounts: mcalAccounts, instance } = useMsal();
   const [mainState, setMainState] = useState({
     isShowImportantInfoModalOpen: false,
     isShutdownModalOpen: false,
@@ -29,16 +30,23 @@ function PageIndex() {
   const {
     getMenuMainItems,
     getMenuOtherItems,
+    handleClickLogo,
     handleOnMouseEnter,
     handleOnMouseLeave,
     handleSiderOpen,
-    handleClickLogo,
-    menuOnSelect,
     menuFeatureOnClick,
     menuFeatureOnSelect,
+    menuOnSelect,
     removeSiderInlineStyle,
     setModalOpen,
-  } = useHelpers({ dispatch, instance, mcalAccounts, navigate, setMainState });
+  } = useHelpers({
+    dispatch,
+    instance,
+    mcalAccounts,
+    navigate,
+    setMainState,
+    siderIsCollapsed: menuState.siderIsCollapsed,
+  });
 
   const location = useLocation();
 
@@ -60,8 +68,8 @@ function PageIndex() {
 
   return (
     <ScopeStyle
-      style={{ '--layout-background': layoutBackground }}
       $collapsed={menuState.siderIsCollapsed}
+      style={{ '--layout-background': layoutBackground }}
     >
       {/* <Link to={pagesPathName.home.path}>
       </Link> */}
@@ -73,33 +81,32 @@ function PageIndex() {
             <Layout.Sider
               className="main-menu"
               collapsed={menuState.siderIsCollapsed}
-              ref={removeSiderInlineStyle}
               onCollapse={handleSiderOpen}
               onMouseEnter={handleOnMouseEnter}
               onMouseLeave={handleOnMouseLeave}
+              ref={removeSiderInlineStyle}
             >
               <div className="logo-container">
                 {menuState.siderIsCollapsed ? (
                   <Link to={'/'}>
                     <img
-                      className="img-logo"
-                      src={logoSrc}
                       alt="logo"
+                      className="img-logo"
                       onClick={handleClickLogo}
+                      src={logoSrc}
                     />
                   </Link>
                 ) : (
                   <Link to={'/'}>
                     <img
-                      className="img-logo-with-word"
-                      src={logoWithWordSrc}
                       alt="logo with word"
+                      className="img-logo-with-word"
                       onClick={handleClickLogo}
+                      src={logoWithWordSrc}
                     />
                   </Link>
                 )}
               </div>
-
               <Menu
                 className="mg-t-30"
                 items={getMenuMainItems(accountsState?.omRole)}
@@ -120,7 +127,10 @@ function PageIndex() {
             </Layout.Sider>
           )}
           <Layout className={`layout-cotent ${noSideBar ? '' : 'no-side-bar'}`}>
-            <Outlet />
+            <div className="container">
+              <Outlet />
+            </div>
+            <Chatbot />
           </Layout>
         </Layout>
         <ShutdownModal

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
+import { pagesPathName } from "@/router";
 import { Button } from "antd";
 import ScopeStyle from "./indexStyle";
-import { pagesPathName } from "@/router";
 
 function NotFound() {
   return (

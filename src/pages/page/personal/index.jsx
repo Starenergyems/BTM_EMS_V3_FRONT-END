@@ -1,5 +1,5 @@
-import { pagesPathName } from "@/router";
 import { PageBox } from "@/components/units";
+import { pagesPathName } from "@/router";
 import ScopeStyle from "./indexStyle";
 
 function Personal () {

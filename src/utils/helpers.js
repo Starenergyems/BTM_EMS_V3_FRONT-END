@@ -10,8 +10,8 @@ export const errorMsgHandler = (errors, setError) => {
     errors.forEach((err) => {
       setError([
         {
-          name: err.loc[1],
           errors: [err.msg],
+          name: err.loc[1],
         },
       ]);
     });

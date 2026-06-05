@@ -2,9 +2,9 @@ import styled from 'styled-components';
 import { color } from '@/styles/variable/indexStyle';
 
 const style = styled.div`
-    .logo-container {
-      text-align: center;
-      cursor: pointer;
+  .logo-container {
+    text-align: center;
+    cursor: pointer;
 
     .img-logo {
       height: 48px;
@@ -13,6 +13,7 @@ const style = styled.div`
       height: 63px;
     }
   }
+
   .ant-layout {
     overflow-x: hidden;
     .ant-layout-sider-children {
@@ -23,21 +24,23 @@ const style = styled.div`
         .ant-menu-title-content {
           border-bottom: 0;
         }
-        .ant-menu-item,.ant-menu-submenu {
-          &::after{
-            display:none;}
+        .ant-menu-item,
+        .ant-menu-submenu {
+          &::after {
+            display: none;
           }
         }
       }
-      
     }
   }
+
   .ant-layout.layout-cotent {
     background: var(--layout-background) !important;
     margin-inline-start: 80px;
     min-height: 100vh;
-    &.no-side-bar{
-      margin-inline-start: 0;}
+    &.no-side-bar {
+      margin-inline-start: 0;
+    }
   }
   .main-menu {
     overflow: auto;
@@ -46,23 +49,15 @@ const style = styled.div`
     inset-inline-start: 0;
     top: 0;
     bottom: 0;
-    scrollbar-width: "thin";
-    scrollbar-gutter: "stable";
+    scrollbar-width: 'thin';
+    scrollbar-gutter: 'stable';
     z-index: 999;
   }
   .ant-layout-sider-children {
     .ant-menu {
-      .ant-menu-submenu {
-        &.ant-menu-submenu-vertical {
-          svg {
-            transform: ${(props) => {
-              // return props.$collapsed && "translateX(-7px)";
-            }};
-          }
-        }
-      }
+      
+
       .ant-menu-item {
-        //因此icon與其他icon大小不相同，因此客製調整
         .icon-important-info {
           transform: scale(1.15);
         }
@@ -83,7 +78,7 @@ const style = styled.div`
           position: relative;
 
           &::before {
-            content: "";
+            content: '';
             display: block;
             width: 5px;
             height: 5px;
@@ -94,7 +89,8 @@ const style = styled.div`
       }
     }
   }
-  [class*="css-var"] {
+
+  [class*='css-var'] {
     .ant-badge {
       --ant-badge-dot-size: 10px;
 

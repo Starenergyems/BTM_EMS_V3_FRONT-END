@@ -1,6 +1,6 @@
-import { color } from "@/styles/variable/indexStyle";
-import { Modal } from "antd";
 import styled from "styled-components";
+import { Modal } from "antd";
+import { color } from "@/styles/variable/indexStyle";
 
 const style = styled(Modal)`
   p {

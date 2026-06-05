@@ -1,11 +1,11 @@
 import { useEffect, useState, useTransition } from 'react';
-import { Select, PageBox } from '@/components/units';
+import { PageBox, Select } from '@/components/units';
 import AlarmTable from './alarmTable';
+import { selectOptions } from './indexConfig';
 import { useHelpers } from './indexHelper';
 import ScopeStyle from './indexStyle';
-import { selectOptions } from './indexConfig';
 
-function AlarmOverview({ title, titleEn, name }) {
+function AlarmOverview({ name, title, titleEn }) {
   const [isPending, startTransition] = useTransition();
   const [state, setState] = useState({
     data: [],
@@ -14,8 +14,8 @@ function AlarmOverview({ title, titleEn, name }) {
 
   const { getDatas, handleSelectChange, handleTableChange } = useHelpers({
     name,
-    state,
     setState,
+    state,
   });
 
   useEffect(() => {
@@ -29,15 +29,15 @@ function AlarmOverview({ title, titleEn, name }) {
       <ScopeStyle>
         <div className="alarm-overview-container">
           <Select
-            size="sm"
-            placeholder="選擇能源類別"
-            options={selectOptions}
             onChange={handleSelectChange}
+            options={selectOptions}
+            placeholder="選擇能源類別"
+            size="sm"
           />
           <AlarmTable
             data={state?.filterDatas}
-            name={name}
             isPending={isPending}
+            name={name}
             onChange={handleTableChange}
           />
         </div>

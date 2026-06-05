@@ -1,16 +1,16 @@
+import { Flex } from 'antd';
 import ScopeStyle from './indexStyle';
 import { color } from '@/styles/variable/indexStyle';
-import { Flex } from 'antd';
 
-function LegendBage({ item, onClick, variant, size, active = false }) {
+function LegendBage({ active = false, item, onClick, size, variant }) {
   return (
-    <ScopeStyle $variant={variant} $size={size} $colors={item?.bgColor}>
+    <ScopeStyle $colors={item?.bgColor} $size={size} $variant={variant}>
       <Flex
         align="center"
         className={`legend-item ${active ? ' active' : ''}`}
+        gap={8}
         key={item.name}
         onClick={onClick}
-        gap={8}
       >
         <span
           className="legend-stick"

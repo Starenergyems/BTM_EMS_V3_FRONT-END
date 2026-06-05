@@ -1,11 +1,11 @@
-import { pagesPathName } from '@/router';
 import { SystemOverview } from '@/components/page/systemOverview';
+import { pagesPathName } from '@/router';
 
 function Charger() {
-  const { routeName, pathName, pathNameEN } = pagesPathName.charger;
+  const { pathName, pathNameEN, routeName } = pagesPathName.charger;
 
   return (
-    <SystemOverview title={pathName} titleEn={pathNameEN} name={routeName} />
+    <SystemOverview name={routeName} title={pathName} titleEn={pathNameEN} />
   );
 }
 

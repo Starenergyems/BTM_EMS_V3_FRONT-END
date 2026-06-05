@@ -1,37 +1,37 @@
-import { Row, Col } from 'antd';
 import { Icon } from '@iconify/react';
-import { color } from '@/styles/variable/indexStyle';
 import Typography from '@/components/units/typography';
 import { statusData } from '@/pages/page/home/timeStatus/indexConfig';
+import { Col, Row } from 'antd';
 import { labelData } from './indexConfig';
 import ScopeStyle from './indexStyle';
+import { color } from '@/styles/variable/indexStyle';
 
-export const Item = ({ icon, data }) => {
+export const Item = ({ data, icon }) => {
   const status = statusData.find((item) => item.status === data?.status);
   const statusColor = status.status > 0 ? status.color : color.lightBlue;
   return (
     <ScopeStyle>
       <div className="item-box">
         <div className="item-label">
-          <Icon icon={icon} fontSize="30" color={statusColor} />
+          <Icon color={statusColor} fontSize="30" icon={icon} />
           <Typography size="lg">{data?.name}</Typography>
         </div>
-        <Typography size="lg" color={statusColor}>
+        <Typography color={statusColor} size="lg">
           {status?.title_cn || '正常'}
         </Typography>
       </div>
       <div className="mg-t-20">
         {labelData?.map((label) => (
-          <Row key={label.name} className="item-value" align="middle">
-            <Col span={6} offset={3}>
+          <Row align="middle" className="item-value" key={label.name}>
+            <Col offset={3} span={6}>
               <Typography size="lg">{label.title}</Typography>
             </Col>
-            <Col span={4} offset={2}>
-              <Typography size="lg" color={statusColor}>
+            <Col offset={2} span={4}>
+              <Typography color={statusColor} size="lg">
                 {data?.[label.name] || '--s'}
               </Typography>
             </Col>
-            <Col span={4} offset={4}>
+            <Col offset={4} span={4}>
               <Typography size="lg">{label.unit}</Typography>
             </Col>
           </Row>

@@ -1,5 +1,5 @@
-import { Modal } from "antd";
 import styled from "styled-components";
+import { Modal } from "antd";
 
 const style = styled(Modal)`
   .remind {

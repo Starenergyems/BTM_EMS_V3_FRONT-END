@@ -1,7 +1,7 @@
 import { Button as AntdButton } from 'antd';
 import ScopeStyle from './indexStyle';
 
-function Button({ size, children, className, ...buttonAttr }) {
+function Button({ children, className, size, ...buttonAttr }) {
   return (
     <ScopeStyle
       $size={size}

@@ -1,14 +1,14 @@
-import { useState, useEffect, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
+import CurrentTime from '@/components/units/currentTime';
+import { Col, Row } from 'antd';
+import EquipmentConfiguration from './equipmentConfiguration/index';
+import EquipmentInfo from './equipmentInfo/index';
 import Flow from './flow/index';
+import { useHelpers } from './indexHelper';
+import useReducerStore from './store/useReducerStore';
+import TimeStatus from './timeStatus/index';
 import TrendChart from './trendChart/index';
 import ScopeStyle from './indexStyle';
-import EquipmentConfiguration from './equipmentConfiguration/index';
-import TimeStatus from './timeStatus/index';
-import EquipmentInfo from './equipmentInfo/index';
-import CurrentTime from '@/components/units/currentTime';
-import { useHelpers } from './indexHelper';
-import { Col, Row } from 'antd';
-import useReducerStore from './store/useReducerStore';
 
 function Home() {
   const store = useReducerStore();
@@ -19,15 +19,15 @@ function Home() {
   const [flowDatas, setFlowDatas] = useState({});
   const [equipmentDatas, setEquipmentDatas] = useState({});
   const [chartDatas, setChartDatas] = useState({
-    trendDatas: {},
     chartDatas: [],
     equipmentChartDatas: {},
+    trendDatas: {},
   });
 
-  const { getEquipmentDatas, getTrendDatas, getFlowDatas } = useHelpers({
-    setFlowDatas,
-    setEquipmentDatas,
+  const { getEquipmentDatas, getFlowDatas, getTrendDatas } = useHelpers({
     setChartDatas,
+    setEquipmentDatas,
+    setFlowDatas,
   });
 
   useEffect(() => {
@@ -42,43 +42,38 @@ function Home() {
     });
   }, [store.date]);
 
-  useEffect(() => {
-    getFlowDatas(); // 首次執行
-
-    const timer = setInterval(() => {
-      getFlowDatas(); // 每 30 秒只呼叫這個
-    }, 30000);
-
-    return () => clearInterval(timer);
-  }, []);
-
   return (
     <ScopeStyle>
       <div className="current-time">
         <CurrentTime />
       </div>
+
       <Row>
-        <Col xs={24} xl={12} className="block block1">
-          <Flow data={flowDatas} detailDatas={equipmentDatas} />
+        <Col className="block block1" xl={12} xs={24}>
+          <Flow
+            data={flowDatas}
+            detailDatas={equipmentDatas}
+            getFlowDatas={getFlowDatas}
+          />
         </Col>
-        <Col xs={24} xl={12} className="block block2">
+        <Col className="block block2" xl={12} xs={24}>
           <TrendChart
+            chartDatas={chartDatas?.trendDatas?.chartData ?? []}
             isPending={isPending}
             trendDatas={chartDatas?.trendDatas}
-            chartDatas={chartDatas?.trendDatas?.chartData ?? []}
           />
         </Col>
       </Row>
       <Row className="mg-t-40">
-        <Col xs={24} xl={12} className="block block3">
-          <Col xs={0} xl={24}>
+        <Col className="block block3" xl={12} xs={24}>
+          <Col xl={24} xs={0}>
             <TimeStatus data={flowDatas?.timestamp} />
           </Col>
           <div className="mg-t-36">
             <EquipmentConfiguration data={equipmentDatas} />
           </div>
         </Col>
-        <Col xs={24} xl={12} className="block block4">
+        <Col className="block block4" xl={12} xs={24}>
           <EquipmentInfo
             data={chartDatas?.equipmentChartDatas}
             isPending={isEquipmentPending}

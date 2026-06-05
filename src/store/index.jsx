@@ -2,10 +2,10 @@ import {
   combineReducers,
   configureStore,
   createAction,
-} from "@reduxjs/toolkit";
-import { apiReducer, layoutReducer, menuReducer } from "@/slices/index";
+} from '@reduxjs/toolkit';
+import { apiReducer, layoutReducer, menuReducer } from '@/slices/index';
 
-const resetStore = createAction("reset");
+const resetStore = createAction('reset');
 
 const combinedReducer = combineReducers({
   ...apiReducer,
@@ -22,12 +22,12 @@ const rootReducer = (state, action) => {
 };
 
 export const store = configureStore({
-  reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
         // 忽略特定 action (reduxToolkit不允許非序列式的資料，而 blob 即是)
-        ignoredActions: ["resources/getResourcesDeviceDownload/fulfilled"],
+        ignoredActions: ['resources/getResourcesDeviceDownload/fulfilled'],
       },
     }),
+  reducer: rootReducer,
 });

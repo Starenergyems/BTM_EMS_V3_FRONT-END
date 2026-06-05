@@ -1,11 +1,12 @@
-import { pagesPathName } from '@/router';
 import { BillOverview } from '@/components/page/billOverview';
+import { pagesPathName } from '@/router';
 
 function charger() {
-  const { routeName, pathName, pathNameEN } = pagesPathName.bill.charger;
-  return (
-    <BillOverview title={pathName} titleEn={pathNameEN} name={routeName} />
-  );
+  const { pathName, pathNameEN, routeName } = pagesPathName.bill.charger;
+
+  const name = routeName.split('bill')[1]?.toLocaleLowerCase() || '';
+
+  return <BillOverview name={name} title={pathName} titleEn={pathNameEN} />;
 }
 
 export default charger;

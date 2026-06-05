@@ -1,15 +1,15 @@
 import { useCallback } from 'react';
-import { color } from '@/styles/variable/indexStyle';
+import {
+  systemConfig,
+  yAxisLabels,
+} from '@/components/page/billOverview/indexConfig';
 import {
   chartOptions,
   customLegendOnClick,
   handleChart,
   rotateHandeler,
 } from '@/utils/chart';
-import {
-  systemConfig,
-  yAxisLabels,
-} from '@/components/page/billOverview/indexConfig';
+import { color } from '@/styles/variable/indexStyle';
 
 // useHelpers 為最外層 function，function 內區塊的撰寫順序由上而下為：
 // 1. useCallback 需要相依的 function
@@ -22,8 +22,8 @@ const legendObject = Object.values(systemConfig).map(
 
 const legendNameMap = [].concat(...legendObject);
 
-function useHelpers({ refs, name }) {
-  const { printRef, printChartRef } = refs;
+function useHelpers({ name, refs }) {
+  const { printChartRef, printRef } = refs;
 
   const defaultChartOptions = chartOptions(legendNameMap);
 
@@ -35,62 +35,62 @@ function useHelpers({ refs, name }) {
       ...defaultChartOptions,
       grid: {
         ...defaultChartOptions.grid,
-        top: 20,
+        borderWidth: 0,
         left: 40,
         right: 40,
-        borderWidth: 0,
+        top: 20,
       },
 
       xAxis: {
-        type: 'category',
-        boundaryGap: 10,
-        axisLine: {
-          show: true,
-          lineStyle: {
-            color: color.white,
-          },
-        },
         axisLabel: {
           color: color.white,
           fontSize: 14,
           padding: [10, 0, 0, 0],
-          showMinLabel: true, // 確保顯示第一個標籤（00:00）
-          showMaxLabel: true, // 確保顯示最後一個標籤（24:00）
           rotate: rotateAngle,
+          showMaxLabel: true, // 確保顯示最後一個標籤（24:00）
+          showMinLabel: true, // 確保顯示第一個標籤（00:00）
         },
-
+        axisLine: {
+          lineStyle: {
+            color: color.white,
+          },
+          show: true,
+        },
         axisTick: {
           show: false,
         },
+        boundaryGap: 10,
+
+        type: 'category',
       },
       yAxis: yAxisLabels?.map((label, idx) => ({
-        type: 'value',
-        name: label?.title,
-        nameLocation: 'middle',
-        scale: false,
         axisLabel: {
           color: systemConfig?.[name]?.color,
           fontSize: 12,
           padding: [0, 5, 0, 5],
         },
-        nameTextStyle: {
-          color: systemConfig?.[name]?.color,
-          padding: idx === 0 ? [5, 10, 55, 10] : [55, 10, 25, 10],
-          fontSize: 18,
+        axisLine: {
+          lineStyle: {
+            color: color.white,
+          },
+          show: true,
         },
         axisTick: {
-          show: true,
           alignWithLabel: true,
           lineStyle: {
             color: color.white,
           },
-        },
-        axisLine: {
           show: true,
-          lineStyle: {
-            color: color.white,
-          },
         },
+        name: label?.title,
+        nameLocation: 'middle',
+        nameTextStyle: {
+          color: systemConfig?.[name]?.color,
+          fontSize: 18,
+          padding: idx === 0 ? [5, 10, 55, 10] : [55, 10, 25, 10],
+        },
+        scale: false,
+        type: 'value',
       })),
     };
   }, [printRef, name]);
@@ -104,9 +104,9 @@ function useHelpers({ refs, name }) {
   );
 
   return {
-    legendNameMap,
     customLegendOnClick,
     getChartOption,
+    legendNameMap,
     setChart,
   };
 }

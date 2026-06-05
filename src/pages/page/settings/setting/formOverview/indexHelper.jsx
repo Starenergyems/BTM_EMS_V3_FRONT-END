@@ -75,114 +75,6 @@ export const formConfig = (formInstance) => {
   };
 
   return {
-    base: [
-      {
-        isFrame: false,
-        children: [
-          {
-            formItemAttr: {
-              label: '運轉狀態',
-              name: 'control_activate',
-            },
-            variants: 'switch',
-          },
-          {
-            formItemAttr: {
-              label: '契約容量設定',
-              name: 'contract',
-              unit: 'kW',
-              inputPattern: 'number',
-              rules: [
-                () => ({
-                  validator(_, value) {
-                    return contractValidator(value);
-                  },
-                }),
-              ],
-            },
-
-            variants: 'input',
-          },
-        ],
-      },
-      {
-        isFrame: true,
-        children: [
-          {
-            formItemAttr: {
-              label: '防超約',
-              name: 'aoc_switch',
-            },
-            variants: 'switch',
-          },
-          {
-            formItemAttr: {
-              label: '超約數值設定',
-              name: 'over',
-              unit: 'kW',
-              inputPattern: 'number',
-              rules: [
-                () => ({
-                  validator(_, value) {
-                    return overValidator(value);
-                  },
-                }),
-              ],
-            },
-            variants: 'input',
-          },
-        ],
-      },
-      {
-        isFrame: true,
-        children: [
-          {
-            formItemAttr: {
-              label: '防逆流',
-              name: 'arc_switch',
-            },
-            variants: 'switch',
-          },
-          {
-            formItemAttr: {
-              label: '逆流數值設定',
-              name: 'reverse',
-              unit: 'kW',
-              inputPattern: 'number',
-              rules: [
-                () => ({
-                  validator(_, value) {
-                    return reverseValidator(value);
-                  },
-                }),
-              ],
-            },
-            variants: 'input',
-          },
-        ],
-      },
-      {
-        isFrame: true,
-        children: [
-          {
-            formItemAttr: {
-              label: '備用電源開關',
-              name: 'back_up_soc_switch',
-            },
-            variants: 'switch',
-          },
-          {
-            formItemAttr: {
-              label: '保留 SOC',
-              name: 'keep_soc',
-              inputPattern: 'number',
-              unit: '%',
-            },
-            variants: 'input',
-          },
-        ],
-      },
-    ],
     advanced: [
       // {
       //   isFrame: true,
@@ -210,14 +102,12 @@ export const formConfig = (formInstance) => {
       //   ],
       // },
       {
-        isFrame: true,
         children: [
           {
             formItemAttr: {
+              inputPattern: 'number',
               label: '最高 SOC',
               name: 'max_soc',
-              unit: '%',
-              inputPattern: 'number',
               rules: [
                 () => ({
                   validator(_, value) {
@@ -225,15 +115,15 @@ export const formConfig = (formInstance) => {
                   },
                 }),
               ],
+              unit: '%',
             },
             variants: 'input',
           },
           {
             formItemAttr: {
+              inputPattern: 'number',
               label: '最低 SOC',
               name: 'min_soc',
-              unit: '%',
-              inputPattern: 'number',
               rules: [
                 () => ({
                   validator(_, value) {
@@ -241,6 +131,7 @@ export const formConfig = (formInstance) => {
                   },
                 }),
               ],
+              unit: '%',
             },
             variants: 'input',
           },
@@ -248,19 +139,19 @@ export const formConfig = (formInstance) => {
             formItemAttr: {
               label: '充放模式',
               name: 'charge_mode',
-              themecategory: 'circle-light',
               options: [
                 { label: '平均分配', value: 'Average Dispatch' },
                 { label: '動態 SOC', value: 'Dynamic Balance SOC' },
               ],
+              themecategory: 'circle-light',
             },
 
             variants: 'select',
           },
         ],
+        isFrame: true,
       },
       {
-        isFrame: true,
         children: [
           {
             formItemAttr: {
@@ -271,10 +162,10 @@ export const formConfig = (formInstance) => {
           },
           {
             formItemAttr: {
+              inputPattern: 'number',
               label: '市電 SOC 上限',
               name: 'gridP_max_soc',
               unit: '%',
-              inputPattern: 'number',
             },
             variants: 'input',
           },
@@ -293,6 +184,115 @@ export const formConfig = (formInstance) => {
             variants: 'switch',
           },
         ],
+        isFrame: true,
+      },
+    ],
+    base: [
+      {
+        children: [
+          {
+            formItemAttr: {
+              label: '運轉狀態',
+              name: 'control_activate',
+            },
+            variants: 'switch',
+          },
+          {
+            formItemAttr: {
+              inputPattern: 'number',
+              label: '契約容量設定',
+              name: 'contract',
+              rules: [
+                () => ({
+                  validator(_, value) {
+                    return contractValidator(value);
+                  },
+                }),
+              ],
+              unit: 'kW',
+            },
+
+            variants: 'input',
+          },
+        ],
+        isFrame: false,
+      },
+      {
+        children: [
+          {
+            formItemAttr: {
+              label: '防超約',
+              name: 'aoc_switch',
+            },
+            variants: 'switch',
+          },
+          {
+            formItemAttr: {
+              inputPattern: 'number',
+              label: '超約數值設定',
+              name: 'over',
+              rules: [
+                () => ({
+                  validator(_, value) {
+                    return overValidator(value);
+                  },
+                }),
+              ],
+              unit: 'kW',
+            },
+            variants: 'input',
+          },
+        ],
+        isFrame: true,
+      },
+      {
+        children: [
+          {
+            formItemAttr: {
+              label: '防逆流',
+              name: 'arc_switch',
+            },
+            variants: 'switch',
+          },
+          {
+            formItemAttr: {
+              inputPattern: 'number',
+              label: '逆流數值設定',
+              name: 'reverse',
+              rules: [
+                () => ({
+                  validator(_, value) {
+                    return reverseValidator(value);
+                  },
+                }),
+              ],
+              unit: 'kW',
+            },
+            variants: 'input',
+          },
+        ],
+        isFrame: true,
+      },
+      {
+        children: [
+          {
+            formItemAttr: {
+              label: '備用電源開關',
+              name: 'back_up_soc_switch',
+            },
+            variants: 'switch',
+          },
+          {
+            formItemAttr: {
+              inputPattern: 'number',
+              label: '保留 SOC',
+              name: 'keep_soc',
+              unit: '%',
+            },
+            variants: 'input',
+          },
+        ],
+        isFrame: true,
       },
     ],
   };
@@ -312,13 +312,13 @@ export async function onSubmit(form) {
       const finalValues = {
         ...values,
         contract: toNullableNumber(values.contract),
-        over: toNullableNumber(values.over),
-        reverse: toNullableNumber(values.reverse),
-        max_p: toNullableNumber(values.max_p),
+        gridP_max_soc: toNullableNumber(values.gridP_max_soc),
         max_c: toNullableNumber(values.max_c),
+        max_p: toNullableNumber(values.max_p),
         max_soc: toNullableNumber(values.max_soc),
         min_soc: toNullableNumber(values.min_soc),
-        gridP_max_soc: toNullableNumber(values.gridP_max_soc),
+        over: toNullableNumber(values.over),
+        reverse: toNullableNumber(values.reverse),
       };
 
       const response = await api.post(endpoints.setting.switch, finalValues);

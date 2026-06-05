@@ -1,13 +1,13 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { useEchartAutoResize } from '@/hooks/useEchartAutoResize';
-import { Flex } from 'antd';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import LegendBage from '@/components/units/legendBage';
+import { useEchartAutoResize } from '@/hooks/useEchartAutoResize';
 import { noDataHandler } from '@/utils/chart';
+import { Flex } from 'antd';
 import { config } from './indexConfig';
-import ScopeStyle from './indexStyle';
 import { useHelpers } from './indexHelper';
+import ScopeStyle from './indexStyle';
 
-export const Chart = ({ name, data = [], isPending }) => {
+export const Chart = ({ data = [], isPending, name }) => {
   const printRef = useRef(null);
   const printChartRef = useRef(null);
 
@@ -21,8 +21,8 @@ export const Chart = ({ name, data = [], isPending }) => {
   const { customLegendOnClick, getChartOption, setChart } = useHelpers({
     name,
     refs: {
-      printRef,
       printChartRef,
+      printRef,
     },
   });
   const option = useMemo(() => getChartOption(), [getChartOption]);
@@ -45,12 +45,12 @@ export const Chart = ({ name, data = [], isPending }) => {
     if (printRef.current && data.length > 0) {
       const newOption = {
         ...option,
+        series: JSON.parse(JSON.stringify(option.series)),
+
         xAxis: {
           ...option.xAxis,
           data: data.map((item) => item.time),
         },
-
-        series: JSON.parse(JSON.stringify(option.series)),
       };
       newOption.series = legendNameMap.map((legend) => {
         let color = legend.bgColor;
@@ -58,18 +58,18 @@ export const Chart = ({ name, data = [], isPending }) => {
         const yAxisIndex = legend.accumulation ? 1 : 0;
 
         return {
-          name: legend.name,
-          type: 'line',
-          symbol: 'none', // 不顯示折線圖的點
-          stack: '',
-          yAxisIndex,
           data: data.map((item) => item?.[legend.name]),
-          lineStyle: {
-            width: 3,
-          },
           itemStyle: {
             color,
           },
+          lineStyle: {
+            width: 3,
+          },
+          name: legend.name,
+          stack: '',
+          symbol: 'none', // 不顯示折線圖的點
+          type: 'line',
+          yAxisIndex,
         };
       });
 
@@ -83,16 +83,15 @@ export const Chart = ({ name, data = [], isPending }) => {
 
   return (
     <ScopeStyle>
-      <div ref={printRef} className="chart-wrapper"></div>
-      <Flex className="mg-y-15" justify="center" wrap gap={20}>
+      <div className="chart-wrapper" ref={printRef}></div>
+      <Flex className="mg-y-15" gap={20} justify="center" wrap>
         {legendNameMap?.map((legend) => {
           const isSelected = state?.customLegend?.[legend.name] !== false;
           return (
             <LegendBage
-              key={legend.name}
-              item={legend}
-              size="lg"
               active={isSelected}
+              item={legend}
+              key={legend.name}
               onClick={() => {
                 customLegendOnClick(
                   legend.name,
@@ -100,6 +99,7 @@ export const Chart = ({ name, data = [], isPending }) => {
                   setState,
                 );
               }}
+              size="lg"
             />
           );
         })}

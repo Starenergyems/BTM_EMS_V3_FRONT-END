@@ -1,15 +1,15 @@
-import { pagesPathName } from '@/router/pagesPathName';
 import ManagementOverview from '@/components/page/managementOverview';
+import { pagesPathName } from '@/router/pagesPathName';
 
 function System() {
-  const { routeName, pathName, pathNameEN } =
+  const { pathName, pathNameEN, routeName } =
     pagesPathName.systemSetting.system;
 
   return (
     <ManagementOverview
+      name={routeName}
       title={pathName}
       titleEn={pathNameEN}
-      name={routeName}
     />
   );
 }

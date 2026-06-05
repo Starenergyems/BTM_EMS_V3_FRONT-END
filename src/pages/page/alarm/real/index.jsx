@@ -1,11 +1,11 @@
-import { pagesPathName } from '@/router';
 import AlarmOverview from '@/components/page/alarmOverview';
+import { pagesPathName } from '@/router';
 
 function Real() {
-  const { routeName, pathName, pathNameEN } = pagesPathName.alarm.real;
+  const { pathName, pathNameEN, routeName } = pagesPathName.alarm.real;
 
   return (
-    <AlarmOverview title={pathName} titleEn={pathNameEN} name={routeName} />
+    <AlarmOverview name={routeName} title={pathName} titleEn={pathNameEN} />
   );
 }
 

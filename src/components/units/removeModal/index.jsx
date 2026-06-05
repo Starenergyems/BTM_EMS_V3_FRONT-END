@@ -12,8 +12,8 @@ function RemoveModal({ children, modalAttr }) {
       maskClosable={false}
       okText="確認刪除"
       styles={{
+        footer: { direction: "rtl", textAlign: "center" },
         header: { textAlign: "center" },
-        footer: { textAlign: "center", direction: "rtl" },
       }}
       title="刪除提示"
       {...modalAttr}

@@ -1,13 +1,13 @@
+import Typography from '@/components/units/typography';
+
+import { ScopeStyle } from './indexStyle';
 import { color } from '@/styles/variable/indexStyle';
 
-import Typography from '@/components/units/typography';
-import { ScopeStyle } from './indexStyle';
-
-export const OuterFrame = ({ title, icon, children }) => {
+export const OuterFrame = ({ children, icon, title }) => {
   return (
     <ScopeStyle>
       <div className="form-header">
-        <Typography size="lg" color={color.themeBlack}>
+        <Typography color={color.themeBlack} size="lg">
           {title}
         </Typography>
         {icon && icon}

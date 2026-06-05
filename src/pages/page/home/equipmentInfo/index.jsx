@@ -1,12 +1,12 @@
 import { useState } from 'react';
+import { Icon } from '@iconify/react/dist/iconify.js';
 import HomeBox from '@/components/units/homeBox';
-import { Flex, Row, Col, Tabs } from 'antd';
-import ScopeStyle from './indexStyle';
 import Typography from '@/components/units/typography';
+import { Col, Flex, Row, Tabs } from 'antd';
 import EquipmentBarChart from './equipmentBarChart/index';
 import EquipmentPieChart from './equipmentPieChart/index';
-import { Icon } from '@iconify/react/dist/iconify.js';
 import { equipmentInfoDatas } from './indexConfig';
+import ScopeStyle from './indexStyle';
 
 function EquipmentInfo({ data, isPending }) {
   const [electricityType, setElectricityType] = useState('bill'); // 累積電費 or 用電佔比
@@ -23,79 +23,79 @@ function EquipmentInfo({ data, isPending }) {
   const BarChart = () => {
     return (
       <EquipmentBarChart
-          type={electricityType}
           data={data}
           isPending={isPending}
+          type={electricityType}
         />
     )
   }
 
   const PieChart = () => {
-    return <EquipmentPieChart type={powerType} data={data} />;
+    return <EquipmentPieChart data={data} type={powerType} />;
   }
 
   const items = [
     {
+      children: BarChart(),
       key: 'bill',
       label: '累積電費',
-      children: BarChart(),
     },
     {
+      children: BarChart(),
       key: 'percentage',
       label: '用電佔比 / 用電度數',
-      children: BarChart(),
     },
   ];
   const items2 = [
     {
+      children: PieChart(),
       key: 'powerSupply',
       label: '供電',
-      children: PieChart(),
     },
     {
+      children: PieChart(),
       key: 'power',
       label: '用電',
-      children: PieChart(),
     },
   ];
   return (
     <ScopeStyle>
       <HomeBox title="設備資訊">
         <Row align="center" gutter={[8, 24]}>
-          <Col xs={24} lg={16}>
+          <Col lg={16} xs={24}>
             <Tabs
               defaultActiveKey="bill"
-              type="card"
               items={items}
               onChange={handleElectricityTypeChange}
+              type="card"
             />
           </Col>
-          <Col xs={24} lg={8}>
+          <Col lg={8} xs={24}>
             <Tabs
               defaultActiveKey="powerSupply"
-              type="card"
               items={items2}
               onChange={handlePowerTypeChange}
+              type="card"
             />
           </Col>
         </Row>
         <Row className="mg-t-5" gutter={[8, 8]}>
           {equipmentInfoDatas?.map((equipment, index) => (
             <Col
-              key={`${equipment.name}_${index}`}
-              xs={24}
-              md={12}
-              xxl={8}
               className="equipmentInfo-item"
+              key={`${equipment.name}_${index}`}
+              md={12}
+              xs={24}
+              xxl={8}
             >
               <Row>
                 <Col xs={10}>
                   <Flex align="center" gap={8}>
                     {equipment.title && (
                       <Icon
-                        icon="material-symbols-light:circle"
-                        fontSize={16}
                         color={equipment.color}
+                        fontSize={16}
+                        icon="material-symbols-light:circle"
                       />
                     )}
                     <Typography size="sm">{equipment.title}</Typography>
@@ -113,7 +113,7 @@ function EquipmentInfo({ data, isPending }) {
                           : 12
                     }
                   >
-                    <Typography size="sm" color={equipment.color}>
+                    <Typography color={equipment.color} size="sm">
                       {data?.[type.name] || '--'}
                       <span className="pd-l-4">
                         {data?.[type.name] && data?.[type.name] !== ''

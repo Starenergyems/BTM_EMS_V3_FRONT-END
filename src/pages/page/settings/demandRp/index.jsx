@@ -1,31 +1,34 @@
-import { useEffect } from 'react';
-import { pagesPathName } from '@/router';
-import { useBoolean } from '@/hooks/useBoolean';
-import { color } from '@/styles/variable/indexStyle';
-import { Form, Row, Col } from 'antd';
+import { useEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
 import { PageBox } from '@/components/units';
+import Button from '@/components/units/button';
 import { OuterFrame } from '@/components/units/outerFrame/index';
 import {
-  renderField,
   getDefaultValues,
+  renderField,
 } from '@/components/widgets/modalForm/indexHelper';
-import ScopeStyle from './indexStyle';
+import { useBoolean } from '@/hooks/useBoolean';
+import { pagesPathName } from '@/router';
+import { Col, Form, Row } from 'antd';
 import { useHelpers } from './indexHelper';
-import Typography from '@/components/units/typography';
-import Button from '@/components/units/button';
 import { ModalOverview } from './modal/index';
+import ScopeStyle from './indexStyle';
 
 function DemandRp() {
   const routeName = pagesPathName.setting.demandRp.pathName;
 
+  const location = useLocation();
+  const navigate = useNavigate();
   const toggle = useBoolean(false);
   const [formInstance] = Form.useForm();
+  const hasInitializedRef = useRef(false);
 
   // 選擇的策略
   const selectedStrategy =
     Form.useWatch('strategy', formInstance) || 'daily_pick_time';
 
-  const { getData, formFields, ExtraFormFields, onSubmit } = useHelpers({
+  const { ExtraFormFields, formFields, getData, onSubmit } = useHelpers({
     formInstance,
     selectedStrategy,
     toggle,
@@ -38,13 +41,45 @@ function DemandRp() {
   }, [selectedStrategy, formInstance]);
 
   useEffect(() => {
-    if (selectedStrategy) {
-      getData();
-    }
-  }, [selectedStrategy]);
+    if (hasInitializedRef.current) return;
+    hasInitializedRef.current = true;
 
+    const nextPrefillEvent = location.state?.prefillEvent || {};
+
+    const prefillValues = {
+      ...nextPrefillEvent,
+      range: [
+        dayjs(nextPrefillEvent.sign_start_date),
+        dayjs(nextPrefillEvent.sign_end_date),
+      ],
+      sign_end_date: dayjs(nextPrefillEvent.sign_end_date).format('YYYY-MM-DD'),
+      sign_start_date: dayjs(nextPrefillEvent.sign_start_date).format(
+        'YYYY-MM-DD',
+      ),
+    };
+
+    // 先套用 prefill，避免首屏閃動與後續被 API 蓋掉
+    if (Object.keys(nextPrefillEvent).length > 0) {
+      formInstance.setFieldsValue(prefillValues);
+    }
+
+    getData(prefillValues);
+
+    if (!nextPrefillEvent) return;
+
+    navigate(location.pathname, { replace: true, state: null });
+  }, [
+    formInstance,
+    getData,
+    location.pathname,
+    location.state,
+    navigate,
+    selectedStrategy,
+  ]);
+
+  const strategyName = ExtraFormFields?.[selectedStrategy]?.title;
   return (
-    <PageBox headerTitle={`${routeName} VPP Demand Response`}>
+    <PageBox headerTitle={`${routeName} Demand Response`}>
       <ScopeStyle>
         <Form
           form={formInstance}
@@ -54,9 +89,9 @@ function DemandRp() {
             <div className="item">
               {formFields()?.map((item, idx) => (
                 <Col
+                  key={`form-item-${idx}`}
                   lg={{ span: idx === 0 ? 6 : 8 }}
                   span={24}
-                  key={`form-item-${idx}`}
                 >
                   <Form.Item {...item.formItemAttr}>
                     {renderField(item)}
@@ -65,18 +100,9 @@ function DemandRp() {
               ))}
             </div>
           </OuterFrame>
-          <OuterFrame title={'需量類型'}>
-            <Row className="item">
-              <Col lg={{ span: 6 }} span={24} className="mg-y-20">
-                <Typography
-                  md={{ size: 'sm' }}
-                  size="md"
-                  color={color.themeBlack}
-                >
-                  {ExtraFormFields?.[selectedStrategy]?.title}
-                </Typography>
-              </Col>
-              <Col lg={{ span: 8 }} span={24}>
+          <OuterFrame title={strategyName || '需量類型'}>
+            <Row justify="center">
+              <Col span={8}>
                 {ExtraFormFields?.[selectedStrategy]?.formEields?.map(
                   (item, idx) => (
                     <Form.Item
@@ -90,13 +116,13 @@ function DemandRp() {
               </Col>
             </Row>
             <div className="center-btn">
-              <Button size="md" type="primary" onClick={() => onSubmit()}>
+              <Button onClick={() => onSubmit()} size="md" type="primary">
                 送出
               </Button>
             </div>
           </OuterFrame>
         </Form>
-        <ModalOverview toggle={toggle}  />
+        <ModalOverview toggle={toggle} />
       </ScopeStyle>
     </PageBox>
   );

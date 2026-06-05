@@ -1,24 +1,24 @@
 import { useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { api } from '@/slices/api/setting';
-import { endpoints } from '@/utils/endpoints';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
-import { Form } from 'antd';
-import { errorMsgHandler } from '@/utils/helpers';
+import { v4 as uuidv4 } from 'uuid';
 import { getDefaultValues } from '@/components/widgets/modalForm/indexHelper';
+import { api } from '@/slices/api/setting';
+import { endpoints } from '@/utils/endpoints';
+import { errorMsgHandler } from '@/utils/helpers';
+import { Form } from 'antd';
 
 import { config } from '../indexConfig';
 import { ExtraFormFields } from './indexConfig';
 
 export const useHelpers = ({
+  events,
   formInstance,
   formSecInstance,
-  list,
-  setList,
-  events,
-  setFavList,
   getEventData,
+  list,
+  setFavList,
+  setList,
 }) => {
   const strategy = Form.useWatch('strategy', formInstance);
   const fav = Form.useWatch('fav', formSecInstance);
@@ -37,8 +37,8 @@ export const useHelpers = ({
     if (fav === 'no') {
       formSecInstance?.setFields([
         {
-          name: 'name',
           errors: [],
+          name: 'name',
         },
       ]);
     }
@@ -50,8 +50,8 @@ export const useHelpers = ({
       formSecInstance?.setFieldsValue({ fav: 'no', name: undefined });
       formSecInstance?.setFields([
         {
-          name: 'name',
           errors: [],
+          name: 'name',
         },
       ]);
     }
@@ -64,27 +64,34 @@ export const useHelpers = ({
   const formFields = () => {
     return [
       {
-        formItemAttr: {
-          label: '日期',
-          name: 'range',
-          defaultValue: [dayjs(new Date()), dayjs(new Date())],
-          rules: [{ required: true, message: '請選擇日期' }],
-        },
-        variants: 'rangePicker',
         componentProps: {
           inputAttr: {
             placeholder: '請選擇日期',
           },
         },
+        formItemAttr: {
+          defaultValue: [dayjs(new Date()), dayjs(new Date())],
+          label: '日期',
+          name: 'range',
+          rules: [{ message: '請選擇日期', required: true }],
+        },
+        variants: 'rangePicker',
       },
       {
+        componentProps: {
+          inputAttr: {
+            minuteStep: 30,
+            placeholder: '請選擇時段',
+            // inputReadOnly: true,
+          },
+        },
         formItemAttr: {
+          defaultValue: [startTime, endTime],
+          format: 'HH:mm',
           label: '時段',
           name: 'time',
-          format: 'HH:mm',
-          defaultValue: [startTime, endTime],
           rules: [
-            { required: true, message: '請選擇時段' },
+            { message: '請選擇時段', required: true },
             {
               validator: (_, value) => {
                 if (!value) return Promise.resolve();
@@ -92,7 +99,7 @@ export const useHelpers = ({
                 if (!range || !range[0] || !range[1]) return Promise.resolve();
 
                 try {
-                  const { startAt, endAt } = getScheduleRange({
+                  const { endAt, startAt } = getScheduleRange({
                     range,
                     time: value,
                   });
@@ -107,24 +114,12 @@ export const useHelpers = ({
           ],
         },
         variants: 'timerangepicker',
-        componentProps: {
-          inputAttr: {
-            placeholder: '請選擇時段',
-            minuteStep: 30,
-            inputReadOnly: true,
-          },
-        },
       },
       {
-        formItemAttr: {
-          label: '服務模式',
-          name: 'strategy',
-          defaultValue: 'arbitrage',
-          rules: [{ required: true, message: '請選擇服務模式' }],
-        },
-        variants: 'select',
         componentProps: {
-          themecategory: 'circle-light',
+          inputAttr: {
+            placeholder: '請選擇服務模式',
+          },
           options: config
             .filter((el) => el.strategy !== 'idle')
             .map((el) => ({
@@ -132,10 +127,15 @@ export const useHelpers = ({
               value: el.strategy,
             })),
 
-          inputAttr: {
-            placeholder: '請選擇服務模式',
-          },
+          themecategory: 'circle-light',
         },
+        formItemAttr: {
+          defaultValue: 'arbitrage',
+          label: '服務模式',
+          name: 'strategy',
+          rules: [{ message: '請選擇服務模式', required: true }],
+        },
+        variants: 'select',
       },
       ...(strategy && ExtraFormFields[strategy]
         ? ExtraFormFields[strategy]
@@ -147,13 +147,6 @@ export const useHelpers = ({
   const favFormFields = () => {
     return [
       {
-        formItemAttr: {
-          label: '新增至常用清單',
-          name: 'fav',
-          disabled: !isListAllSameDay,
-          themecategory: 'circle-light',
-        },
-        variants: 'select',
         componentProps: {
           defaultValue: 'no',
           options: [
@@ -167,15 +160,26 @@ export const useHelpers = ({
             },
           ],
         },
+        formItemAttr: {
+          disabled: !isListAllSameDay,
+          label: '新增至常用清單',
+          name: 'fav',
+          themecategory: 'circle-light',
+        },
+        variants: 'select',
       },
       {
-        id: 'name',
+        componentProps: {
+          inputAttr: {
+            placeholder: '請輸入項目名稱',
+          },
+        },
         formItemAttr: {
+          disabled: fav !== 'yes',
           label: '項目名稱',
           name: 'name',
-          disabled: fav !== 'yes',
           rules: [
-            { required: fav === 'yes', message: '請輸入項目名稱' },
+            { message: '請輸入項目名稱', required: fav === 'yes' },
             {
               validator: (_, value) => {
                 if (!value) return Promise.resolve();
@@ -190,12 +194,8 @@ export const useHelpers = ({
             },
           ],
         },
+        id: 'name',
         variants: 'input',
-        componentProps: {
-          inputAttr: {
-            placeholder: '請輸入項目名稱',
-          },
-        },
       },
     ];
   };
@@ -277,7 +277,7 @@ export const useHelpers = ({
       endAt = endAt.add(1, 'day');
     }
 
-    return { startAt, endAt, isFullDay };
+    return { endAt, isFullDay, startAt };
   };
 
   // 判斷是否與現有日曆時間衝突
@@ -342,21 +342,21 @@ export const useHelpers = ({
       const dailyRanges = getDailyScheduleRanges(values);
 
       const formattedValuesList = dailyRanges.map(
-        ({ startAt, endAt, isFullDay }) => {
+        ({ endAt, isFullDay, startAt }) => {
           assertRangeGreaterThan30Minutes(startAt, endAt);
           assertNoEventConflict(startAt, endAt);
           assertNoListConflict(startAt, endAt);
 
           return {
-            id: uuidv4(),
-            // title: config.find((c) => c.strategy === values.strategy)?.title || '',
-            start: startAt.format('YYYY-MM-DD HH:mm'),
-            end: endAt.format('YYYY-MM-DD HH:mm'),
             allDay: isFullDay,
+            end: endAt.format('YYYY-MM-DD HH:mm'),
             extendedProps: {
               ...values,
               strategy: values.strategy,
             },
+            id: uuidv4(),
+            // title: config.find((c) => c.strategy === values.strategy)?.title || '',
+            start: startAt.format('YYYY-MM-DD HH:mm'),
           };
         },
       );
@@ -389,11 +389,11 @@ export const useHelpers = ({
         if (isFav) {
           const payload = {
             [values.name]: list?.map((item) => ({
-              start: dayjs(item.start).format('HH:mm'),
               end: dayjs(item.end).format('HH:mm'),
               extendedProps: {
                 ...item.extendedProps,
               },
+              start: dayjs(item.start).format('HH:mm'),
             })),
           };
 
@@ -437,11 +437,11 @@ export const useHelpers = ({
   }
 
   return {
-    getFavList,
-    formFields,
-    favFormFields,
     addListHandler,
+    favFormFields,
+    formFields,
     getDefaultValuesHandler,
+    getFavList,
     handleDelete,
     onSubmit,
   };

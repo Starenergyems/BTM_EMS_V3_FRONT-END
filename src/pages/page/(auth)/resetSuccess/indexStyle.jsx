@@ -1,5 +1,5 @@
-import { Flex } from "antd";
 import styled from "styled-components";
+import { Flex } from "antd";
 import { color } from "@/styles/variable/indexStyle";
 
 const style = styled(Flex)`

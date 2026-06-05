@@ -1,6 +1,6 @@
 import { css } from 'styled-components';
-import { color } from '@/styles/variable/indexStyle';
 import { hexToRgba } from '@/styles/function';
+import { color } from '@/styles/variable/indexStyle';
 
 /* Badge */
 const badgeStyles = css`

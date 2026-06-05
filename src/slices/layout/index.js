@@ -8,8 +8,8 @@ const layoutState = {
 };
 
 const layoutSlice = createSlice({
-  name: 'layout',
   initialState: layoutState,
+  name: 'layout',
   reducers: {
     setBackground(state, action) {
       state.background = action.payload;

@@ -1,17 +1,17 @@
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { Icon } from '@iconify/react';
-import { formatTimestamp } from '@/utils/format';
-import { omRole } from '@/slices/api/main/accounts/index';
-import { Flex, Tooltip } from 'antd';
 import Button from '@/components/units/button';
+import { omRole } from '@/slices/api/main/accounts/index';
+import { formatTimestamp } from '@/utils/format';
+import { Flex, Tooltip } from 'antd';
 import { statusValues } from './indexConfig';
 
 // useHelpers 為最外層 function，function 內區塊的撰寫順序由上而下為：
 // 1. useCallback 需要相依的 function
 // 2. api function
 // 3. 一般 function
-function useHelpers({ state, setState, name, toggle, setisEdit }) {
+function useHelpers({ name, setisEdit, setState, state, toggle }) {
   const accountsState = useSelector((state) => state.accounts);
   const isSuperUser = accountsState?.omRole === omRole.superUser.value;
 
@@ -33,69 +33,69 @@ function useHelpers({ state, setState, name, toggle, setisEdit }) {
   function getColumnDatas() {
     return [
       {
+        align: 'center',
         dataIndex: 'name',
+        render: (value) => value || '--',
         title: '姓名',
-        align: 'center',
-        render: (value) => value || '--',
       },
       {
+        align: 'center',
         dataIndex: 'permission',
-        title: '權限等級',
-        align: 'center',
         render: (value) => value || '--',
+        title: '權限等級',
       },
       {
-        dataIndex: 'status',
-        title: '帳號狀態',
         align: 'center',
+        dataIndex: 'status',
         render: (value) => statusValues[value] || '--',
+        title: '帳號狀態',
       },
 
       {
-        dataIndex: 'note',
-        title: '附註',
         align: 'center',
+        dataIndex: 'note',
         render: (value) => value || '--',
+        title: '附註',
       },
       {
-        dataIndex: 'lasttime',
-        title: '最後登入時間',
         align: 'center',
+        dataIndex: 'lasttime',
         render: (value) => formatTimestamp(value),
+        title: '最後登入時間',
       },
       name === 'permissionManagement' && isSuperUser
         ? {
-            dataIndex: 'action',
-            title: '',
             align: 'center',
-            fixed: 'right',
             className: 'edit-column',
+            dataIndex: 'action',
+            fixed: 'right',
             render: () => (
-              <Flex justify="center" align="center" gap={8}>
+              <Flex align="center" gap={8} justify="center">
                 <Tooltip title="編輯帳號">
                   <Button
-                    variant="icon"
                     onClick={() => {
                       toggle.onTrue();
                       setisEdit(true);
                     }}
+                    variant="icon"
                   >
-                    <Icon icon="fa6-solid:pen" fontSize="20" />
+                    <Icon fontSize="20" icon="fa6-solid:pen" />
                   </Button>
                 </Tooltip>
                 <Tooltip title="刪除帳號">
                   <Button
-                    variant="icon"
                     onClick={() => {
                       toggle.onTrue();
                       setisEdit(true);
                     }}
+                    variant="icon"
                   >
-                    <Icon icon="mdi:garbage" fontSize="24" />
+                    <Icon fontSize="24" icon="mdi:garbage" />
                   </Button>
                 </Tooltip>
               </Flex>
             ),
+            title: '',
           }
         : {},
     ];
@@ -120,8 +120,8 @@ function useHelpers({ state, setState, name, toggle, setisEdit }) {
 
   return {
     getColumnDatas,
-    setTableLoading,
     handleSelectChange,
+    setTableLoading,
   };
 }
 

@@ -1,24 +1,26 @@
-import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { useLocation, useNavigate } from 'react-router-dom';
 import moment from 'moment';
-import { pagesPathName } from '@/router';
-import { useBoolean } from '@/hooks/useBoolean';
 import { PageBox } from '@/components/units';
-import { Card, Col, Row, Tooltip } from 'antd';
 import Typography from '@/components/units/typography';
-import ScopeStyle from './indexStyle';
-import { ModalOverview } from './modal/index';
+import { useBoolean } from '@/hooks/useBoolean';
+import { pagesPathName } from '@/router';
+import { Card, Col, Row, Tooltip } from 'antd';
 import { FormOverview } from './formOverview/index';
 import { ExtraFormFields, ExtraLabels } from './formOverview/indexConfig';
 import { useHelpers } from './indexHelper';
-
+import { ModalOverview } from './modal/index';
+import ScopeStyle from './indexStyle';
 
 moment.locale('en-GB');
 const localizer = momentLocalizer(moment);
 
 function Schedule() {
   const routeName = pagesPathName.setting.schedule.pathName;
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const toggle = useBoolean(false);
 
@@ -26,12 +28,14 @@ function Schedule() {
   const [date, setDate] = useState(new Date());
   const [view, setView] = useState('month');
   const [calevents, setCalEvents] = useState([]);
+  const [prefillEvent, setPrefillEvent] = useState(null);
+  const [prefillVersion, setPrefillVersion] = useState(0);
 
-  const { getEventData, delEvent, handleDelete, eventColors } = useHelpers({
+  const { delEvent, eventColors, getEventData, handleDelete } = useHelpers({
     calevents,
+    eventIndex,
     setCalEvents,
     setEventIndex,
-    eventIndex,
     toggle,
   });
 
@@ -39,6 +43,36 @@ function Schedule() {
     getEventData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // 預填事件處理邏輯(from chatbot tool)
+  useEffect(() => {
+    const nextPrefillEvent = location.state?.prefillEvent;
+
+    if (!nextPrefillEvent) return;
+
+    setPrefillEvent(nextPrefillEvent);
+    setPrefillVersion((prev) => prev + 1);
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location.pathname, location.state, navigate]);
+
+  const prefillList = useMemo(() => {
+    if (!prefillEvent) return [];
+
+    const toNormalised = (item) => {
+      if (!item || typeof item !== 'object') return null;
+      // 如果已有 extendedProps 結構就直接用，否則把 item 扁平包進去
+      if (item.extendedProps) return item;
+      const { end, start, ...rest } = item;
+      return {
+        end: end ?? null,
+        extendedProps: rest,
+        start: start ?? null,
+      };
+    };
+
+    const raw = Array.isArray(prefillEvent) ? prefillEvent : [prefillEvent];
+    return raw.map(toNormalised).filter(Boolean);
+  }, [prefillEvent]);
 
   const CustomEvent = ({ event }) => {
     const strategy = event?.extendedProps?.strategy;
@@ -91,38 +125,43 @@ function Schedule() {
   return (
     <ScopeStyle>
       <PageBox headerTitle={`${routeName} Operation Scheduling`}>
-        <Row gutter={20} className="calendar-wrap">
-          <Col xxl={6} xl={7} xs={24}>
-            <FormOverview events={calevents} getEventData={getEventData} />
+        <Row className="calendar-wrap" gutter={20}>
+          <Col xl={7} xs={24} xxl={6}>
+            <FormOverview
+              events={calevents}
+              getEventData={getEventData}
+              initialList={prefillList}
+              key={`prefill-${prefillVersion}`}
+            />
           </Col>
-          <Col xxl={18} xl={17} xs={24}>
+          <Col xl={17} xs={24} xxl={18}>
             <Card>
               <Calendar
-                selectable
+                components={{ event: CustomEvent }}
+                date={date}
+                defaultDate={new Date()}
+                defaultView="month"
+                eventPropGetter={(event) => eventColors(event)}
                 events={calevents.map((event) => ({
                   ...event,
-                  start: new Date(event.start),
                   end: new Date(event.end),
+                  start: new Date(event.start),
                 }))}
-                defaultView="month"
-                views={['month', 'day', 'agenda']}
-                date={date}
+                localizer={localizer}
                 onNavigate={(newDate) => setDate(newDate)}
-                view={view}
+                onSelectEvent={(event) => delEvent(event)}
                 onView={(newView) => setView(newView)}
                 scrollToTime={new Date(1970, 1, 1, 6)}
-                defaultDate={new Date()}
-                localizer={localizer}
+                selectable
                 style={{ height: 'calc(100vh - 300px)', minHeight: '600px' }}
-                onSelectEvent={(event) => delEvent(event)}
-                eventPropGetter={(event) => eventColors(event)}
-                components={{ event: CustomEvent }}
+                view={view}
+                views={['month', 'day', 'agenda']}
               />
             </Card>
           </Col>
         </Row>
 
-        <ModalOverview toggle={toggle} handleDelete={handleDelete} />
+        <ModalOverview handleDelete={handleDelete} toggle={toggle} />
       </PageBox>
     </ScopeStyle>
   );

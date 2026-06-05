@@ -14,8 +14,8 @@ const createReducerStore = (reducer, initialState) => {
     };
   };
   return {
-    getSnapshot,
     dispatch,
+    getSnapshot,
     subscribe,
   };
 };

@@ -1,17 +1,23 @@
-import { useState, useEffect, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { format, subDays } from 'date-fns';
-import { Row, Col, Flex } from 'antd';
+import { Chart } from '@/components/page/billOverview/chart';
 import { PageBox } from '@/components/units';
 import { Select } from '@/components/units';
-import ScopeStyle from '../../../pages/page/bill/indexStyle';
 import DatePicker from '@/components/units/datePicker';
-import TransparentCard from '@/components/units/transparentCard';
-import { Chart } from '@/components/page/billOverview/chart';
 import { InfoCard } from '@/components/units/infoCard';
-import { systemConfig, selectOptions } from './indexConfig';
-import { useHelpers } from './indexHelper';
+import TransparentCard from '@/components/units/transparentCard';
+import { Col, Flex, Row } from 'antd';
 
-export const BillOverview = ({ title, titleEn, name }) => {
+import { selectOptions, systemConfig } from './indexConfig';
+import { useHelpers } from './indexHelper';
+import ScopeStyle from '../../../pages/page/bill/indexStyle';
+
+export const BillOverview = ({ name, title, titleEn }) => {
+
+  console.log('name', name, systemConfig);
+
+
+  
   const configName = systemConfig?.[name];
 
   const [isPending, startTransition] = useTransition();
@@ -46,38 +52,38 @@ export const BillOverview = ({ title, titleEn, name }) => {
   return (
     <PageBox headerTitle={`${title}電費計算 ${titleEn}`}>
       <ScopeStyle>
-        <Flex align="center" wrap gap={12}>
+        <Flex align="center" gap={12} wrap>
           <Select
-            size="sm"
             defaultValue="day"
-            options={selectOptions}
             onChange={handleSelectChange}
+            options={selectOptions}
+            size="sm"
           />
           <DatePicker
             className="mg-t-20 mg-b-20"
-            size="sm"
-            picker={range}
             defaultValue={timeUnit[range]}
             onChange={onChange}
+            picker={range}
+            size="sm"
           />
         </Flex>
         <TransparentCard theme="dark">
-          <Chart name={name} data={state?.chartData} isPending={isPending} />
+          <Chart data={state?.chartData} isPending={isPending} name={name} />
         </TransparentCard>
-        <Row gutter={[24, 24]} className="mg-t-20">
+        <Row className="mg-t-20" gutter={[24, 24]}>
           {configName &&
             configName.config.map((item, itemIndex) => (
               <Col
                 key={`card_${itemIndex}`}
-                xs={24}
-                md={configName?.config.length > 3 && 12}
                 lg={configName?.config.length > 3 ? 6 : 8}
+                md={configName?.config.length > 3 && 12}
+                xs={24}
               >
                 <InfoCard
+                  color={configName?.color}
+                  icon={item.icon}
                   title={item.title}
                   value={state?.[item.name]}
-                  icon={item.icon}
-                  color={configName?.color}
                 />
               </Col>
             ))}

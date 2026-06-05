@@ -1,21 +1,21 @@
 import { useEffect, useState, useTransition } from 'react';
 import { format } from 'date-fns';
-import { color } from '@/styles/variable/indexStyle';
-import { pagesPathName } from '@/router';
-import { Flex, Row, Col } from 'antd';
 import { PageBox } from '@/components/units';
 import { Select } from '@/components/units';
+import { ExcelButton } from '@/components/units/button/download/excelButton';
 import DatePicker from '@/components/units/datePicker';
-import Typography from '@/components/units/typography';
 import TransparentCard from '@/components/units/transparentCard';
+import Typography from '@/components/units/typography';
+import { pagesPathName } from '@/router';
+import { Col, Flex, Row } from 'antd';
 import { Chart } from './chart/index';
+import { config } from './chart/indexConfig';
+import { selectOptions, totalConfig } from './indexConfig';
+import { useHelpers } from './indexHelper';
 import { ReportTable } from './table/index';
 import ScopeStyle from '../indexStyle';
 import Style from './indexStyle';
-import { useHelpers } from './indexHelper';
-import { selectOptions, totalConfig } from './indexConfig';
-import { config } from './chart/indexConfig';
-import { ExcelButton } from '@/components/units/button/download/excelButton';
+import { color } from '@/styles/variable/indexStyle';
 
 function Report() {
   const routeName = pagesPathName.bill.report.pathName;
@@ -29,9 +29,9 @@ function Report() {
   });
   const [range, setRange] = useState('day');
 
-  const { getDatas, exportToExcelChartHandler } = useHelpers({
-    setState,
+  const { exportToExcelChartHandler, getDatas } = useHelpers({
     range,
+    setState,
   });
 
   useEffect(() => {
@@ -53,25 +53,25 @@ function Report() {
       <ScopeStyle>
         <Style>
           <Flex
-            className="mg-t-20 mg-b-20"
             align="center"
+            className="mg-t-20 mg-b-20"
+            gap={12}
             justify="space-between"
             md={{ wrap: 'row' }}
             wrap
-            gap={12}
           >
-            <Flex align="center" wrap gap={12}>
+            <Flex align="center" gap={12} wrap>
               <Select
-                size="sm"
                 defaultValue="day"
-                options={selectOptions}
                 onChange={handleSelectChange}
+                options={selectOptions}
+                size="sm"
               />
               <DatePicker
-                size="sm"
-                picker={range}
                 defaultValue={timeUnit[range]}
                 onChange={onChange}
+                picker={range}
+                size="sm"
               />
             </Flex>
 
@@ -91,12 +91,12 @@ function Report() {
           </TransparentCard>
           <Row className="mg-y-20" gutter={[30, 30]}>
             {totalConfig.map((item) => (
-              <Col lg={{ span: 8 }} span={24} key={item.name}>
+              <Col key={item.name} lg={{ span: 8 }} span={24}>
                 <Flex
-                  className="total-item"
-                  justify="space-between"
                   align="center"
+                  className="total-item"
                   direction="column"
+                  justify="space-between"
                 >
                   <Typography>{item.title}</Typography>
                   <Typography color={color.lightBlue} weight="600">
@@ -109,8 +109,8 @@ function Report() {
 
           <ReportTable
             data={state.data?.chartData}
-            isPending={isPending}
             date={state.data?.date}
+            isPending={isPending}
             type={range}
           />
         </Style>

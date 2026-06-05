@@ -1,17 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEchartAutoResize } from '@/hooks/useEchartAutoResize';
 import { Card, Flex, Segmented, Table } from 'antd';
-import { color } from '@/styles/variable/indexStyle';
+import { customLegendNameMap } from './indexConfig';
 import { useHelpers } from './indexHelper';
 import ScopeStyle from './indexStyle';
-import { customLegendNameMap } from './indexConfig';
-import { useEchartAutoResize } from '@/hooks/useEchartAutoResize';
+import { color } from '@/styles/variable/indexStyle';
 
 function ServiceProduct() {
   const [mainState, setMainState] = useState({
-    serviceProductStatus: 'realTimeSpinningReserve',
-    serviceProductTableData: [],
     isServiceProductTableLoading: false,
     serviceProductData: [],
+    serviceProductStatus: 'realTimeSpinningReserve',
+    serviceProductTableData: [],
   });
   const realTimeSpinningReservePowerRef = useRef(null);
   const realTimeSpinningReservePowerChartRef = useRef(null);
@@ -21,15 +21,15 @@ function ServiceProduct() {
   );
   const {
     customLegendOnClick,
+    getRealTimeSpinningReservePowerOption,
     getServiceProductData,
     getSpmTableColumns,
-    getRealTimeSpinningReservePowerOption,
     setRealTimeSpinningReservePowerChart,
   } = useHelpers({
     mainState,
     refs: {
-      realTimeSpinningReservePowerRef,
       realTimeSpinningReservePowerChartRef,
+      realTimeSpinningReservePowerRef,
     },
     setMainState,
   });
@@ -113,20 +113,20 @@ function ServiceProduct() {
         <div className="real-time-spinning-reserve-segmented">
           <Segmented
             defaultValue={mainState.serviceProductStatus}
-            options={[{ label: '即時備轉', value: 'realTimeSpinningReserve' }]}
             onChange={(value) => {
               setMainState((prevState) => ({
                 ...prevState,
                 serviceProductStatus: value,
               }));
             }}
+            options={[{ label: '即時備轉', value: 'realTimeSpinningReserve' }]}
           />
         </div>
       </Flex>
       <Card className="mg-t-16">
         <div
-          ref={realTimeSpinningReservePowerRef}
           className="revenue-sharing-bar-stack-chart"
+          ref={realTimeSpinningReservePowerRef}
         ></div>
       </Card>
       <Flex className="custom-legend mg-t-50-minus" gap={16} justify="center">

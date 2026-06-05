@@ -1,23 +1,33 @@
+import { useEffect } from 'react';
+import { Icon } from '@iconify/react';
 import FlowImage from '@/assets/img/home/flow.png';
 import FlowingImage from '@/assets/img/home/flowing.gif';
-import { Icon } from '@iconify/react';
-import { color } from '@/styles/variable/indexStyle';
-import { Flex, Space, Col, Tooltip } from 'antd';
 import Typography from '@/components/units/typography';
+import { equipmentDatas } from '@/pages/page/home/equipmentConfiguration/indexConfig';
 import TimeStatus from '@/pages/page/home/timeStatus';
 import { statusData } from '@/pages/page/home/timeStatus/indexConfig';
-import { equipmentDatas } from '@/pages/page/home/equipmentConfiguration/indexConfig';
-import ScopeStyle from './indexStyle';
+import { Col, Flex, Space, Tooltip } from 'antd';
 import { flowDatas } from './indexConfig';
+import ScopeStyle from './indexStyle';
+import { color } from '@/styles/variable/indexStyle';
 
-function Flow({ data, detailDatas }) {
+function Flow({ data, detailDatas, getFlowDatas }) {
+  useEffect(() => {
+    getFlowDatas(); // 首次執行
+
+    const timer = setInterval(() => {
+      getFlowDatas(); // 每 30 秒只呼叫這個
+    }, 30000);
+
+    return () => clearInterval(timer);
+  }, []);
   return (
     <ScopeStyle>
       <div className="flow-container">
         <img
+          alt="flow png"
           className="flow-image"
           src={FlowImage}
-          alt="flow png"
           style={{ width: '100%' }}
         />
 
@@ -35,28 +45,28 @@ function Flow({ data, detailDatas }) {
 
           const flowBox = (
             <Flex
-              key={`${flow.name}_${idx}`}
               align="center"
-              justify={flow?.hasSoc ? 'space-around' : 'center'}
               className={`flow-box ${flow.name}`}
+              justify={flow?.hasSoc ? 'space-around' : 'center'}
+              key={`${flow.name}_${idx}`}
             >
               <DetailValue
-                flow={flow}
-                statusColor={statusColor}
                 data={data}
+                flow={flow}
                 soc={false}
+                statusColor={statusColor}
               />
               {flow?.hasSoc && (
                 <DetailValue
-                  flow={{ name: `soc`, title: 'SOC', unit: '%' }}
-                  statusColor={statusColor}
                   data={{
                     soc: {
-                      value: data?.[flow.name]?.soc,
                       status: data?.[flow.name]?.status,
+                      value: data?.[flow.name]?.soc,
                     },
                   }}
+                  flow={{ name: `soc`, title: 'SOC', unit: '%' }}
                   soc={true}
+                  statusColor={statusColor}
                 />
               )}
             </Flex>
@@ -66,21 +76,25 @@ function Flow({ data, detailDatas }) {
             <div key={`${flow.name}_${idx}`}>
               {data?.[flow.name]?.status !== 4 && (
                 <img
+                  alt="flowing gif"
                   className={`flowing-image ${flow.name}_flowing`}
                   src={FlowingImage}
-                  alt="flowing gif"
                 />
               )}
               {data?.[flow.name]?.status === 4 && flow.noDataImage && (
                 <img
+                  alt="no data"
                   className={`noData-image ${flow.name}_noData`}
                   src={flow.noDataImage}
-                  alt="no data"
                 />
               )}
               {detailLabel ? (
                 <Tooltip
+                  align={{ offset: [0, -10] }}
                   placement="bottom"
+                  style={{
+                    maxWidth: '100%',
+                  }}
                   title={
                     <Flex gap={8}>
                       {detailLabel.children?.map((child, idx) => (
@@ -92,10 +106,6 @@ function Flow({ data, detailDatas }) {
                       ))}
                     </Flex>
                   }
-                  align={{ offset: [0, -10] }}
-                  style={{
-                    maxWidth: '100%',
-                  }}
                 >
                   {flowBox}
                 </Tooltip>
@@ -106,25 +116,25 @@ function Flow({ data, detailDatas }) {
           );
         })}
       </div>
-      <Col xs={24} xl={0} className="pd-l-40 mg-t-50 mg-b-44">
+      <Col className="pd-l-40 mg-t-50 mg-b-44" xl={0} xs={24}>
         <TimeStatus data={data?.timestamp} />
       </Col>
     </ScopeStyle>
   );
 }
 
-const DetailValue = ({ flow, statusColor, data, soc }) => {
+const DetailValue = ({ data, flow, soc, statusColor }) => {
   const renderColor =
     data?.[flow.name]?.status > 0 ? statusColor : color.buttonGray;
   return (
-    <Space direction="vertical" gap={{ xs: 8, sm: 10, md: 12, lg: 14 }}>
-      <Flex align="center" justify="center" gap={10}>
+    <Space direction="vertical" gap={{ lg: 14, md: 12, sm: 10, xs: 8 }}>
+      <Flex align="center" gap={10} justify="center">
         {!soc && (
-          <Icon icon={flow.icon} fontSize={flow.iconSize} color={renderColor} />
+          <Icon color={renderColor} fontSize={flow.iconSize} icon={flow.icon} />
         )}
         <Typography color={renderColor}>{flow.title}</Typography>
       </Flex>
-      <Typography size="xl" color={statusColor}>
+      <Typography color={statusColor} size="xl">
         {data?.[flow.name]?.value ?? '--'}
         <span className="pd-l-5">{flow.unit}</span>
       </Typography>

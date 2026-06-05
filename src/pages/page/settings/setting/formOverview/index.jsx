@@ -1,10 +1,10 @@
-import { color } from '@/styles/variable/indexStyle';
-import { Form } from 'antd';
-import Typography from '@/components/units/typography';
-import { ScopeStyle } from './indexStyle';
 import Button from '@/components/units/button';
+import Typography from '@/components/units/typography';
 import { renderField } from '@/components/widgets/modalForm/indexHelper';
+import { Form } from 'antd';
 import { formConfig, onSubmit } from './indexHelper';
+import { ScopeStyle } from './indexStyle';
+import { color } from '@/styles/variable/indexStyle';
 
 export const FormOverview = ({ formInstance, title, type }) => {
   const config = formConfig(formInstance)[type] || [];
@@ -12,7 +12,7 @@ export const FormOverview = ({ formInstance, title, type }) => {
   return (
     <ScopeStyle>
       <div className="form-header">
-        <Typography size="lg" color={color.themeBlack}>
+        <Typography color={color.themeBlack} size="lg">
           {title}
         </Typography>
       </div>
@@ -35,7 +35,7 @@ export const FormOverview = ({ formInstance, title, type }) => {
             </div>
           ))}
         </div>
-        <Button size="md" type="primary" onClick={() => onSubmit(formInstance)}>
+        <Button onClick={() => onSubmit(formInstance)} size="md" type="primary">
           <Typography size="lg">儲存</Typography>
         </Button>
       </div>

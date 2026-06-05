@@ -1,6 +1,5 @@
 import { forwardRef } from 'react';
 import { TimePicker as AntdTimePicker } from 'antd';
-import dayjs from 'dayjs';
 import ScopeStyle from './indexStyle';
 
 const format = 'HH:mm:ss';

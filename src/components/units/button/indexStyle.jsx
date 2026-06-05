@@ -3,6 +3,12 @@ import { color } from '@/styles/variable/indexStyle';
 
 const getVariantStyle = (variant) => {
   switch (variant) {
+    case 'default':
+      return `
+        color: ${color.white};
+        background: ${color.buttonGray} !important;
+        border: 0 !important;
+      `;
     case 'icon':
       return `
         width: auto;
@@ -14,12 +20,6 @@ const getVariantStyle = (variant) => {
           background: transparent;
         }
       `;
-    case 'default':
-      return `
-        color: ${color.white};
-        background: ${color.buttonGray} !important;
-        border: 0 !important;
-      `;
     default:
       return '';
   }
@@ -29,14 +29,14 @@ const style = styled.div`
   .ant-btn {
     width: ${(props) => {
       switch (props.$size) {
-        case 'xl':
-          return '150px';
         case 'lg':
           return '120px';
         case 'md':
           return '98px';
         case 'sm':
           return '60px';
+        case 'xl':
+          return '150px';
         default:
           return '100%';
       }

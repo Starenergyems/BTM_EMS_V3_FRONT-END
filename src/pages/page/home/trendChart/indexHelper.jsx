@@ -1,18 +1,18 @@
 import { useCallback } from 'react';
 import { format } from 'date-fns';
 import { api } from '@/slices/api/setting';
-import { endpoints } from '@/utils/endpoints';
-import { color } from '@/styles/variable/indexStyle';
 import {
   chartOptions,
   customLegendOnClick,
-  handleChart,
   dataZoomLabelFormatterHandler,
+  handleChart,
   rotateHandeler,
 } from '@/utils/chart';
+import { endpoints } from '@/utils/endpoints';
+import { dispatch } from '../store/useReducerStore';
 import { customLegendNameMap } from './indexConfig';
 
-import { dispatch } from '../store/useReducerStore';
+import { color } from '@/styles/variable/indexStyle';
 
 // useHelpers 為最外層 function，function 內區塊的撰寫順序由上而下為：
 // 1. useCallback 需要相依的 function
@@ -20,7 +20,7 @@ import { dispatch } from '../store/useReducerStore';
 // 3. 一般function
 
 function useHelpers({ refs }) {
-  const { printRef, printChartRef } = refs;
+  const { printChartRef, printRef } = refs;
 
   const defaultChartOptions = chartOptions(customLegendNameMap);
 
@@ -43,101 +43,31 @@ function useHelpers({ refs }) {
 
       return {
         ...defaultChartOptions,
+        dataZoom: [
+          {
+            end: 100,
+            filterMode: 'none',
+            rangeMode: ['percent', 'percent'],
+            start: 0,
+            type: 'inside',
+          },
+          {
+            end: 100,
+            filterMode: 'none',
+            rangeMode: ['percent', 'percent'],
+            start: 0,
+          },
+        ],
         grid: {
           ...defaultChartOptions.grid,
           bottom: 65,
           left: 20,
           right: 68,
         },
-        xAxis: {
-          type: 'category',
-          boundaryGap: false, // 避免填充效果
-          axisLine: {
-            show: true,
-            onZero: false,
-            lineStyle: {
-              color: color.white,
-            },
-          },
-          axisTick: {
-            show: true,
-            alignWithLabel: true,
-          },
-          axisLabel: {
-            ...dataZoomLabelFormatterHandler(printRef, currentZoomRange),
-            color: color.white,
-            rotate: rotateAngle,
-            fontSize: 14,
-            padding: [10, 0, 0, 0],
-            showMinLabel: true, // 確保顯示第一個標籤（00:00）
-            showMaxLabel: true, // 確保顯示最後一個標籤（24:00）
-          },
-          data: [],
-        },
-        yAxis: [
-          {
-            // // min: -20,
-            // // max: 60,
-            inerval: 10,
-            name: '',
-            nameLocation: 'end',
-            nameTextStyle: {
-              color: color.white,
-              fontWeight: 'lighter',
-              fontSize: 14,
-              verticalAlign: 'top',
-              padding: [-25, 0, 10, 0],
-            },
-            type: 'value',
-            axisLabel: {
-              color: color.white,
-              fontSize: 14,
-              padding: [0, 5, 0, 0],
-            },
-            splitLine: {
-              show: false,
-            },
-          },
-          {
-            type: 'value',
-            position: 'right',
-            axisLabel: {
-              color: color.white,
-              fontSize: 14,
-            },
-            splitLine: {
-              show: true, // 確保右側軸的線有顯示
-              lineStyle: {
-                color: color.white,
-                type: 'dashed',
-              },
-            },
-          },
-        ],
-        dataZoom: [
-          {
-            type: 'inside',
-            start: 0,
-            end: 100,
-            rangeMode: ['percent', 'percent'],
-            filterMode: 'none',
-          },
-          {
-            start: 0,
-            end: 100,
-            rangeMode: ['percent', 'percent'],
-            filterMode: 'none',
-          },
-        ],
         series: [
           ...customLegendNameMap.map((item) => ({
-            name: item.name,
-            type: 'line',
-            smooth: true,
-            symbol: 'none',
-            symbolSize: 5,
-            stack: null,
             areaStyle: item.showArea ? { opacity: 0.3 } : null,
+            data: [],
             itemStyle: {
               color: item.bgColor,
             },
@@ -145,31 +75,101 @@ function useHelpers({ refs }) {
               color: item.bgColor,
               width: 1,
             },
-            data: [],
+            name: item.name,
+            smooth: true,
+            stack: null,
+            symbol: 'none',
+            symbolSize: 5,
+            type: 'line',
           })),
           {
-            type: 'line',
-            name: 'staticLines', // 不放在 legend 裡面
+            data: [], // 不給數據
             markLine: {
-              silent: true, // 不觸發滑鼠事件
-              symbol: 'none', // 不顯示箭頭
-              lineStyle: {
-                type: 'dashed',
-                color: color.white,
-              },
               label: {
-                position: 'end', // 標籤放在右側
-                formatter: '{b}', // 顯示下面 data 裡的 name
                 color: color.white,
                 fontSize: 14,
+                formatter: '{b}', // 顯示下面 data 裡的 name
+                position: 'end', // 標籤放在右側
               },
+              lineStyle: {
+                color: color.white,
+                type: 'dashed',
+              },
+              silent: true, // 不觸發滑鼠事件
+              symbol: 'none', // 不顯示箭頭
               // data: [
               //   { yAxis: 10, name: '防逆流' }, // 第一條線
               //   { yAxis: 45, name: '防超約' }, // 第二條線 (不等距)
               //   { yAxis: 55, name: '契約容量' }, // 第三條線
               // ],
             },
-            data: [], // 不給數據
+            name: 'staticLines', // 不放在 legend 裡面
+            type: 'line',
+          },
+        ],
+        xAxis: {
+          axisLabel: {
+            ...dataZoomLabelFormatterHandler(printRef, currentZoomRange),
+            color: color.white,
+            fontSize: 14,
+            padding: [10, 0, 0, 0],
+            rotate: rotateAngle,
+            showMaxLabel: true, // 確保顯示最後一個標籤（24:00）
+            showMinLabel: true, // 確保顯示第一個標籤（00:00）
+          },
+          axisLine: {
+            lineStyle: {
+              color: color.white,
+            },
+            onZero: false,
+            show: true,
+          },
+          axisTick: {
+            alignWithLabel: true,
+            show: true,
+          },
+          boundaryGap: false, // 避免填充效果
+          data: [],
+          type: 'category',
+        },
+        yAxis: [
+          {
+            axisLabel: {
+              color: color.white,
+              fontSize: 14,
+              padding: [0, 5, 0, 0],
+            },
+            // // min: -20,
+            // // max: 60,
+            inerval: 10,
+            name: '',
+            nameLocation: 'end',
+            nameTextStyle: {
+              color: color.white,
+              fontSize: 14,
+              fontWeight: 'lighter',
+              padding: [-25, 0, 10, 0],
+              verticalAlign: 'top',
+            },
+            splitLine: {
+              show: false,
+            },
+            type: 'value',
+          },
+          {
+            axisLabel: {
+              color: color.white,
+              fontSize: 14,
+            },
+            position: 'right',
+            splitLine: {
+              lineStyle: {
+                color: color.white,
+                type: 'dashed',
+              },
+              show: true, // 確保右側軸的線有顯示
+            },
+            type: 'value',
           },
         ],
       };
@@ -187,15 +187,15 @@ function useHelpers({ refs }) {
 
   // 日期選擇器變更
   const onChange = (date, dateString) => {
-    dispatch({ type: 'date', payload: dateString });
+    dispatch({ payload: dateString, type: 'date' });
   };
 
   return {
     customLegendOnClick,
     getChartOption,
-    setChart,
-    onChange,
     getNewDatas,
+    onChange,
+    setChart,
   };
 }
 

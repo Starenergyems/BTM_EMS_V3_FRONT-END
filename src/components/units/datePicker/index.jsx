@@ -1,18 +1,18 @@
 import { forwardRef } from 'react';
-import { DatePicker as AntdDatePicker } from 'antd';
 import dayjs from 'dayjs';
+import { DatePicker as AntdDatePicker } from 'antd';
 import ScopeStyle from '@/components/units/datePicker/indexStyle';
 
 function DatePicker(
   {
-    defaultValue,
-    className,
-    size,
     bgColor,
+    className,
+    defaultValue,
     errorMessage,
     // datePickerAttr = {},
     inputAttr = {},
     isInvalid,
+    size,
     ...forwardRefProps
   },
   ref,
@@ -30,11 +30,11 @@ function DatePicker(
 
   return (
     <ScopeStyle
-      className={` ${className ?? ''}`}
-      $status={inputAttr?.status}
+      $bgColor={bgColor}
       $isInvalid={isInvalid}
       $size={size}
-      $bgColor={bgColor}
+      $status={inputAttr?.status}
+      className={` ${className ?? ''}`}
     >
       <AntdDatePicker autoComplete="off" {...datePickerProps} ref={ref} />
       {(isInvalid || inputAttr?.status === 'error') && (

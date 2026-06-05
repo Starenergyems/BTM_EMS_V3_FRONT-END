@@ -2,16 +2,15 @@ import { color } from '@/styles/variable/indexStyle';
 
 const equipmentInfoDatas = [
   {
-    name: 'solarP',
-    title: '太陽能',
-    color: color.lightBlue,
-    isSupply: true,
     bill: [
       {
         name: 'solar_arbitrage',
         unit: 'NT$',
       },
     ],
+    color: color.lightBlue,
+    isSupply: true,
+    name: 'solarP',
     percentage: [
       {
         name: 'solar_percentage',
@@ -22,18 +21,18 @@ const equipmentInfoDatas = [
         unit: 'kWh',
       },
     ],
+    title: '太陽能',
   },
   {
-    name: 'discharge',
-    title: '儲能放電',
-    color: color.blue,
-    isSupply: true,
     bill: [
       {
         name: 'battery_arbitrage_demand',
         unit: 'NT$',
       },
     ],
+    color: color.blue,
+    isSupply: true,
+    name: 'discharge',
     percentage: [
       {
         name: 'battery_demand_percentage',
@@ -44,25 +43,25 @@ const equipmentInfoDatas = [
         unit: 'kWh',
       },
     ],
+    title: '儲能放電',
   },
   {
-    name: '',
-    title: '',
-    color: '',
     bill: [],
+    color: '',
+    name: '',
     percentage: [],
+    title: '',
   },
   {
-    name: 'chargerP',
-    title: '充電樁',
-    color: color.yellow,
-    isSupply: false,
     bill: [
       {
         name: 'charger_arbitrage',
         unit: 'NT$',
       },
     ],
+    color: color.yellow,
+    isSupply: false,
+    name: 'chargerP',
     percentage: [
       {
         name: 'charger_percentage',
@@ -73,18 +72,18 @@ const equipmentInfoDatas = [
         unit: 'kWh',
       },
     ],
+    title: '充電樁',
   },
   {
-    name: 'battery',
-    title: '儲能充電',
-    color: color.warningYellow,
-    isSupply: false,
     bill: [
       {
         name: 'battery_arbitrage_supply',
         unit: 'NT$',
       },
     ],
+    color: color.warningYellow,
+    isSupply: false,
+    name: 'battery',
     percentage: [
       {
         name: 'battery_supply_percentage',
@@ -95,18 +94,18 @@ const equipmentInfoDatas = [
         unit: 'kWh',
       },
     ],
+    title: '儲能充電',
   },
   {
-    name: 'loaderP',
-    title: '負載',
-    color: color.red,
-    isSupply: false,
     bill: [
       {
         name: 'load_arbitrage',
         unit: 'NT$',
       },
     ],
+    color: color.red,
+    isSupply: false,
+    name: 'loaderP',
     percentage: [
       {
         name: 'load_percentage',
@@ -117,6 +116,7 @@ const equipmentInfoDatas = [
         unit: 'kWh',
       },
     ],
+    title: '負載',
   },
 ];
 

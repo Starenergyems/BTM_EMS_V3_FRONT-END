@@ -1,18 +1,19 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import * as echarts from 'echarts';
-import { useEchartAutoResize } from '@/hooks/useEchartAutoResize';
-import { Flex } from 'antd';
-import LegendBage from '@/components/units/legendBage';
-import ChartResetDownload from '@/components/units/chartResetDownload';
-import { noDataHandler } from '@/utils/chart';
 import {
   systemConfig,
   yAxisLabels,
 } from '@/components/page/billOverview/indexConfig';
-import ScopeStyle from './indexStyle';
-import { useHelpers } from './indexHelper';
+import ChartResetDownload from '@/components/units/chartResetDownload';
+import LegendBage from '@/components/units/legendBage';
+import { useEchartAutoResize } from '@/hooks/useEchartAutoResize';
+import { noDataHandler } from '@/utils/chart';
+import { Flex } from 'antd';
 
-export const Chart = ({ name, data = [], isPending }) => {
+import { useHelpers } from './indexHelper';
+import ScopeStyle from './indexStyle';
+
+export const Chart = ({ data = [], isPending, name }) => {
   const printRef = useRef(null);
   const printChartRef = useRef(null);
 
@@ -26,8 +27,8 @@ export const Chart = ({ name, data = [], isPending }) => {
   const { customLegendOnClick, getChartOption, setChart } = useHelpers({
     name,
     refs: {
-      printRef,
       printChartRef,
+      printRef,
     },
   });
   const option = useMemo(() => getChartOption(), [getChartOption]);
@@ -51,7 +52,7 @@ export const Chart = ({ name, data = [], isPending }) => {
       let maxAxisArbitrage = 0;
       let minAxisArbitrage = 0;
 
-      legendNameMap.forEach((legend) => {
+      legendNameMap?.forEach((legend) => {
         const values = data
           .map((item) => item?.[legend.name] ?? 0)
           .filter((v) => v !== null);
@@ -67,11 +68,12 @@ export const Chart = ({ name, data = [], isPending }) => {
 
       const newOption = {
         ...option,
+        series: JSON.parse(JSON.stringify(option.series)),
+
         xAxis: {
           ...option.xAxis,
           data: data.map((item) => item.time),
         },
-
         yAxis: yAxisLabels.map((yAxisLabel, index) => {
           let maxAxisArbitrage = 0;
           let minAxisArbitrage = 0;
@@ -97,17 +99,16 @@ export const Chart = ({ name, data = [], isPending }) => {
           });
           return {
             ...option.yAxis?.[index],
-            min: Math.min(minAxisSupply, minAxisArbitrage),
             max: Math.max(maxAxisSupply, maxAxisArbitrage),
+            min: Math.min(minAxisSupply, minAxisArbitrage),
           };
         }),
-        series: JSON.parse(JSON.stringify(option.series)),
       };
       newOption.series = legendNameMap.map((legend) => {
         let color = legend.bgColor;
         // 如果是漸層配置，創建 LinearGradient 對象
         if (legend.isGradient) {
-          const { x, y, x2, y2, colorStops } = legend.bgColor;
+          const { colorStops, x, x2, y, y2 } = legend.bgColor;
           color = new echarts.graphic.LinearGradient(x, y, x2, y2, colorStops);
         }
 
@@ -116,15 +117,15 @@ export const Chart = ({ name, data = [], isPending }) => {
         const yAxisIndex = legend.name.includes('arbitrage') ? 1 : 0;
 
         return {
-          name: legend.name,
-          type: 'bar',
           barWidth: '8px',
-          stack: '',
-          yAxisIndex,
           data: data.map((item) => item?.[legend.name]),
           itemStyle: {
             color,
           },
+          name: legend.name,
+          stack: '',
+          type: 'bar',
+          yAxisIndex,
         };
       });
 
@@ -140,24 +141,23 @@ export const Chart = ({ name, data = [], isPending }) => {
     <ScopeStyle>
       <Flex className="mg-t-15 mg-r-30" justify="end">
         <ChartResetDownload
-          setIsReset={setIsReset}
-          setState={setState}
+          chartDatas={data}
           legendNameMap={legendNameMap}
           printChartRef={printChartRef}
-          chartDatas={data}
+          setIsReset={setIsReset}
+          setState={setState}
         />
       </Flex>
 
-      <div ref={printRef} className="chart-wrapper"></div>
-      <Flex className="mg-y-15" justify="center" wrap gap={20}>
+      <div className="chart-wrapper" ref={printRef}></div>
+      <Flex className="mg-y-15" gap={20} justify="center" wrap>
         {legendNameMap?.map((legend) => {
           const isSelected = state?.customLegend?.[legend.name] !== false;
           return (
             <LegendBage
-              key={legend.name}
-              item={legend}
-              size="lg"
               active={isSelected}
+              item={legend}
+              key={legend.name}
               onClick={() => {
                 customLegendOnClick(
                   legend.name,
@@ -165,6 +165,7 @@ export const Chart = ({ name, data = [], isPending }) => {
                   setState,
                 );
               }}
+              size="lg"
             />
           );
         })}

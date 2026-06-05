@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Tabs } from 'antd';
 import { PageBox } from '@/components/units';
 import Typography from '@/components/units/typography';
-import ManagementTable from './managementTable';
+import { Tabs } from 'antd';
 import { useHelpers } from './indexHelper';
+import ManagementTable from './managementTable';
 import ScopeStyle from './indexStyle';
 
 function ManagementOverview({ title, titleEn }) {
@@ -19,26 +19,26 @@ function ManagementOverview({ title, titleEn }) {
 
   const items = [
     {
+      children: (
+        <ManagementTable
+          data={state?.user}
+          name="profile"
+          setState={setState}
+        />
+      ),
       key: 'profile',
       label: '個人資料',
-      children: (
-        <ManagementTable
-          name="profile"
-          data={state?.user}
-          setState={setState}
-        />
-      ),
     },
     {
-      key: 'permissionManagement',
-      label: '權限管理',
       children: (
         <ManagementTable
-          name="permissionManagement"
           data={state?.accounts}
+          name="permissionManagement"
           setState={setState}
         />
       ),
+      key: 'permissionManagement',
+      label: '權限管理',
     },
   ];
 
@@ -46,14 +46,14 @@ function ManagementOverview({ title, titleEn }) {
     <PageBox headerTitle={`${title} ${titleEn}`}>
       <ScopeStyle>
         <Tabs
+          items={items}
           tabBarExtraContent={{
             left: (
-              <Typography size="xl" className="mg-l-28 mg-r-50">
+              <Typography className="mg-l-28 mg-r-50" size="xl">
                 系統設定
               </Typography>
             ),
           }}
-          items={items}
         />
       </ScopeStyle>
     </PageBox>

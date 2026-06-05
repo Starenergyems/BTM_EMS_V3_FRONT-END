@@ -6,7 +6,7 @@ import { endpoints } from '@/utils/endpoints';
 // 2. api function
 // 3. 一般function
 
-function useHelpers({ name, setState, setInfoState }) {
+function useHelpers({ name, setInfoState, setState }) {
   const getDatas = async (date) => {
     try {
       const data = await api.get(endpoints?.[name]?.lineChart, {

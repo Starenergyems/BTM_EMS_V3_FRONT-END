@@ -7,7 +7,7 @@ import { endpoints } from '@/utils/endpoints';
 // 2. api function
 // 3. 一般function
 
-function useHelpers({ setEquipmentDatas, setChartDatas, setFlowDatas }) {
+function useHelpers({ setChartDatas, setEquipmentDatas, setFlowDatas }) {
   const intervalStore = useSelector((state) => state.layout);
 
   const getEquipmentDatas = async () => {
@@ -44,25 +44,25 @@ function useHelpers({ setEquipmentDatas, setChartDatas, setFlowDatas }) {
       setChartDatas((prevState) => {
         return {
           ...prevState,
-          trendDatas: trendRes.data.data,
           equipmentChartDatas: equipmentRes.data.data,
+          trendDatas: trendRes.data.data,
         };
       });
     } catch (error) {
       console.error('getTrendDatas error:', error);
       // 發生錯誤時保持現有資料或設為空
       setChartDatas({
-        trendDatas: {},
         chartDatas: [],
         equipmentChartDatas: {},
+        trendDatas: {},
       });
     }
   };
 
   return {
     getEquipmentDatas,
-    getTrendDatas,
     getFlowDatas,
+    getTrendDatas,
   };
 }
 

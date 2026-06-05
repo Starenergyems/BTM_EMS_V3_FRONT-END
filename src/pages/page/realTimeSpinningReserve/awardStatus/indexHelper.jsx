@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 import * as echarts from 'echarts';
-import { toDateTimeStr } from '@/utils/format';
-import { color } from '@/styles/variable/indexStyle';
-import { customLegendNameMap } from './indexConfig';
 import { api } from '@/slices/api/setting';
+import { toDateTimeStr } from '@/utils/format';
+import { customLegendNameMap } from './indexConfig';
+import { color } from '@/styles/variable/indexStyle';
 
 // useHelpers 為最外層 function，function 內區塊的撰寫順序由上而下為：
 // 1. useCallback 需要相依的 function
@@ -11,7 +11,7 @@ import { api } from '@/slices/api/setting';
 // 3. 一般 function
 
 function useHelpers({ refs, setMainState }) {
-  const { awardPowerRef, awardPowerChartRef } = refs;
+  const { awardPowerChartRef, awardPowerRef } = refs;
 
   /* Memoized Common Functions */
   // 表格是否 loading
@@ -57,21 +57,19 @@ function useHelpers({ refs, setMainState }) {
   function getAwardSatusTableColumns() {
     const hourList = [...Array(24)].map((_item, index) => {
       return {
-        title: index,
         align: 'center',
-        width: 45,
-        render: (value) => value[`${index}:00`],
         onCell: () => ({
           style: { color: color.lightBlue },
         }),
+        render: (value) => value[`${index}:00`],
+        title: index,
+        width: 45,
       };
     });
     return [
       {
-        title: '整點',
         align: 'center',
         fixed: 'left',
-        width: 80,
         render: () => (
           <>
             得標量
@@ -79,6 +77,8 @@ function useHelpers({ refs, setMainState }) {
             (kWh)
           </>
         ),
+        title: '整點',
+        width: 80,
       },
       ...hourList,
     ];
@@ -87,13 +87,50 @@ function useHelpers({ refs, setMainState }) {
   // 當月分帳 bar 堆疊圖設定檔
   const getAwardPowerOption = useCallback(() => {
     return {
+      grid: {
+        bottom: 60,
+        containLabel: true,
+        left: 20,
+        right: 38,
+        top: 50,
+      },
+      legend: {
+        borderRadius: 5,
+        bottom: 10,
+        data: ['realTimeSpinningReserve'],
+        formatter: (name) => {
+          return customLegendNameMap[name] || name;
+        },
+        icon: 'roundRect',
+        itemGap: 30,
+        itemHeight: 10,
+        itemWidth: 35,
+        padding: 10,
+        selected: Object.keys(customLegendNameMap).reduce((acc, key) => {
+          acc[key] = true;
+          return acc;
+        }, {}),
+        show: false,
+      },
+      series: [
+        {
+          barWidth: '50%',
+          data: [],
+          itemStyle: {
+            color: color.lightBlue,
+          },
+          lineStyle: {
+            width: 3,
+          },
+          name: 'realTimeSpinningReserve',
+          stack: 'total',
+          symbolSize: 7,
+          type: 'bar',
+        },
+      ],
       tooltip: {
-        trigger: 'axis',
         backgroundColor: color.themeBlack,
         borderColor: 'transparent',
-        textStyle: {
-          color: color.white,
-        },
         formatter(params) {
           const numberFormat = new Intl.NumberFormat('en-US', {
             maximumFractionDigits: 3,
@@ -121,47 +158,30 @@ function useHelpers({ refs, setMainState }) {
           }
           return '';
         },
-      },
-      grid: {
-        top: 50,
-        left: 20,
-        right: 38,
-        bottom: 60,
-        containLabel: true,
-      },
-      legend: {
-        data: ['realTimeSpinningReserve'],
-        selected: Object.keys(customLegendNameMap).reduce((acc, key) => {
-          acc[key] = true;
-          return acc;
-        }, {}),
-        icon: 'roundRect',
-        itemWidth: 35,
-        itemHeight: 10,
-        itemGap: 30,
-        borderRadius: 5,
-        padding: 10,
-        bottom: 10,
-        show: false,
-        formatter: (name) => {
-          return customLegendNameMap[name] || name;
+        textStyle: {
+          color: color.white,
         },
+        trigger: 'axis',
       },
       xAxis: {
-        type: 'category',
-        splitLine: { show: false },
-        axisTick: {
-          show: false,
-        },
         axisLabel: {
           color: color.white,
           fontSize: 14,
         },
+        axisTick: {
+          show: false,
+        },
         data: [...Array(24)].map(
           (_item, index) => `${index < 10 ? `0${index}` : index}:00`,
         ),
+        splitLine: { show: false },
+        type: 'category',
       },
       yAxis: {
+        axisLabel: {
+          color: color.white,
+          fontSize: 14,
+        },
         // min: 0,
         // max: 3000,
         // inerval: 500,
@@ -169,15 +189,10 @@ function useHelpers({ refs, setMainState }) {
         nameLocation: 'end',
         nameTextStyle: {
           color: color.white,
+          fontSize: 14,
           fontWeight: 'lighter',
-          fontSize: 14,
-          verticalAlign: 'top',
           padding: [-25, -40, 10, 0],
-        },
-        type: 'value',
-        axisLabel: {
-          color: color.white,
-          fontSize: 14,
+          verticalAlign: 'top',
         },
         splitLine: {
           lineStyle: {
@@ -185,23 +200,8 @@ function useHelpers({ refs, setMainState }) {
             type: 'dashed',
           },
         },
+        type: 'value',
       },
-      series: [
-        {
-          type: 'bar',
-          stack: 'total',
-          name: 'realTimeSpinningReserve',
-          data: [],
-          itemStyle: {
-            color: color.lightBlue,
-          },
-          lineStyle: {
-            width: 3,
-          },
-          symbolSize: 7,
-          barWidth: '50%',
-        },
-      ],
     };
   }, []);
 
@@ -230,8 +230,8 @@ function useHelpers({ refs, setMainState }) {
     const option = chart.getOption();
     const isSelected = !option.legend[0].selected[name];
     chart.dispatchAction({
-      type: 'legendToggleSelect',
       name,
+      type: 'legendToggleSelect',
     });
     setMainState((prevState) => {
       return {
@@ -247,8 +247,8 @@ function useHelpers({ refs, setMainState }) {
   return {
     customLegendOnClick,
     getAwardData,
-    getAwardSatusTableColumns,
     getAwardPowerOption,
+    getAwardSatusTableColumns,
     setAwardPowerChart,
     setTableLoading,
   };

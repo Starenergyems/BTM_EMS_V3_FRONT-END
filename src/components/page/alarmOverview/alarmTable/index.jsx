@@ -2,7 +2,7 @@ import { Table } from 'antd';
 
 import { useHelpers } from './indexHelper';
 
-function AlarmTable({ data = [], name, isPending, onChange }) {
+function AlarmTable({ data = [], isPending, name, onChange }) {
   const { getColumnDatas } = useHelpers({
     name,
   });
@@ -12,10 +12,11 @@ function AlarmTable({ data = [], name, isPending, onChange }) {
       columns={getColumnDatas()}
       dataSource={data}
       loading={isPending}
+      onChange={onChange}
       pagination={{
-        showTotal: (total) => `總共 ${Math.ceil(total / 10)} 頁`,
         pageSize: 10,
         position: ['bottomCenter'],
+        showTotal: (total) => `總共 ${Math.ceil(total / 10)} 頁`,
       }}
       rowClassName="custom-no-hover"
       rowKey={
@@ -25,7 +26,6 @@ function AlarmTable({ data = [], name, isPending, onChange }) {
       scroll={{
         x: 'max-content',
       }}
-      onChange={onChange}
       style={{
         '--nodata-overflow': data.length === 0 ? 'hidden' : 'auto hidden',
       }}

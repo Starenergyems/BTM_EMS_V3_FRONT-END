@@ -2,30 +2,30 @@ import { createSlice } from "@reduxjs/toolkit";
 
 //初始值
 const initialState = {
-  siderIsCollapsed: true,
   selectedKeys: location.pathname || [],
   seoncdarySelectedKeys: location.pathname || [],
+  siderIsCollapsed: true,
 };
 const menuSlice = createSlice({
-  name: "menu",
   initialState,
+  name: "menu",
   reducers: {
-    setSiderCollapsed (state, action) {
-      state.siderIsCollapsed = action.payload;
-    },
     setSelectedKeys (state, action) {
       state.selectedKeys = action.payload;
     },
     setSeoncdarySelectedKeys (state, action) {
       state.seoncdarySelectedKeys = action.payload;
     },
+    setSiderCollapsed (state, action) {
+      state.siderIsCollapsed = action.payload;
+    },
   },
 });
 
 export const {
   init,
-  setSiderCollapsed,
   setSelectedKeys,
   setSeoncdarySelectedKeys,
+  setSiderCollapsed,
 } = menuSlice.actions;
 export default menuSlice.reducer;

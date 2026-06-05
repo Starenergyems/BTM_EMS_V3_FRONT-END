@@ -1,23 +1,23 @@
-import { inputNumHandler } from '@/utils/helpers';
 import {
-  FormInput,
-  FormSwitch,
-  FormSelect,
   FormDatePicker,
+  FormInput,
+  FormRangePicker,
+  FormSelect,
+  FormSwitch,
   FormTimePicker,
   FormTimeRangePicker,
-  FormRangePicker,
 } from '@/components/units/form';
+import { inputNumHandler } from '@/utils/helpers';
 
 // 1. 定義元件映射表 (將邏輯抽離)
 const FORM_COMPONENTS = {
+  datepicker: (props) => <FormDatePicker {...props} />,
   input: (props) => <FormInput {...props} />,
+  rangePicker: (props) => <FormRangePicker {...props} />,
   select: (props) => <FormSelect {...props} />,
   switch: (props) => <FormSwitch {...props} />,
-  datepicker: (props) => <FormDatePicker {...props} />,
   timepicker: (props) => <FormTimePicker {...props} />,
   timerangepicker: (props) => <FormTimeRangePicker {...props} />,
-  rangePicker: (props) => <FormRangePicker {...props} />,
   // 如果有複雜邏輯，可以寫成 builder 函數
   // textarea: (props) => <Textarea {...props} />,
 };

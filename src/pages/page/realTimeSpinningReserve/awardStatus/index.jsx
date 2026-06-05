@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Card, Flex } from 'antd';
-import { toDateTimeStr } from '@/utils/format';
-import { color } from '@/styles/variable/indexStyle';
+import { useEchartAutoResize } from '@/hooks/useEchartAutoResize';
 import { noDataHandler } from '@/utils/chart';
+import { toDateTimeStr } from '@/utils/format';
+import { Card, Flex } from 'antd';
+import { customLegendNameMap } from './indexConfig';
 import { useHelpers } from './indexHelper';
 import ScopeStyle from './indexStyle';
-import { customLegendNameMap } from './indexConfig';
-import { useEchartAutoResize } from '@/hooks/useEchartAutoResize';
+import { color } from '@/styles/variable/indexStyle';
 
 function AwardStatus() {
   const [mainState, setMainState] = useState({
@@ -30,7 +30,7 @@ function AwardStatus() {
     getAwardPowerOption,
     setAwardPowerChart,
   } = useHelpers({
-    refs: { awardPowerRef, awardPowerChartRef },
+    refs: { awardPowerChartRef, awardPowerRef },
     setMainState,
   });
 
@@ -120,8 +120,8 @@ function AwardStatus() {
       </Flex>
       <Card className="mg-t-16">
         <div
-          ref={awardPowerRef}
           className="revenue-sharing-bar-stack-chart"
+          ref={awardPowerRef}
         ></div>
       </Card>
       <Flex className="custom-legend mg-t-50-minus" gap={16} justify="center">

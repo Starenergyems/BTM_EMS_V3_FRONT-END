@@ -1,17 +1,17 @@
+import FormDatePicker from './datePicker';
 import FormInput from './input';
+import FormRangePicker from './rangePicker';
 import FormSelect from './select';
 import FormSwitch from './switch';
-import FormDatePicker from './datePicker';
-import FormTimeRangePicker from './timeRangepicker';
 import FormTimePicker from './timepicker';
-import FormRangePicker from './rangePicker';
+import FormTimeRangePicker from './timeRangepicker';
 
 export {
+  FormDatePicker,
   FormInput,
+  FormRangePicker,
   FormSelect,
   FormSwitch,
-  FormDatePicker,
   FormTimePicker,
   FormTimeRangePicker,
-  FormRangePicker,
 };

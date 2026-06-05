@@ -1,14 +1,14 @@
+import toast from 'react-hot-toast';
 import { api } from '@/slices/api/setting';
 import { endpoints } from '@/utils/endpoints';
-import toast from 'react-hot-toast';
-import { color } from '@/styles/variable/indexStyle';
-
 import { config } from './indexConfig.jsx';
+
+import { color } from '@/styles/variable/indexStyle';
 
 export const useHelpers = ({
   calevents,
-  setCalEvents,
   eventIndex,
+  setCalEvents,
   setEventIndex,
   toggle,
 }) => {
@@ -61,5 +61,5 @@ export const useHelpers = ({
     return { style: { backgroundColor: color.buttonGray } };
   };
 
-  return { getEventData, delEvent, handleDelete, eventColors };
+  return { delEvent, eventColors, getEventData, handleDelete };
 };

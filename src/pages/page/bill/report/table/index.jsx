@@ -2,7 +2,7 @@ import { Table } from 'antd';
 
 import { useHelpers } from './indexHelper';
 
-export function ReportTable({ data = [], date, type, isPending, onChange }) {
+export function ReportTable({ data = [], date, isPending, onChange, type }) {
   const { getColumnDatas } = useHelpers({
     date,
     type,
@@ -13,6 +13,7 @@ export function ReportTable({ data = [], date, type, isPending, onChange }) {
       columns={getColumnDatas()}
       dataSource={data}
       loading={isPending}
+      onChange={onChange}
       pagination={{
         pageSize: 50,
         position: ['bottomCenter'],
@@ -25,7 +26,6 @@ export function ReportTable({ data = [], date, type, isPending, onChange }) {
       scroll={{
         x: 'max-content',
       }}
-      onChange={onChange}
       style={{
         '--nodata-overflow': data.length === 0 ? 'hidden' : 'auto hidden',
       }}

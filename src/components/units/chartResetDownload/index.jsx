@@ -1,14 +1,14 @@
-import { downloadChartImageHandler, exportToExcelHandler } from '@/utils/chart';
-import { Flex } from 'antd';
 import { Icon } from '@iconify/react';
 import Button from '@/components/units/button';
+import { downloadChartImageHandler, exportToExcelHandler } from '@/utils/chart';
+import { Flex } from 'antd';
 
 function ChartResetDownload({
-  setIsReset,
-  setState,
+  chartDatas,
   legendNameMap,
   printChartRef,
-  chartDatas
+  setIsReset,
+  setState
 }) {
   const handleReset = () => {
     // 重置 React state 中的 customLegend
@@ -28,23 +28,23 @@ function ChartResetDownload({
     <Flex align="center">
       <Button variant="icon">
         <Icon
+          fontSize="24"
           icon="grommet-icons:power-reset"
           onClick={handleReset}
-          fontSize="24"
         />
       </Button>
       <Button variant="icon">
         <Icon
+          fontSize="24"
           icon="fluent:arrow-download-20-filled"
           onClick={() => downloadChartImageHandler(printChartRef)}
-          fontSize="24"
         />
       </Button>
       <Button variant="icon">
         <Icon
+          fontSize="25"
           icon="mdi:file-download-outline"
           onClick={() => exportToExcelHandler(legendNameMap,chartDatas)}
-          fontSize="25"
         />
       </Button>
     </Flex>

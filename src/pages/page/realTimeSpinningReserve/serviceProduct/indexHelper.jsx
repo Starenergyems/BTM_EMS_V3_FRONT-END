@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
+import { Position } from 'reactflow';
 import * as echarts from 'echarts';
+import { customLegendNameMap } from './indexConfig';
 import { hexToRgba } from '@/styles/function';
 import { color } from '@/styles/variable/indexStyle';
-import { customLegendNameMap } from './indexConfig';
-import { Position } from 'reactflow';
 
 // useHelpers 為最外層 function，function 內區塊的撰寫順序由上而下為：
 // 1. useCallback 需要相依的 function
@@ -12,8 +12,8 @@ import { Position } from 'reactflow';
 
 function useHelpers({ refs, setMainState }) {
   const {
-    realTimeSpinningReservePowerRef,
     realTimeSpinningReservePowerChartRef,
+    realTimeSpinningReservePowerRef,
   } = refs;
 
   /* Memoized Common Functions */
@@ -45,9 +45,9 @@ function useHelpers({ refs, setMainState }) {
       const dispatchPower = Math.floor(Math.random() * 60);
 
       result[i] = {
-        time: (h < 10 ? '0' + h : h) + ':' + (m < 10 ? '0' + m : m),
-        loadPower,
         dispatchPower,
+        loadPower,
+        time: (h < 10 ? '0' + h : h) + ':' + (m < 10 ? '0' + m : m),
       };
     }
     if (getDataType) {
@@ -89,8 +89,8 @@ function useHelpers({ refs, setMainState }) {
       // 為了給 table 元件作為 rowKey 的識別，因為 UI 的設計不符合一般 table 的資料結構
       return {
         ...prevState,
-        serviceProductTableData: [obj],
         serviceProductData: fetchData.realTimeSpinningReserve,
+        serviceProductTableData: [obj],
       };
     });
   }, [generateMinuteIntervals, setMainState]);
@@ -99,11 +99,7 @@ function useHelpers({ refs, setMainState }) {
   function getSpmTableColumns() {
     const hourList = [...Array(24)].map((_item, index) => {
       return {
-        title: index,
         align: 'center',
-        width: 45,
-        // render: (value) => value[`${index}:00`] ?? "X",
-        render: () => 'X',
         onCell: () => ({
           // style: {
           //   color: value[`${index}:00`] != null ? color.lightBlue : color.gray,
@@ -112,15 +108,19 @@ function useHelpers({ refs, setMainState }) {
             color: color.gray,
           },
         }),
+        // render: (value) => value[`${index}:00`] ?? "X",
+        render: () => 'X',
+        title: index,
+        width: 45,
       };
     });
     return [
       {
-        title: '整點',
         align: 'center',
         fixed: 'left',
-        width: 80,
         render: () => '執行率',
+        title: '整點',
+        width: 80,
       },
       ...hourList,
     ];
@@ -146,13 +146,191 @@ function useHelpers({ refs, setMainState }) {
   // 服務商品圖設定檔
   const getRealTimeSpinningReservePowerOption = useCallback(() => {
     return {
+      grid: {
+        bottom: 70,
+        containLabel: true,
+        left: 10,
+        right: 38,
+        top: 50,
+      },
+      legend: {
+        borderRadius: 5,
+        bottom: 10,
+        data: ['cbl', 'loadCurve', 'contribution'],
+        formatter: (name) => {
+          return customLegendNameMap[name] || name;
+        },
+        icon: 'roundRect',
+        itemGap: 30,
+        itemHeight: 10,
+        itemWidth: 35,
+        padding: 10,
+        selected: Object.keys(customLegendNameMap).reduce((acc, key) => {
+          acc[key] = true;
+          return acc;
+        }, {}),
+        show: false,
+      },
+      series: [
+        // 1. cbl - 白色線條在最上方
+        {
+          data: [],
+          itemStyle: {
+            color: color.white,
+          },
+          lineStyle: {
+            color: color.white,
+            width: 2,
+          },
+          markLine: {
+            data: [
+              {
+                name: '調度指令下達',
+                xAxis: '06:50',
+                ...markDashedStyle,
+              },
+              {
+                name: '服務開始',
+                xAxis: '07:00',
+                ...markSolidStyle,
+              },
+
+              {
+                name: '服務結束',
+                xAxis: '12:00',
+                ...markSolidStyle,
+              },
+              {
+                name: '下次待命開始',
+                xAxis: '14:00',
+                ...markDashedStyle,
+                label: {
+                  ...markDashedStyle.label,
+                  // offset: [0, 50],
+                },
+              },
+            ],
+            symbol: 'none',
+          },
+          name: 'cbl',
+          sampling: 'average',
+          smooth: true,
+          symbol: 'none',
+          symbolSize: 5,
+          type: 'line',
+        },
+        // 2. realTimeSpinningReserve - 底部系列，帶面積填充
+        {
+          data: [],
+          itemStyle: {
+            color: '#0770FF',
+          },
+          lineStyle: {
+            color: '#0770FF',
+            width: 2,
+          },
+          markLine: {
+            data: [
+              {
+                name: '調度指令下達',
+                xAxis: '06:50',
+                ...markDashedStyle,
+              },
+              {
+                name: '服務開始',
+                xAxis: '07:00',
+                ...markSolidStyle,
+              },
+
+              {
+                name: '服務結束',
+                xAxis: '12:00',
+                ...markSolidStyle,
+              },
+              {
+                name: '下次待命開始',
+                xAxis: '14:00',
+                ...markDashedStyle,
+                label: {
+                  ...markDashedStyle.label,
+                  // offset: [0, 50],
+                },
+              },
+            ],
+            symbol: 'none',
+          },
+          name: 'loadCurve',
+          sampling: 'average',
+          smooth: true,
+          stack: 'total', // 使用 stack
+          symbol: 'none',
+          symbolSize: 5,
+          type: 'line',
+        },
+        // 3. 差值系列 (cbl - loadCurve) - 填充兩者之間的區域
+        {
+          areaStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              {
+                color: 'rgba(213,72,120,0.8)',
+                offset: 0,
+              },
+              {
+                color: 'rgba(213,72,120,0.3)',
+                offset: 1,
+              },
+            ]),
+          },
+          data: [], // 需要計算 cbl - realTimeSpinningReserve 的差值
+          itemStyle: {
+            color: 'rgba(213,72,120,0.8)',
+          },
+          lineStyle: {
+            color: 'transparent',
+            width: 0, // 隱藏這條線
+          },
+          markLine: {
+            data: [
+              {
+                name: '調度指令下達',
+                xAxis: '06:50',
+                ...markDashedStyle,
+              },
+              {
+                name: '服務開始',
+                xAxis: '07:00',
+                ...markSolidStyle,
+              },
+
+              {
+                name: '服務結束',
+                xAxis: '12:00',
+                ...markSolidStyle,
+              },
+              {
+                name: '下次待命開始',
+                xAxis: '14:00',
+                ...markDashedStyle,
+                label: {
+                  ...markDashedStyle.label,
+                  // offset: [0, 50],
+                },
+              },
+            ],
+            symbol: 'none',
+          },
+          name: 'contribution',
+          sampling: 'average',
+          smooth: true,
+          stack: 'total', // 堆疊在 loadCurve 上
+          symbol: 'none',
+          symbolSize: 5,
+          type: 'line',
+        },
+      ],
       tooltip: {
-        trigger: 'axis',
         backgroundColor: color.themeBlack,
         borderColor: 'transparent',
-        textStyle: {
-          color: color.white,
-        },
         formatter(params) {
           const numberFormat = new Intl.NumberFormat('en-US', {
             maximumFractionDigits: 3,
@@ -180,41 +358,18 @@ function useHelpers({ refs, setMainState }) {
           }
           return '';
         },
-      },
-      grid: {
-        top: 50,
-        left: 10,
-        right: 38,
-        bottom: 70,
-        containLabel: true,
-      },
-      legend: {
-        data: ['cbl', 'loadCurve', 'contribution'],
-        selected: Object.keys(customLegendNameMap).reduce((acc, key) => {
-          acc[key] = true;
-          return acc;
-        }, {}),
-        icon: 'roundRect',
-        itemWidth: 35,
-        itemHeight: 10,
-        itemGap: 30,
-        borderRadius: 5,
-        padding: 10,
-        bottom: 10,
-        show: false,
-        formatter: (name) => {
-          return customLegendNameMap[name] || name;
+        textStyle: {
+          color: color.white,
         },
+        trigger: 'axis',
       },
       xAxis: {
-        type: 'category',
-        splitLine: { show: false },
-        axisTick: {
-          show: false,
-        },
         axisLabel: {
           color: color.white,
           fontSize: 14,
+          formatter: function (value) {
+            return value.endsWith(':00') ? value : '';
+          },
           interval: function (index, value) {
             // 根據容器寬度動態計算顯示間隔
             const containerWidth =
@@ -227,31 +382,32 @@ function useHelpers({ refs, setMainState }) {
             // 只顯示整點且符合間隔
             return value.endsWith(':00') && index % (interval * 60) === 0;
           },
-          formatter: function (value) {
-            return value.endsWith(':00') ? value : '';
-          },
           padding: [10, 0, 0, 0],
         },
+        axisTick: {
+          show: false,
+        },
         data: generateMinuteIntervals('23:59', 'time'),
+        splitLine: { show: false },
+        type: 'category',
       },
       yAxis: {
-        min: 0,
-        max: 1200,
-        inerval: 200,
-        name: '容量 (kW)',
-        nameLocation: 'end',
-        nameTextStyle: {
-          color: color.white,
-          fontWeight: 'lighter',
-          fontSize: 14,
-          verticalAlign: 'top',
-          padding: [-25, 0, 10, 0],
-        },
-        type: 'value',
         axisLabel: {
           color: color.white,
           fontSize: 14,
           padding: [0, 5, 0, 0],
+        },
+        inerval: 200,
+        max: 1200,
+        min: 0,
+        name: '容量 (kW)',
+        nameLocation: 'end',
+        nameTextStyle: {
+          color: color.white,
+          fontSize: 14,
+          fontWeight: 'lighter',
+          padding: [-25, 0, 10, 0],
+          verticalAlign: 'top',
         },
         splitLine: {
           lineStyle: {
@@ -259,164 +415,8 @@ function useHelpers({ refs, setMainState }) {
             type: 'dashed',
           },
         },
+        type: 'value',
       },
-      series: [
-        // 1. cbl - 白色線條在最上方
-        {
-          name: 'cbl',
-          type: 'line',
-          smooth: true,
-          symbol: 'none',
-          symbolSize: 5,
-          sampling: 'average',
-          itemStyle: {
-            color: color.white,
-          },
-          lineStyle: {
-            color: color.white,
-            width: 2,
-          },
-          markLine: {
-            symbol: 'none',
-            data: [
-              {
-                name: '調度指令下達',
-                xAxis: '06:50',
-                ...markDashedStyle,
-              },
-              {
-                name: '服務開始',
-                xAxis: '07:00',
-                ...markSolidStyle,
-              },
-
-              {
-                name: '服務結束',
-                xAxis: '12:00',
-                ...markSolidStyle,
-              },
-              {
-                name: '下次待命開始',
-                xAxis: '14:00',
-                ...markDashedStyle,
-                label: {
-                  ...markDashedStyle.label,
-                  // offset: [0, 50],
-                },
-              },
-            ],
-          },
-          data: [],
-        },
-        // 2. realTimeSpinningReserve - 底部系列，帶面積填充
-        {
-          name: 'loadCurve',
-          type: 'line',
-          smooth: true,
-          stack: 'total', // 使用 stack
-          symbol: 'none',
-          symbolSize: 5,
-          sampling: 'average',
-          itemStyle: {
-            color: '#0770FF',
-          },
-          lineStyle: {
-            width: 2,
-            color: '#0770FF',
-          },
-          markLine: {
-            symbol: 'none',
-            data: [
-              {
-                name: '調度指令下達',
-                xAxis: '06:50',
-                ...markDashedStyle,
-              },
-              {
-                name: '服務開始',
-                xAxis: '07:00',
-                ...markSolidStyle,
-              },
-
-              {
-                name: '服務結束',
-                xAxis: '12:00',
-                ...markSolidStyle,
-              },
-              {
-                name: '下次待命開始',
-                xAxis: '14:00',
-                ...markDashedStyle,
-                label: {
-                  ...markDashedStyle.label,
-                  // offset: [0, 50],
-                },
-              },
-            ],
-          },
-          data: [],
-        },
-        // 3. 差值系列 (cbl - loadCurve) - 填充兩者之間的區域
-        {
-          name: 'contribution',
-          type: 'line',
-          smooth: true,
-          stack: 'total', // 堆疊在 loadCurve 上
-          symbol: 'none',
-          symbolSize: 5,
-          sampling: 'average',
-          itemStyle: {
-            color: 'rgba(213,72,120,0.8)',
-          },
-          lineStyle: {
-            width: 0, // 隱藏這條線
-            color: 'transparent',
-          },
-          markLine: {
-            symbol: 'none',
-            data: [
-              {
-                name: '調度指令下達',
-                xAxis: '06:50',
-                ...markDashedStyle,
-              },
-              {
-                name: '服務開始',
-                xAxis: '07:00',
-                ...markSolidStyle,
-              },
-
-              {
-                name: '服務結束',
-                xAxis: '12:00',
-                ...markSolidStyle,
-              },
-              {
-                name: '下次待命開始',
-                xAxis: '14:00',
-                ...markDashedStyle,
-                label: {
-                  ...markDashedStyle.label,
-                  // offset: [0, 50],
-                },
-              },
-            ],
-          },
-          areaStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              {
-                offset: 0,
-                color: 'rgba(213,72,120,0.8)',
-              },
-              {
-                offset: 1,
-                color: 'rgba(213,72,120,0.3)',
-              },
-            ]),
-          },
-          data: [], // 需要計算 cbl - realTimeSpinningReserve 的差值
-        },
-      ],
     };
   }, [res, generateMinuteIntervals, realTimeSpinningReservePowerRef]);
 
@@ -445,8 +445,8 @@ function useHelpers({ refs, setMainState }) {
     const option = chart.getOption();
     const isSelected = !option.legend[0].selected[name];
     chart.dispatchAction({
-      type: 'legendToggleSelect',
       name,
+      type: 'legendToggleSelect',
     });
     setMainState((prevState) => {
       return {
@@ -461,42 +461,42 @@ function useHelpers({ refs, setMainState }) {
 
   return {
     customLegendOnClick,
+    getRealTimeSpinningReservePowerOption,
     getServiceProductData,
     getSpmTableColumns,
-    getRealTimeSpinningReservePowerOption,
     setRealTimeSpinningReservePowerChart,
     setTableLoading,
   };
 }
 
 const markSolidStyle = {
-  lineStyle: {
-    color: color.white,
-    width: 2,
-    type: 'solid',
-  },
   label: {
-    show: true,
     color: color.white,
     fontSize: 18,
     formatter: '{b}',
     offset: [0, 0],
+    show: true,
+  },
+  lineStyle: {
+    color: color.white,
+    type: 'solid',
+    width: 2,
   },
 };
 
 const markDashedStyle = {
-  lineStyle: {
-    color: color.red,
-    width: 2,
-    type: 'dashed',
-  },
   label: {
-    show: true,
-    position: 'start',
     color: color.red,
     fontSize: 18,
     formatter: '{b}',
     offset: [0, 35],
+    position: 'start',
+    show: true,
+  },
+  lineStyle: {
+    color: color.red,
+    type: 'dashed',
+    width: 2,
   },
 };
 

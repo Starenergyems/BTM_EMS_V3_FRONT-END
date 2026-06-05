@@ -1,28 +1,72 @@
 export const ExtraFormFields = {
-  spinning: [
+  demand_response: [
     {
-      formItemAttr: {
-        label: '功率',
-        name: 'offer_kw',
-        inputPattern: 'number',
-        unit: 'kW',
-        rules: [{ required: true, message: '請輸入功率' }],
+      componentProps: {
+        inputAttr: {
+          placeholder: '請選擇操作',
+        },
       },
-      variants: 'input',
+      formItemAttr: {
+        label: '市場',
+        name: 'demand_response_market',
+        options: [
+          {
+            label: 'sReg',
+            value: 'sReg',
+          },
+          {
+            label: '補充備轉',
+            value: 'supplemental',
+          },
+        ],
+        rules: [{ message: '請輸入操作', required: true }],
+        themecategory: 'circle-light',
+      },
+      variants: 'select',
+    },
+    {
       componentProps: {
         inputAttr: {
           placeholder: '請輸入功率',
         },
       },
+      formItemAttr: {
+        inputPattern: 'number',
+        label: '功率',
+        name: 'offer_kw',
+        rules: [{ message: '請輸入功率', required: true }],
+        unit: 'kW',
+      },
+      variants: 'input',
+    },
+  ],
+  spinning: [
+    {
+      componentProps: {
+        inputAttr: {
+          placeholder: '請輸入功率',
+        },
+      },
+      formItemAttr: {
+        inputPattern: 'number',
+        label: '功率',
+        name: 'offer_kw',
+        rules: [{ message: '請輸入功率', required: true }],
+        unit: 'kW',
+      },
+      variants: 'input',
     },
   ],
   user_battery_schedule: [
     {
+      componentProps: {
+        inputAttr: {
+          placeholder: '請選擇操作',
+        },
+      },
       formItemAttr: {
         label: '操作',
         name: 'operation',
-        themecategory: 'circle-light',
-        rules: [{ required: true, message: '請輸入操作' }],
         options: [
           {
             label: '充電',
@@ -33,37 +77,38 @@ export const ExtraFormFields = {
             value: 'discharge',
           },
         ],
+        rules: [{ message: '請輸入操作', required: true }],
+        themecategory: 'circle-light',
       },
       variants: 'select',
-      componentProps: {
-        inputAttr: {
-          placeholder: '請選擇操作',
-        },
-      },
     },
     {
-      formItemAttr: {
-        label: '功率',
-        name: 'value',
-        inputPattern: 'number',
-        unit: 'kW',
-        rules: [{ required: true, message: '請輸入功率' }],
-      },
-      variants: 'input',
       componentProps: {
         inputAttr: {
           placeholder: '請輸入功率',
         },
       },
+      formItemAttr: {
+        inputPattern: 'number',
+        label: '功率',
+        name: 'value',
+        rules: [{ message: '請輸入功率', required: true }],
+        unit: 'kW',
+      },
+      variants: 'input',
     },
     {
+      componentProps: {
+        inputAttr: {
+          placeholder: '請輸入SOC數值',
+        },
+      },
       formItemAttr: {
+        inputPattern: 'number',
         label: 'SOC',
         name: 'stop_soc',
-        inputPattern: 'number',
-        unit: '%',
         rules: [
-          { required: true, message: '請輸入SOC數值' },
+          { message: '請輸入SOC數值', required: true },
           {
             validator: (_, value) => {
               if (!value) return Promise.resolve();
@@ -77,54 +122,9 @@ export const ExtraFormFields = {
             },
           },
         ],
+        unit: '%',
       },
       variants: 'input',
-      componentProps: {
-        inputAttr: {
-          placeholder: '請輸入SOC數值',
-        },
-      },
-    },
-  ],
-  demand_response: [
-    {
-      formItemAttr: {
-        label: '市場',
-        name: 'demand_response_market',
-        themecategory: 'circle-light',
-        rules: [{ required: true, message: '請輸入操作' }],
-        options: [
-          {
-            label: 'sReg',
-            value: 'sReg',
-          },
-          {
-            label: '補充備轉',
-            value: 'supplemental',
-          },
-        ],
-      },
-      variants: 'select',
-      componentProps: {
-        inputAttr: {
-          placeholder: '請選擇操作',
-        },
-      },
-    },
-    {
-      formItemAttr: {
-        label: '功率',
-        name: 'offer_kw',
-        inputPattern: 'number',
-        unit: 'kW',
-        rules: [{ required: true, message: '請輸入功率' }],
-      },
-      variants: 'input',
-      componentProps: {
-        inputAttr: {
-          placeholder: '請輸入功率',
-        },
-      },
     },
   ],
 };
@@ -144,7 +144,7 @@ const labels = [
   },
 ];
 export const ExtraLabels = {
-  demand_monthly_pick: labels,
   demand_guaranteed: labels,
+  demand_monthly_pick: labels,
   guaran_response: labels,
 };

@@ -1,13 +1,13 @@
+import dayjs from 'dayjs';
 import { api } from '@/slices/api/setting';
 import { endpoints } from '@/utils/endpoints';
-import { Form } from 'antd';
-import dayjs from 'dayjs';
 import { errorMsgHandler, successMsgHandler } from '@/utils/helpers';
+import { Form } from 'antd';
 
 export const useHelpers = ({ formInstance, selectedStrategy, toggle }) => {
   const rangeValue = Form.useWatch('range', formInstance);
 
-  const getData = async () => {
+  const getData = async (prefillValues = {}) => {
     try {
       const response = await api.get(
         endpoints.demandRp.demandSet(selectedStrategy),
@@ -24,22 +24,31 @@ export const useHelpers = ({ formInstance, selectedStrategy, toggle }) => {
         }
 
         if (selectedStrategy === 'guaran_response') {
-          if (typeof data?.guaran_reserve_time === 'string') {
-            const [start, end] = data.guaran_reserve_time.split('-');
-            normalizedData.guaran_reserve_time =
+          if (typeof data?.guaranteed_standby_time === 'string') {
+            const [start, end] = data.guaranteed_standby_time.split('-');
+
+            normalizedData.guaranteed_standby_time =
               start && end
                 ? [dayjs(start, 'HH:mm'), dayjs(end, 'HH:mm')]
-                : undefined;
+                : [
+                    dayjs(rangeValue.guaranteed_standby_time[0], 'HH:mm'),
+                    dayjs(rangeValue.guaranteed_standby_time[1], 'HH:mm'),
+                  ];
           }
 
-          if (data?.guaran_response_notification !== undefined) {
-            normalizedData.guaran_response_notification = String(
-              data.guaran_response_notification,
+          if (data?.notification_minutes_before !== undefined) {
+            normalizedData.notification_minutes_before = String(
+              data.notification_minutes_before,
             );
           }
         }
 
-        formInstance.setFieldsValue(normalizedData);
+        const mergedData = {
+          ...normalizedData,
+          ...prefillValues,
+        };
+
+        formInstance.setFieldsValue(mergedData);
       }
     } catch (error) {
       console.error('API Error:', error);
@@ -49,14 +58,6 @@ export const useHelpers = ({ formInstance, selectedStrategy, toggle }) => {
   const formFields = () => {
     return [
       {
-        formItemAttr: {
-          label: '需量類型',
-          name: 'strategy',
-          themecategory: 'circle-light',
-          defaultValue: 'daily_pick_time',
-          rules: [{ required: true, message: '請選擇需量類型' }],
-        },
-        variants: 'select',
         componentProps: {
           inputAttr: {
             placeholder: '請選擇需量類型',
@@ -66,28 +67,41 @@ export const useHelpers = ({ formInstance, selectedStrategy, toggle }) => {
             value: key,
           })),
         },
+        formItemAttr: {
+          defaultValue: 'daily_pick_time',
+          label: '需量類型',
+          name: 'strategy',
+          rules: [{ message: '請選擇需量類型', required: true }],
+          themecategory: 'circle-light',
+        },
+        variants: 'select',
       },
       {
-        formItemAttr: {
-          label: '抑低容量',
-          name: 'signKw',
-          inputPattern: 'number',
-          rules: [{ required: true, message: '請輸入抑低容量' }],
-        },
-        variants: 'input',
         componentProps: {
           inputAttr: {
             placeholder: '請輸入抑低容量',
           },
         },
+        formItemAttr: {
+          inputPattern: 'number',
+          label: '抑低容量',
+          name: 'signKw',
+          rules: [{ message: '請輸入抑低容量', required: true }],
+        },
+        variants: 'input',
       },
       {
+        componentProps: {
+          inputAttr: {
+            placeholder: '請選擇簽約時間',
+          },
+        },
         formItemAttr: {
+          defaultValue: [dayjs(new Date()), dayjs(new Date())],
           label: '簽約時間',
           name: 'range',
-          defaultValue: [dayjs(new Date()), dayjs(new Date())],
           rules: [
-            { required: true, message: '請選擇簽約時間' },
+            { message: '請選擇簽約時間', required: true },
             {
               validator: (_, value) => {
                 if (
@@ -104,11 +118,6 @@ export const useHelpers = ({ formInstance, selectedStrategy, toggle }) => {
           ],
         },
         variants: 'rangePicker',
-        componentProps: {
-          inputAttr: {
-            placeholder: '請選擇簽約時間',
-          },
-        },
       },
     ];
   };
@@ -194,39 +203,101 @@ export const useHelpers = ({ formInstance, selectedStrategy, toggle }) => {
 
   const ExtraFormFields = {
     daily_pick_time: {
-      title: '日選時段型',
       formEields: [
         {
-          formItemAttr: {
-            label: '時段',
-            name: 'daily_pick_time',
-            defaultValue: '18:00-20:00',
-            themecategory: 'circle-light',
-          },
-
-          variants: 'select',
           componentProps: {
             inputAttr: {
-              placeholder: '請選擇時段',
               options: [
                 { label: '18:00-20:00', value: '18:00-20:00' },
                 { label: '16:00-20:00', value: '16:00-20:00' },
                 { label: '16:00-22:00', value: '16:00-22:00' },
               ],
+              placeholder: '請選擇時段',
             },
           },
+
+          formItemAttr: {
+            defaultValue: '18:00-20:00',
+            label: '時段',
+            name: 'daily_pick_time',
+            themecategory: 'circle-light',
+          },
+          variants: 'select',
         },
       ],
+      title: '日選時段型',
     },
-    monthly_pick_date: {
-      title: '月選8日型',
+    guaran_response: {
       formEields: [
         {
+          componentProps: {
+            inputAttr: {
+              options: [
+                { label: '提前30分鐘', value: '30' },
+                { label: '提前1小時', value: '60' },
+                { label: '提前2小時', value: '120' },
+              ],
+              placeholder: '請選擇通知方式',
+            },
+          },
           formItemAttr: {
-            label: '日期',
-            name: 'monthly_pick_date',
-            mode: 'multiple',
+            defaultValue: '30',
+            format: 'HH:mm',
+            label: '通知方式',
+            name: 'notification_minutes_before',
+            themecategory: 'circle-light',
+          },
+          variants: 'select',
+        },
+        {
+          componentProps: {
+            inputAttr: {
+              disabled: true,
+              disabledTime: createDisabledTime,
+              hideDisabledOptions: true,
+              minuteStep: 30,
+              placeholder: '請選擇通知時段',
+            },
+          },
+          formItemAttr: {
+            defaultValue: [guaranStartTime, guaranEndTime],
+            format: 'HH:mm',
+            label: '待命時間',
+            name: 'guaranteed_standby_time',
+            rules: [
+              {
+                validator: (_, value) => {
+                  return createGuaranResponseInformValidator(formInstance)(
+                    _,
+                    value,
+                  );
+                },
+              },
+            ],
+            size: 'full',
+          },
+          variants: 'timerangepicker',
+        },
+      ],
+      title: '保證反應型',
+    },
+    monthly_pick_date: {
+      formEields: [
+        {
+          componentProps: {
+            inputAttr: {
+              options: Array.from({ length: 31 }, (_, i) => ({
+                label: `${i + 1}日`,
+                value: i + 1,
+              })),
+              placeholder: '請選擇日期',
+            },
+          },
+          formItemAttr: {
             defaultValue: [],
+            label: '日期',
+            mode: 'multiple',
+            name: 'monthly_pick_date',
             rules: [
               {
                 validator: (_, value) => {
@@ -240,71 +311,9 @@ export const useHelpers = ({ formInstance, selectedStrategy, toggle }) => {
             ],
           },
           variants: 'select',
-          componentProps: {
-            inputAttr: {
-              placeholder: '請選擇日期',
-              options: Array.from({ length: 31 }, (_, i) => ({
-                label: `${i + 1}日`,
-                value: i + 1,
-              })),
-            },
-          },
         },
       ],
-    },
-    guaran_response: {
-      title: '保證反應型',
-      formEields: [
-        {
-          formItemAttr: {
-            label: '通知方式',
-            name: 'guaran_response_notification',
-            themecategory: 'circle-light',
-            format: 'HH:mm',
-            defaultValue: '0.5',
-          },
-          variants: 'select',
-          componentProps: {
-            inputAttr: {
-              placeholder: '請選擇通知方式',
-              options: [
-                { label: '提前30分鐘', value: '0.5' },
-                { label: '提前1小時', value: '1' },
-                { label: '提前2小時', value: '2' },
-              ],
-            },
-          },
-        },
-        {
-          formItemAttr: {
-            label: '待命時間',
-            name: 'guaran_reserve_time',
-            format: 'HH:mm',
-            size: 'full',
-            defaultValue: [guaranStartTime, guaranEndTime],
-            rules: [
-              {
-                validator: (_, value) => {
-                  return createGuaranResponseInformValidator(formInstance)(
-                    _,
-                    value,
-                  );
-                },
-              },
-            ],
-          },
-          variants: 'timerangepicker',
-          componentProps: {
-            inputAttr: {
-              placeholder: '請選擇通知時段',
-              minuteStep: 30,
-              disabledTime: createDisabledTime,
-              disabled: true,
-              hideDisabledOptions: true,
-            },
-          },
-        },
-      ],
+      title: '月選8日型',
     },
   };
 
@@ -315,16 +324,16 @@ export const useHelpers = ({ formInstance, selectedStrategy, toggle }) => {
       .then(async (values) => {
         let finalValues = {
           ...values,
-          sign_start_date: values.range[0].format('YYYY-MM-DD'),
           sign_end_date: values.range[1].format('YYYY-MM-DD'),
+          sign_start_date: values.range[0].format('YYYY-MM-DD'),
         };
         if (values.strategy === 'guaran_response') {
-          const reserveTime = values.guaran_reserve_time;
+          const reserveTime = values.guaranteed_standby_time;
           finalValues = {
             ...values,
-            sign_start_date: values.range[0].format('YYYY-MM-DD'),
+            guaranteed_standby_time: `${reserveTime[0].format('HH:mm')}-${reserveTime[1].format('HH:mm')}`,
             sign_end_date: values.range[1].format('YYYY-MM-DD'),
-            guaran_reserve_time: `${reserveTime[0].format('HH:mm')}-${reserveTime[1].format('HH:mm')}`,
+            sign_start_date: values.range[0].format('YYYY-MM-DD'),
           };
         }
         const response = await api.post(
@@ -345,9 +354,9 @@ export const useHelpers = ({ formInstance, selectedStrategy, toggle }) => {
   }
 
   return {
-    getData,
-    formFields,
     ExtraFormFields,
+    formFields,
+    getData,
     onSubmit,
   };
 };

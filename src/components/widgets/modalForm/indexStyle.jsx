@@ -1,5 +1,5 @@
-import { Modal } from 'antd';
 import styled from 'styled-components';
+import { Modal } from 'antd';
 import { absoluteCenter, color } from '@/styles/variable/indexStyle';
 
 const style = styled(Modal)`

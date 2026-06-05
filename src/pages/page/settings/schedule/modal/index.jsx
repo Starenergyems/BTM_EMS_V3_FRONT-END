@@ -1,9 +1,9 @@
-import ModalNormal from '@/components/widgets/modalNormal';
 import Typography from '@/components/units/typography';
-import { color } from '@/styles/variable/indexStyle';
+import ModalNormal from '@/components/widgets/modalNormal';
 import { ScopeStyle } from './indexStyle';
+import { color } from '@/styles/variable/indexStyle';
 
-export const ModalOverview = ({ toggle, handleDelete }) => {
+export const ModalOverview = ({ handleDelete, toggle }) => {
   if (!toggle?.value) return null;
   return (
     <ModalNormal
@@ -12,15 +12,15 @@ export const ModalOverview = ({ toggle, handleDelete }) => {
         centered: true,
         forceRender: true,
         maskClosable: false,
+        okText: '刪除',
         onCancel: () => toggle.onFalse(),
         onOk: handleDelete,
-        okText: '刪除',
         open: toggle.value,
         title: '',
       }}
     >
       <ScopeStyle>
-        <Typography size="lg" color={color.themeBlack}>
+        <Typography color={color.themeBlack} size="lg">
           是否要刪除此排程？
         </Typography>
       </ScopeStyle>

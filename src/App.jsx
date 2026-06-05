@@ -1,5 +1,5 @@
-import { RouterProvider } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import { RouterProvider } from "react-router-dom";
 import { router } from "@/router";
 import GlobalStyle from "@/styles/globalStyle";
 
@@ -7,7 +7,7 @@ function App() {
   return (
     <>
       <GlobalStyle />
-      <Toaster position="top-center" containerStyle={{ top: "40px" }} />
+      <Toaster containerStyle={{ top: "40px" }} position="top-center" />
       <RouterProvider router={router} />
     </>
   );

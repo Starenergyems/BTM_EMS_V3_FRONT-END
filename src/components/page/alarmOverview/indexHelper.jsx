@@ -6,7 +6,7 @@ import { endpoints } from '@/utils/endpoints';
 // 2. api function
 // 3. 一般function
 
-function useHelpers({ name, state, setState }) {
+function useHelpers({ name, setState, state }) {
   const getDatas = async () => {
     try {
       const data = await api.get(endpoints?.alarm?.[name]);
@@ -59,8 +59,8 @@ function useHelpers({ name, state, setState }) {
 
   return {
     getDatas,
-    handleTableChange,
     handleSelectChange,
+    handleTableChange,
   };
 }
 

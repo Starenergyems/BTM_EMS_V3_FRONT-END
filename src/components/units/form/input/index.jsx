@@ -1,8 +1,8 @@
 import { forwardRef } from 'react';
 import { Icon } from '@iconify/react';
+import { useBoolean } from '@/hooks/useBoolean';
 import { Input as AntdInput, Button } from 'antd';
 import ScopeStyle from '@/components/units/form/input/indexStyle';
-import { useBoolean } from '@/hooks/useBoolean';
 
 function FormInput(
   { className, errorMessage, inputAttr = {}, isInvalid, ...forwardRefProps },
@@ -12,20 +12,20 @@ function FormInput(
   const isTogglePassword = useBoolean(false);
   return (
     <ScopeStyle
-      className={`styled-container-input ${className ?? ''}`}
-      $status={inputAttr?.status}
       $isInvalid={isInvalid}
+      $status={inputAttr?.status}
+      className={`styled-container-input ${className ?? ''}`}
     >
       <div className="input-container">
         <AntdInput
           autoComplete="off"
           {...componentProps}
+          ref={ref}
           type={
             isTogglePassword.value && componentProps.type === 'password'
               ? 'text'
               : componentProps.type
           }
-          ref={ref}
         />
         {componentProps.unit && (
           <span className="input-unit">{componentProps.unit}</span>
@@ -33,14 +33,14 @@ function FormInput(
         {componentProps.type && componentProps.type === 'password' && (
           <Button
             className="input-pwd"
-            type="icon"
             classNames="pd-0"
             onClick={isTogglePassword.onToggle}
+            type="icon"
           >
             {isTogglePassword.value ? (
-              <Icon icon="iconoir:eye-solid" fontSize="24" />
+              <Icon fontSize="24" icon="iconoir:eye-solid" />
             ) : (
-              <Icon icon="iconoir:eye-closed" fontSize="24" />
+              <Icon fontSize="24" icon="iconoir:eye-closed" />
             )}
           </Button>
         )}

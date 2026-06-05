@@ -3,29 +3,29 @@ import { color } from '@/styles/variable/indexStyle';
 
 const getFontSize = (size) => {
   switch (size) {
-    case 'xxl':
-      return 'clamp(28px, 1.2vw, 32px)';
-    case 'xl':
-      return 'clamp(20px, 1.2vw, 24px)';
     case 'lg':
       return 'clamp(16px, 1.2vw, 20px)';
     case 'md':
       return 'clamp(14px, 1.2vw, 18px)';
     case 'sm':
       return 'clamp(12px, 1.2vw, 16px)';
+    case 'xl':
+      return 'clamp(20px, 1.2vw, 24px)';
     case 'xs':
       return 'clamp(10px, 1.2vw, 14px)';
+    case 'xxl':
+      return 'clamp(28px, 1.2vw, 32px)';
     default:
       return 'clamp(16px, 1.2vw, 20px)';
   }
 };
 
 const breakpointMap = {
-  xs: '(max-width: 575px)',
-  sm: '(min-width: 576px)',
-  md: '(min-width: 768px)',
   lg: '(min-width: 992px)',
+  md: '(min-width: 768px)',
+  sm: '(min-width: 576px)',
   xl: '(min-width: 1200px)',
+  xs: '(max-width: 575px)',
   xxl: '(min-width: 1600px)',
 };
 

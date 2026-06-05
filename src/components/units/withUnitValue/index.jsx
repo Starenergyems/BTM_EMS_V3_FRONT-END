@@ -3,19 +3,19 @@ import ScopeStyle from "./indexStyle";
 function WithUnitValue({
   className,
   unit,
-  unitWidth = 35,
   unitTextAlign = "left",
+  unitWidth = 35,
   value,
   valueTextAlign = "right",
   valueWidth,
 }) {
   return (
     <ScopeStyle
-      className={`styled-container-with-unit-value ${className ?? ""}`}
-      $unitWidth={unitWidth}
       $unitTextAlign={unitTextAlign}
-      $valueWidth={valueWidth}
+      $unitWidth={unitWidth}
       $valueTextAlign={valueTextAlign}
+      $valueWidth={valueWidth}
+      className={`styled-container-with-unit-value ${className ?? ""}`}
     >
       <span className="value">{value}</span>
       <span className="unit">{unit}</span>

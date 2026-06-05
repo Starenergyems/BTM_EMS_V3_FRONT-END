@@ -17,10 +17,10 @@ function Textarea(
   const inputProps = { ...inputAttr, ...inputTextAreaAttr, ...forwardRefProps };
   return (
     <ScopeStyle
-      className={`styled-container-textarea ${className ?? ""}`}
-      $status={inputAttr?.status}
       $isInvalid={isInvalid}
       $noResizeSetting={noResize}
+      $status={inputAttr?.status}
+      className={`styled-container-textarea ${className ?? ""}`}
     >
       <AntdInput.TextArea
         autoComplete="off"

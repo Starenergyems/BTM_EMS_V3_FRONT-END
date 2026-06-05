@@ -7,31 +7,37 @@ import { passwordValidationRules } from '@/utils/helpers';
 function useHelpers({ formData }) {
   const formFields = [
     {
+      componentProps: {
+        inputAttr: {
+          placeholder: '請輸入您的舊密碼',
+          type: 'password',
+        },
+      },
       formItemAttr: {
         label: '新密碼',
         name: 'password',
         rules: [
-          { required: true, message: '請輸入您的新密碼' },
+          { message: '請輸入您的新密碼', required: true },
           {
             validator: (_, value) => passwordValidationRules(value),
           },
         ],
       },
-      variants: 'input',
 
-      componentProps: {
-        inputAttr: {
-          type: 'password',
-          placeholder: '請輸入您的舊密碼',
-        },
-      },
+      variants: 'input',
     },
     {
+      componentProps: {
+        inputAttr: {
+          placeholder: '請輸入您的新密碼',
+          type: 'password',
+        },
+      },
       formItemAttr: {
         label: '確認新密碼',
         name: 'newPassword',
         rules: [
-          { required: true, message: '請輸入您的新密碼' },
+          { message: '請輸入您的新密碼', required: true },
           {
             validator: (_, value) => {
               if (!value || value === formData.getFieldValue('password')) {
@@ -43,12 +49,6 @@ function useHelpers({ formData }) {
         ],
       },
       variants: 'input',
-      componentProps: {
-        inputAttr: {
-          placeholder: '請輸入您的新密碼',
-          type: 'password',
-        },
-      },
     },
   ];
   return {

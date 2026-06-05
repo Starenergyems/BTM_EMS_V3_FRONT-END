@@ -31,14 +31,42 @@ const generateMinuteIntervals = (endTime, sec = 180) => {
 // 服務商品圖表基本設定
 const chartOptions = (legendNameMap = []) => {
   return {
+    grid: {
+      borderColor: color.white,
+      borderWidth: 1,
+      bottom: 20,
+      containLabel: true,
+      left: 10,
+      right: 10,
+      show: true,
+      top: 10,
+    },
+    legend: {
+      borderRadius: 5,
+      bottom: 10,
+      data: legendNameMap.map((key) => key.name),
+      formatter: (name) => {
+        const item = legendNameMap.find((legend) => legend.name === name);
+        return item ? item.title : name;
+      },
+      icon: 'roundRect',
+      itemGap: 30,
+      itemHeight: 10,
+      itemWidth: 35,
+      padding: 10,
+      selected: legendNameMap
+        .map((key) => key.name)
+        .reduce((acc, key) => {
+          acc[key] = true;
+          return acc;
+        }, {}),
+      show: false,
+    },
+    series: {},
     // 在這裡添加圖表的基本配置
     tooltip: {
-      trigger: 'axis',
       backgroundColor: color.themeBlack,
       borderColor: 'transparent',
-      textStyle: {
-        color: color.white,
-      },
       formatter(params) {
         const numberFormat = new Intl.NumberFormat('en-US', {
           maximumFractionDigits: 3,
@@ -87,39 +115,11 @@ const chartOptions = (legendNameMap = []) => {
         }
         return '';
       },
-    },
-    grid: {
-      top: 10,
-      left: 10,
-      right: 10,
-      bottom: 20,
-      containLabel: true,
-      borderWidth: 1,
-      borderColor: color.white,
-      show: true,
-    },
-    legend: {
-      data: legendNameMap.map((key) => key.name),
-      selected: legendNameMap
-        .map((key) => key.name)
-        .reduce((acc, key) => {
-          acc[key] = true;
-          return acc;
-        }, {}),
-      icon: 'roundRect',
-      itemWidth: 35,
-      itemHeight: 10,
-      itemGap: 30,
-      borderRadius: 5,
-      padding: 10,
-      bottom: 10,
-      show: false,
-      formatter: (name) => {
-        const item = legendNameMap.find((legend) => legend.name === name);
-        return item ? item.title : name;
+      textStyle: {
+        color: color.white,
       },
+      trigger: 'axis',
     },
-    series: {},
   };
 };
 
@@ -146,17 +146,17 @@ const handleChart = (ref, chartRef, option) => {
           // 取消之前的高亮
           if (currentHighlightIndex !== null) {
             chartRef.current.dispatchAction({
-              type: 'downplay',
-              seriesIndex: 1,
               dataIndex: currentHighlightIndex,
+              seriesIndex: 1,
+              type: 'downplay',
             });
           }
 
           // 高亮當前項目
           chartRef.current.dispatchAction({
-            type: 'highlight',
-            seriesIndex: 1,
             dataIndex: params.dataIndex,
+            seriesIndex: 1,
+            type: 'highlight',
           });
 
           currentHighlightIndex = params.dataIndex;
@@ -178,8 +178,8 @@ const handleChart = (ref, chartRef, option) => {
 // 服務商品客製化 legend 觸發事件
 function customLegendOnClick(name, chart, setState) {
   chart.dispatchAction({
-    type: 'legendToggleSelect',
     name,
+    type: 'legendToggleSelect',
   });
 
   setState((prevState) => {
@@ -202,9 +202,9 @@ const downloadChartImageHandler = (chartRef) => {
   if (chartRef.current) {
     const chartInstance = chartRef.current;
     const dataURL = chartInstance.getDataURL({
-      type: 'png', // 'png' 或 'jpeg'
-      pixelRatio: 3, // 像素比例
       backgroundColor: color.themeBlue,
+      pixelRatio: 3, // 像素比例
+      type: 'png', // 'png' 或 'jpeg'
     });
 
     const link = document.createElement('a');
@@ -260,6 +260,13 @@ const dataZoomChangeHandler = (
 // dataZoom 範圍 label formatter
 const dataZoomLabelFormatterHandler = (printRef, currentZoomRange) => {
   return {
+    formatter:
+      currentZoomRange === 100
+        ? function (value) {
+            // 完整視圖時只格式化整點
+            return value.endsWith('00:00') ? value : '';
+          }
+        : undefined, // 縮放時使用預設格式化
     interval:
       currentZoomRange === 100
         ? function (index, value) {
@@ -278,13 +285,6 @@ const dataZoomLabelFormatterHandler = (printRef, currentZoomRange) => {
             return false;
           }
         : 'auto', // 縮放時讓套件自動決定
-    formatter:
-      currentZoomRange === 100
-        ? function (value) {
-            // 完整視圖時只格式化整點
-            return value.endsWith('00:00') ? value : '';
-          }
-        : undefined, // 縮放時使用預設格式化
   };
 };
 
@@ -307,15 +307,15 @@ const exportToExcelHandler = async (legendNameMap, datas) => {
 
   worksheet.getRow(1).font = {
     bold: true,
-    size: 12,
     color: { argb: 'FFFFFFFF' },
+    size: 12,
   };
   worksheet.getRow(1).fill = {
-    type: 'pattern',
-    pattern: 'solid',
     fgColor: { argb: color.themeBlue.replace('#', '') },
+    pattern: 'solid',
+    type: 'pattern',
   };
-  worksheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
+  worksheet.getRow(1).alignment = { horizontal: 'center', vertical: 'middle' };
   worksheet.getRow(1).height = 25; // 設定標題行高
 
   // 添加資料
@@ -331,7 +331,7 @@ const exportToExcelHandler = async (legendNameMap, datas) => {
 
     const row = worksheet.addRow(rowData);
     // 設定每行資料置中
-    row.alignment = { vertical: 'middle', horizontal: 'center' };
+    row.alignment = { horizontal: 'center', vertical: 'middle' };
     row.height = 20; // 設定資料行高
   });
 
@@ -398,14 +398,17 @@ const getNewDatasHandler = async (url, chartDatas, newData, setNewData) => {
 const noDataHandler = (setChartChart, chartOption) => {
   setChartChart({
     ...chartOption,
+    dataZoom: {
+      show: false,
+    },
     title: {
+      left: 'center',
       text: '暫無數據顯示',
       textStyle: {
         color: '#fff',
         fontSize: 16,
         fontWeight: 'normal',
       },
-      left: 'center',
       top: 'center',
     },
     tooltip: {
@@ -417,9 +420,6 @@ const noDataHandler = (setChartChart, chartOption) => {
     yAxis: {
       show: false,
     },
-    dataZoom: {
-      show: false,
-    },
   });
 };
 
@@ -429,17 +429,17 @@ const fullTimeAxisHandler = (interval) => {
 };
 
 export {
-  generateMinuteIntervals,
   chartOptions,
-  handleChart,
   customLegendOnClick,
-  downloadChartImageHandler,
-  resetChartHandler,
   dataZoomChangeHandler,
   dataZoomLabelFormatterHandler,
+  downloadChartImageHandler,
   exportToExcelHandler,
-  rotateHandeler,
-  getNewDatasHandler,
-  noDataHandler,
   fullTimeAxisHandler,
+  generateMinuteIntervals,
+  getNewDatasHandler,
+  handleChart,
+  noDataHandler,
+  resetChartHandler,
+  rotateHandeler,
 };

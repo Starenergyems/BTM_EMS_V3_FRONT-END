@@ -1,13 +1,13 @@
 import { forwardRef } from "react";
 
 import {
-  CheckboxStyle,
   CheckboxGroupStyle,
+  CheckboxStyle,
 } from "@/components/units/checkbox/indexStyle";
 
 const Checkbox = forwardRef(
   (
-    { className, children, checkboxAttr, errorMessage, isInvalid, ...props },
+    { checkboxAttr, children, className, errorMessage, isInvalid, ...props },
     ref
   ) => {
     return (
@@ -16,9 +16,9 @@ const Checkbox = forwardRef(
           {...checkboxAttr}
           // 使用Checkbox.XXX的時候才會將ant design設計的Prop傳遞下去
           {...props}
+          $isInvalid={isInvalid}
           className={`styled-container-checkbox ${className ?? ""}`}
           ref={ref}
-          $isInvalid={isInvalid}
         >
           {children}
         </CheckboxStyle>
@@ -30,7 +30,7 @@ const Checkbox = forwardRef(
   }
 );
 Checkbox.Group = forwardRef(
-  ({ className, children, checkboxGroupAttr, ...props }, ref) => {
+  ({ checkboxGroupAttr, children, className, ...props }, ref) => {
     return (
       <CheckboxGroupStyle
         {...checkboxGroupAttr}

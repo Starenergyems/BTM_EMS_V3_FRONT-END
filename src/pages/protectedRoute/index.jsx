@@ -1,5 +1,5 @@
-import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
 import { pagesPathName } from "@/router";
 
 function ProtectedRoute({ element: Element }) {
@@ -13,7 +13,7 @@ function ProtectedRoute({ element: Element }) {
     permissions &&
     !permissions.includes(accountsState?.omRole)
   ) {
-    return <Navigate to={pagesPathName.notfound.path} replace />;
+    return <Navigate replace to={pagesPathName.notfound.path} />;
   }
   return <Element />;
 }

@@ -1,6 +1,5 @@
 import { forwardRef } from 'react';
 import { TimePicker as AntdTimePicker } from 'antd';
-import dayjs from 'dayjs';
 import ScopeStyle from './indexStyle';
 
 const format = 'HH:mm:ss';
@@ -18,7 +17,7 @@ const FormTimeRangePicker = ({
       <AntdTimePicker.RangePicker format={format} {...componentProps} />
 
       {(isInvalid || inputAttr?.status === 'error') && (
-        <div className="ant-form-item-explain-error">*{errorMessage}12</div>
+        <div className="ant-form-item-explain-error">*{errorMessage}</div>
       )}
     </ScopeStyle>
   );

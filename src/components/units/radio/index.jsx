@@ -1,12 +1,12 @@
 import { forwardRef } from "react";
 import {
-  RadioStyle,
   RadioGroupStyle,
+  RadioStyle,
 } from "@/components/units/radio/indexStyle";
 
 const Radio = forwardRef(
   (
-    { className, children, errorMessage, isInvalid, radioAttr, ...props },
+    { children, className, errorMessage, isInvalid, radioAttr, ...props },
     ref
   ) => {
     return (
@@ -15,9 +15,9 @@ const Radio = forwardRef(
           {...radioAttr}
           // 使用Radio.XXX的時候才會將ant design設計的Prop傳遞下去
           {...props}
+          $isInvalid={isInvalid}
           className={`styled-container-radio ${className ?? ""}`}
           ref={ref}
-          $isInvalid={isInvalid}
         >
           {children}
         </RadioStyle>
@@ -30,7 +30,7 @@ const Radio = forwardRef(
 );
 Radio.Group = forwardRef(
   (
-    { className, children, errorMessage, isInvalid, radioGroupAttr, ...props },
+    { children, className, errorMessage, isInvalid, radioGroupAttr, ...props },
     ref
   ) => {
     return (
@@ -38,9 +38,9 @@ Radio.Group = forwardRef(
         <RadioGroupStyle
           {...radioGroupAttr}
           {...props}
+          $isInvalid={isInvalid}
           className={`styled-container-radio-group ${className ?? ""}`}
           ref={ref}
-          $isInvalid={isInvalid}
         >
           {children}
         </RadioGroupStyle>

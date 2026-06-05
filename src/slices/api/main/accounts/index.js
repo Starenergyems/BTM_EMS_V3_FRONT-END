@@ -6,25 +6,22 @@ import {
 } from './indexHelper';
 
 const omRole = {
-  superUser: { key: '最高權限', value: 'admin' },
   manager: { key: '管理者	', value: 'manager' },
   normal: { key: '一般用戶', value: 'viewer' },
+  superUser: { key: '最高權限', value: 'admin' },
 };
 
 //初始值
 const initialState = {
   id: null,
+  microsoftData: {},
   // omRole: null,
   omRole: 'admin',
   omRoleStr: '',
   operators: [],
-  microsoftData: {},
 };
 
 const accountsSlice = createSlice({
-  name: 'accounts',
-  initialState,
-  reducers: {},
   extraReducers(builder) {
     builder.addCase(getAccountsInfo.fulfilled, (state, action) => {
       const { id, omRole, omRoleStr } = action.payload;
@@ -44,6 +41,9 @@ const accountsSlice = createSlice({
       state.operators = operators;
     });
   },
+  initialState,
+  name: 'accounts',
+  reducers: {},
 });
 
 export { omRole };

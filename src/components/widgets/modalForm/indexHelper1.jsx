@@ -1,18 +1,30 @@
-import { ImageUpload, Textarea } from '@/components/units';
-import { TimePicker, Upload } from 'antd';
 import { Icon } from '@iconify/react';
-import { FormInput, FormSelect } from '@/components/units/form/index';
+import { ImageUpload, Textarea } from '@/components/units';
 import DatePicker from '@/components/units/datePicker';
+import { FormInput, FormSelect } from '@/components/units/form/index';
 import { toUtcDateTime } from '@/utils/format';
+import { TimePicker, Upload } from 'antd';
 import { color } from '@/styles/variable/indexStyle';
 
 let hiddenRecord = {
   firstIsHiddenIndex: null,
-  lastIsHiddenIndex: null,
   isHiddenCount: 0,
+  lastIsHiddenIndex: null,
   record: {},
 };
 
+//處理日期元件的值(因Datepicker元件需要dayjs的格式value，但前後端資料面需要iso8601格式)
+function getFormatDateValue(values, dateFields) {
+  const dateFielsList = [...new Set(dateFields)].filter(
+    (item) => item !== undefined,
+  );
+  if (dateFielsList.length > 0) {
+    for (const name of dateFielsList) {
+      values[name] = toUtcDateTime(values[name]);
+    }
+  }
+  return values;
+}
 //決定要使用哪一個表單元件
 function getFormUnit(item, formInstance, dateFields, isSubmitted) {
   switch (item.type) {
@@ -37,10 +49,10 @@ function getFormUnit(item, formInstance, dateFields, isSubmitted) {
         inputAttr: {
           ...item?.datePickerProps?.inputAttr,
           name: item.formItemAttr.name, //使用Form.Item的name
+          onChange: item?.datePickerProps?.inputAttr?.onChange,
           value:
             item?.datePickerProps?.inputAttr?.value ??
             item?.datePickerProps?.value,
-          onChange: item?.datePickerProps?.inputAttr?.onChange,
         },
       };
       return <DatePicker {...datePickerProps} />;
@@ -52,18 +64,6 @@ function getFormUnit(item, formInstance, dateFields, isSubmitted) {
         ...item.datePickerProps,
       };
       return <RangePicker {...datePickerProps} />;
-    }
-    case 'input': {
-      const inputProps = {
-        ...item.inputProps,
-        inputAttr: {
-          ...item?.inputProps?.inputAttr,
-          name: item.formItemAttr.name, //使用Form.Item的name
-          value: item?.inputProps?.inputAttr?.value ?? item?.inputProps?.value,
-          onChange: item?.inputProps?.inputAttr?.onChange,
-        },
-      };
-      return <FormInput {...inputProps} />;
     }
     case 'imageUpload': {
       let imageProps = {
@@ -94,17 +94,29 @@ function getFormUnit(item, formInstance, dateFields, isSubmitted) {
       }
       return <ImageUpload {...imageProps} />;
     }
+    case 'input': {
+      const inputProps = {
+        ...item.inputProps,
+        inputAttr: {
+          ...item?.inputProps?.inputAttr,
+          name: item.formItemAttr.name, //使用Form.Item的name
+          onChange: item?.inputProps?.inputAttr?.onChange,
+          value: item?.inputProps?.inputAttr?.value ?? item?.inputProps?.value,
+        },
+      };
+      return <FormInput {...inputProps} />;
+    }
     case 'select': {
       const selectProps = {
         ...item.selectProps,
-        themecategory: 'circle-light',
+        onChange:
+          item?.selectProps?.onChange ||
+          item?.selectProps?.selectAttr?.onChange,
         selectAttr: {
           ...item?.selectProps?.selectAttr,
           name: item.formItemAttr.name, //使用Form.Item的name
         },
-        onChange:
-          item?.selectProps?.onChange ||
-          item?.selectProps?.selectAttr?.onChange,
+        themecategory: 'circle-light',
       };
       return <FormSelect {...selectProps} />;
     }
@@ -114,8 +126,8 @@ function getFormUnit(item, formInstance, dateFields, isSubmitted) {
         inputAttr: {
           ...item?.inputProps?.inputAttr,
           name: item.formItemAttr.name, //使用Form.Item的name
-          value: item?.inputProps?.inputAttr?.value ?? item?.inputProps?.value,
           onChange: item?.inputProps?.inputAttr?.onChange,
+          value: item?.inputProps?.inputAttr?.value ?? item?.inputProps?.value,
         },
         inputTextAreaAttr: {
           ...item?.inputProps?.inputTextAreaAttr,
@@ -145,8 +157,8 @@ function getFormUnit(item, formInstance, dateFields, isSubmitted) {
             <span className="btn-upload">
               <Icon
                 color={color.white}
-                icon="material-symbols:upload"
                 fontSize={20}
+                icon="material-symbols:upload"
               />
             </span>
           )}
@@ -159,7 +171,7 @@ function getFormUnit(item, formInstance, dateFields, isSubmitted) {
 function getInitialValues(list) {
   const obj = {};
   for (const item of list) {
-    let value, name;
+    let name, value;
     switch (item.type) {
       case 'datePicker':
         //沒有可以設定name的屬性，因此只能寫在form.Item上
@@ -171,15 +183,15 @@ function getInitialValues(list) {
         value = item?.formItemAttr?.value || item?.datePickerProps?.value;
         name = item?.formItemAttr?.name;
         break;
-      case 'input': {
-        value = item?.formItemAttr?.value || item?.inputProps?.inputAttr?.value;
-        name = item?.formItemAttr?.name || item?.inputProps?.inputAttr?.name;
-        break;
-      }
       //沒有可以設定name的屬性，因此只能寫在form.Item上
       case 'imageUpload': {
         value = item?.formItemAttr?.value;
         name = item?.formItemAttr?.name;
+        break;
+      }
+      case 'input': {
+        value = item?.formItemAttr?.value || item?.inputProps?.inputAttr?.value;
+        name = item?.formItemAttr?.name || item?.inputProps?.inputAttr?.name;
         break;
       }
       case 'select': {
@@ -207,51 +219,11 @@ function getInitialValues(list) {
   }
   return obj;
 }
-//送出表單
-function onSubmit(form, onFail, onSuccess, setIsSubmitted, dateFields) {
-  setIsSubmitted(true);
-  form
-    .validateFields()
-    .then((values) => {
-      if (typeof onSuccess === 'function') {
-        values = getFormatDateValue(values, dateFields);
 
-        onSuccess(values, form);
-      }
-    })
-    .catch((errorInfo) => {
-      const { errorFields } = errorInfo;
-      form.scrollToField(errorFields[0].name[0], {
-        block: 'center',
-        behavior: 'smooth',
-      });
-      if (typeof onFail === 'function') {
-        onFail(errorInfo);
-      }
-    });
-}
-
-//表單reset
-function onReset(formInstance, setIsSubmitted) {
-  formInstance.resetFields();
-  setIsSubmitted(false);
-}
-//處理日期元件的值(因Datepicker元件需要dayjs的格式value，但前後端資料面需要iso8601格式)
-function getFormatDateValue(values, dateFields) {
-  const dateFielsList = [...new Set(dateFields)].filter(
-    (item) => item !== undefined,
-  );
-  if (dateFielsList.length > 0) {
-    for (const name of dateFielsList) {
-      values[name] = toUtcDateTime(values[name]);
-    }
-  }
-  return values;
-}
 //處理list中的各個item的offset
 function getOffset({
-  isFullWidth,
   index,
+  isFullWidth,
   isHaveGroupTitle,
   item,
   list,
@@ -272,8 +244,8 @@ function getOffset({
   if (index === 0) {
     hiddenRecord = {
       firstIsHiddenIndex: null,
-      lastIsHiddenIndex: null,
       isHiddenCount: 0,
+      lastIsHiddenIndex: null,
       record: {},
     };
   } else {
@@ -335,5 +307,33 @@ function getOffset({
   }
   return offset;
 }
+//表單reset
+function onReset(formInstance, setIsSubmitted) {
+  formInstance.resetFields();
+  setIsSubmitted(false);
+}
+//送出表單
+function onSubmit(form, onFail, onSuccess, setIsSubmitted, dateFields) {
+  setIsSubmitted(true);
+  form
+    .validateFields()
+    .then((values) => {
+      if (typeof onSuccess === 'function') {
+        values = getFormatDateValue(values, dateFields);
 
-export { getFormUnit, getOffset, getInitialValues, onReset, onSubmit };
+        onSuccess(values, form);
+      }
+    })
+    .catch((errorInfo) => {
+      const { errorFields } = errorInfo;
+      form.scrollToField(errorFields[0].name[0], {
+        behavior: 'smooth',
+        block: 'center',
+      });
+      if (typeof onFail === 'function') {
+        onFail(errorInfo);
+      }
+    });
+}
+
+export { getFormUnit, getInitialValues, getOffset, onReset, onSubmit };

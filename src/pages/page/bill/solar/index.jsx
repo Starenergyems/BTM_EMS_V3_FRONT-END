@@ -1,12 +1,10 @@
-import { pagesPathName } from '@/router';
 import { BillOverview } from '@/components/page/billOverview';
+import { pagesPathName } from '@/router';
 
 function solar() {
-  const { routeName, pathName, pathNameEN } = pagesPathName.bill.solar;
-
-  return (
-    <BillOverview title={pathName} titleEn={pathNameEN} name={routeName} />
-  );
+  const { pathName, pathNameEN, routeName } = pagesPathName.bill.solar;
+  const name = routeName.split('bill')[1]?.toLocaleLowerCase() || '';
+  return <BillOverview name={name} title={pathName} titleEn={pathNameEN} />;
 }
 
 export default solar;

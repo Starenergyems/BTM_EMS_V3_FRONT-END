@@ -6,8 +6,8 @@ import { endpoints } from '@/utils/endpoints';
 // 2. api function
 // 3. 一般function
 
-function useHelpers({ setState, formInstance }) {
-  const getDatas = async () => {
+function useHelpers({ formInstance, setState }) {
+  const getDatas = async (prefillValues = {}) => {
     try {
       const [limitResponse, switchResponse] = await Promise.all([
         api.get(endpoints.setting.limit),
@@ -19,13 +19,17 @@ function useHelpers({ setState, formInstance }) {
         ...limitResponse.data.data,
         ...switchResponse.data.data,
       };
+      const mergedData = {
+        ...finalData,
+        ...prefillValues,
+      };
       setState((prevState) => {
         return {
           ...prevState,
-          ...finalData,
+          ...mergedData,
         };
       });
-      formInstance.setFieldsValue(finalData);
+      formInstance.setFieldsValue(mergedData);
     } catch (error) {
       console.error('API Error:', error);
     }

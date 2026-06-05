@@ -9,9 +9,8 @@ function useHelpers({ date, type }) {
   function getColumnDatas() {
     return [
       {
-        dataIndex: 'time',
-        title: '起始時間',
         align: 'center',
+        dataIndex: 'time',
         render: (value) =>
           (
             <span>
@@ -22,41 +21,42 @@ function useHelpers({ date, type }) {
                   : `${value} 月`}
             </span>
           ) || '--',
+        title: '起始時間',
       },
       type === 'day'
         ? {
+            align: 'center',
             dataIndex: 'price_list',
+            render: (value) => value || '--',
             title: (
               <div>
                 時間電價
                 <br /> (NT$)
               </div>
             ),
-            align: 'center',
-            render: (value) => value || '--',
           }
         : {},
       {
+        align: 'center',
         dataIndex: 'solar_benefit_hourly_sums',
+        render: (value) => value || '--',
         title: (
           <div>
             光效益
             <br /> (NT$)
           </div>
         ),
-        align: 'center',
-        render: (value) => value || '--',
       },
       {
+        align: 'center',
         dataIndex: 'acc_solar_battery_benefit_hourly_sums',
+        render: (value) => value || '--',
         title: (
           <div>
             光儲效益
             <br /> (NT$)
           </div>
         ),
-        align: 'center',
-        render: (value) => value || '--',
       },
     ];
   }

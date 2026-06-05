@@ -24,25 +24,26 @@ function useHelpers({ setMainState }) {
   function getDispatchCommandTableColumns() {
     return [
       {
-        dataIndex: "notificationTime",
-        title: "通知時間",
         align: "center",
+        dataIndex: "notificationTime",
         fixed: "left",
         render: (value) => toDateTimeStr(value),
+        title: "通知時間",
       },
       {
+        align: "center",
         dataIndex: "serviceStart",
+        render: (value) => toDateTimeStr(value, "HH:mm"),
         title: "服務開始",
-        align: "center",
-        render: (value) => toDateTimeStr(value, "HH:mm"),
       },
       {
+        align: "center",
         dataIndex: "serviceEnd",
-        title: "服務結束",
-        align: "center",
         render: (value) => toDateTimeStr(value, "HH:mm"),
+        title: "服務結束",
       },
       {
+        align: "center",
         dataIndex: "prev5minAvgPower",
         title: (
           <>
@@ -51,9 +52,9 @@ function useHelpers({ setMainState }) {
             平均功率(kW)
           </>
         ),
-        align: "center",
       },
       {
+        align: "center",
         dataIndex: "fullResponseTime",
         title: (
           <>
@@ -62,9 +63,9 @@ function useHelpers({ setMainState }) {
             (min)
           </>
         ),
-        align: "center",
       },
       {
+        align: "center",
         dataIndex: "spm",
         title: (
           <>
@@ -73,9 +74,9 @@ function useHelpers({ setMainState }) {
             (%)
           </>
         ),
-        align: "center",
       },
       {
+        align: "center",
         dataIndex: "serviceEnergy",
         title: (
           <>
@@ -84,7 +85,6 @@ function useHelpers({ setMainState }) {
             (kWh)
           </>
         ),
-        align: "center",
       },
     ];
   }

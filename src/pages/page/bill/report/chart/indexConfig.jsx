@@ -2,16 +2,16 @@ import { color } from '@/styles/variable/indexStyle';
 
 const yAxisLabels = [
   {
-    name: 'ntd',
-    title: '金額 NT$',
-    position: 'left',
     color: color.white,
+    name: 'ntd',
+    position: 'left',
+    title: '金額 NT$',
   },
   {
-    name: 'ntd',
-    title: '累積效益 NT$',
-    position: 'right',
     color: color.brightGreen,
+    name: 'ntd',
+    position: 'right',
+    title: '累積效益 NT$',
   },
 ];
 
@@ -19,31 +19,31 @@ const config = {
   color: color.lightBlue,
   legendNameMap: [
     {
+      accumulation: false,
+      bgColor: color.red,
       name: 'load_hourly_sums',
       title: '負載',
-      bgColor: color.red,
-      accumulation: false,
       unit: 'NT$',
     },
     {
+      accumulation: false,
+      bgColor: color.warningYellow,
       name: 'load_add_solar_hourly_sums',
       title: '+光效益',
-      bgColor: color.warningYellow,
-      accumulation: false,
       unit: 'NT$',
     },
     {
+      accumulation: false,
+      bgColor: color.blue,
       name: 'load_add_solar_battery_hourly_sums',
       title: '+光儲效益',
-      bgColor: color.blue,
-      accumulation: false,
       unit: 'NT$',
     },
     {
+      accumulation: true,
+      bgColor: color.brightGreen,
       name: 'acc_solar_battery_benefit_hourly_sums',
       title: '+累積效益',
-      bgColor: color.brightGreen,
-      accumulation: true,
       unit: 'NT$',
     },
   ],

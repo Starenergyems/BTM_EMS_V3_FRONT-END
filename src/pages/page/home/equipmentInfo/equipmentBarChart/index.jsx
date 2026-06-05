@@ -1,18 +1,18 @@
-import { useEffect, useRef, useMemo } from 'react';
-import { noDataHandler } from '@/utils/chart';
-import { useEchartAutoResize } from '@/hooks/useEchartAutoResize';
+import { useEffect, useMemo, useRef } from 'react';
 import TransparentCard from '@/components/units/transparentCard';
-import ScopeStyle from './indexStyle';
+import { useEchartAutoResize } from '@/hooks/useEchartAutoResize';
+import { noDataHandler } from '@/utils/chart';
 import { useHelpers } from './indexHelper';
+import ScopeStyle from './indexStyle';
 
-function EquipmentBarChart({ type, data, isPending }) {
+function EquipmentBarChart({ data, isPending, type }) {
   const printRef = useRef(null);
   const printChartRef = useRef(null);
 
-  const { getChartOption, setChart, legendNameMap } = useHelpers({
+  const { getChartOption, legendNameMap, setChart } = useHelpers({
     refs: {
-      printRef,
       printChartRef,
+      printRef,
     },
   });
 
@@ -54,41 +54,41 @@ function EquipmentBarChart({ type, data, isPending }) {
         const seriesData = legendNameMap.map((item) => {
           const name = item?.[type]?.[0]?.name;
           return {
-            unit: 'NT$',
-            value: data?.[name] ?? '',
             itemStyle: {
               color: item.color,
             },
+            unit: 'NT$',
+            value: data?.[name] ?? '',
           };
         });
         newOption.yAxis.data = legendNameMap.map((item) => item.title);
         newOption.series = [
-          { type: 'bar', barWidth: '18px', data: seriesData },
+          { barWidth: '18px', data: seriesData, type: 'bar' },
         ];
       } else {
         const seriesData = legendNameMap.map((item) => {
           const value = item?.[type]?.[1]?.name || '';
           const unit = item?.[type]?.[1]?.unit || '';
           return {
-            name: item.name,
-            type: 'bar',
-            stack: 'total',
             barWidth: '18px',
-            itemStyle: {
-              color: item.color,
-            },
             data: [
               { value: '' },
               {
-                value: item.isSupply ? data?.[value] : '',
                 unit: unit,
+                value: item.isSupply ? data?.[value] : '',
               },
               {
-                value: !item.isSupply ? data?.[value] : '',
                 unit: unit,
+                value: !item.isSupply ? data?.[value] : '',
               },
               { value: '' },
             ],
+            itemStyle: {
+              color: item.color,
+            },
+            name: item.name,
+            stack: 'total',
+            type: 'bar',
           };
         });
 
@@ -103,7 +103,7 @@ function EquipmentBarChart({ type, data, isPending }) {
   return (
     <ScopeStyle>
       <TransparentCard>
-        <div ref={printRef} className="chart-wrapper"></div>
+        <div className="chart-wrapper" ref={printRef}></div>
       </TransparentCard>
     </ScopeStyle>
   );

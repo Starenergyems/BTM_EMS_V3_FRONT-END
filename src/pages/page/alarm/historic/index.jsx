@@ -1,11 +1,11 @@
-import { pagesPathName } from '@/router';
 import AlarmOverview from '@/components/page/alarmOverview';
+import { pagesPathName } from '@/router';
 
 function Historic() {
-  const { routeName, pathName, pathNameEN } = pagesPathName.alarm.historic;
+  const { pathName, pathNameEN, routeName } = pagesPathName.alarm.historic;
 
   return (
-    <AlarmOverview title={pathName} titleEn={pathNameEN} name={routeName} />
+    <AlarmOverview name={routeName} title={pathName} titleEn={pathNameEN} />
   );
 }
 

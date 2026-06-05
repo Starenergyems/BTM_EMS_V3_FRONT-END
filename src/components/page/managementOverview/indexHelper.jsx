@@ -13,8 +13,8 @@ function useHelpers({ setState }) {
     setState((prevState) => {
       return {
         ...prevState,
-        user: [user?.data],
         accounts: accounts?.data,
+        user: [user?.data],
       };
     });
   };
