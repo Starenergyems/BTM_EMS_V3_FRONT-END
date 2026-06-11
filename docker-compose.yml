@@ -1,0 +1,13 @@
+services:
+  btm-ems-3:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: btm-ems-3
+    ports:
+      - "3000:80"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    restart: unless-stopped
+        
