@@ -97,6 +97,7 @@ jobs:
               
               echo '🛑 停止舊容器...'
               cd /opt/BTM_EMS_V3_FRONT-END || exit 1
+              docker rm -f btm-ems-3 || true
               docker compose down --remove-orphans || true
               
               echo '🧹 清理專案暫存檔...'
