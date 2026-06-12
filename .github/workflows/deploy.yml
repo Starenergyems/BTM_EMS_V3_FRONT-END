@@ -9,32 +9,34 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
       packages: write
+
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-    
+
     steps:
-      # 1️⃣ 取得程式碼
+      # 1️⃣ Checkout
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      # 2️⃣ 計算映像資訊
+      # 2️⃣ Generate image tags
       - name: Prepare image tags
         id: image_vars
         run: |
           OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           REPO_LC=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
+
           IMAGE_REPO="ghcr.io/${OWNER_LC}/${REPO_LC}"
           IMAGE_TAG="${IMAGE_REPO}:${{ github.ref_name }}-${{ github.sha }}"
-          IMAGE_BRANCH_LATEST="${IMAGE_REPO}:${{ github.ref_name }}-latest"
+          IMAGE_LATEST="${IMAGE_REPO}:${{ github.ref_name }}-latest"
 
-          echo "image_repo=${IMAGE_REPO}" >> "$GITHUB_OUTPUT"
           echo "image_tag=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
-          echo "image_branch_latest=${IMAGE_BRANCH_LATEST}" >> "$GITHUB_OUTPUT"
+          echo "image_latest=${IMAGE_LATEST}" >> "$GITHUB_OUTPUT"
 
-      # 3️⃣ 登入 GHCR（GitHub Container Registry）
+      # 3️⃣ Login GHCR
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
@@ -42,7 +44,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
-      # 4️⃣ 在 GitHub Runner 建立並推送映像
+      # 4️⃣ Build & Push Image
       - name: Build and push image
         uses: docker/build-push-action@v6
         with:
@@ -51,98 +53,46 @@ jobs:
           push: true
           tags: |
             ${{ steps.image_vars.outputs.image_tag }}
-            ${{ steps.image_vars.outputs.image_branch_latest }}
-      
-      # 5️⃣ 設定 SSH key
+            ${{ steps.image_vars.outputs.image_latest }}
+
+      # 5️⃣ Setup SSH key
       - name: Setup SSH key
         run: |
           echo "${{ secrets.EC2_KEY }}" > key.pem
           chmod 600 key.pem
 
-      # 6️⃣ 驗證部署 Secrets
-      - name: Validate deploy secrets
-        env:
-          EC2_HOST: ${{ secrets.EC2_HOST }}
-          EC2_USER: ${{ secrets.EC2_USER }}
-          EC2_KEY: ${{ secrets.EC2_KEY }}
+      # 6️⃣ Deploy to EC2
+      - name: Deploy to EC2
         run: |
-          set -e
+          SSH_OPTS="-o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ServerAliveCountMax=20 -o ConnectTimeout=20 -i key.pem"
 
-          [ -n "$EC2_HOST" ] || { echo "❌ EC2_HOST is empty. Please set repository secret EC2_HOST."; exit 1; }
-          [ -n "$EC2_USER" ] || { echo "❌ EC2_USER is empty. Please set repository secret EC2_USER."; exit 1; }
-          [ -n "$EC2_KEY" ] || { echo "❌ EC2_KEY is empty. Please set repository secret EC2_KEY."; exit 1; }
+          ssh $SSH_OPTS ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
+            set -e
 
-          if [[ "$EC2_HOST" == *" "* ]]; then
-            echo "❌ EC2_HOST should be only hostname or IP (no spaces)."
-            exit 1
-          fi
+            echo '🚀 Start deploy'
 
-          echo "✅ Required deploy secrets are present."
-      
-      # 7️⃣ SSH 部署到 EC2（只 pull image，不在遠端 build）
-      - name: Deploy on EC2
-        run: |
-          SSH_OPTS="-o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ServerAliveCountMax=20 -o TCPKeepAlive=yes -o ConnectTimeout=20 -i key.pem"
+            # project name（避免亂掉）
+            export COMPOSE_PROJECT_NAME=btm_ems_v3_frontend_${{ github.ref_name }}
 
-          for attempt in 1 2; do
-            echo "🚀 Remote deploy attempt ${attempt}/2"
+            cd /opt/BTM_EMS_V3_FRONT-END
 
-            if ssh $SSH_OPTS ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
-              set -x
-              set -e
-              
-              export COMPOSE_PROJECT_NAME=btm_ems_v3_frontend_${{ github.ref_name }}
-              export IMAGE_TAG=${{ steps.image_vars.outputs.image_tag }}
-              
-              echo '🔧 修正專案目錄權限...'
-              sudo chown -R ubuntu:ubuntu /opt/BTM_EMS_V3_FRONT-END
-              
-              echo '📂 先拉最新程式碼...'
-              cd /opt/BTM_EMS_V3_FRONT-END || exit 1
-              git fetch --all
-              git reset --hard origin/${{ github.ref_name }}
-              git clean -fd
-              
-              echo '🛑 停止並強制移除舊容器...'
-              docker compose down --remove-orphans || true
+            echo '📦 Pull latest image'
+            docker login ghcr.io -u '${{ github.actor }}' -p '${{ github.token }}'
+            docker compose pull btm-ems-3
 
-              # ✅ 直接指定完整容器名稱強制刪除，不存在就靜默跳過
-              docker rm -f \"btm_ems_v3_frontend_${{ github.ref_name }}-btm-ems-3-1\" 2>/dev/null || true
-              
-              echo '🧹 清理專案暫存檔...'
-              find /opt/BTM_EMS_V3_FRONT-END -type f \( -name '*.tmp' -o -name '*.temp' -o -name '*.log' \) -mtime +7 -delete || true
-              
-              echo '🔐 登入 GHCR...'
-              echo '${{ github.token }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
+            echo '🧹 Stop old containers safely'
+            docker compose down --remove-orphans || true
 
-              echo '🐳 拉取 GitHub 已建好的映像...'
-              docker compose pull btm-ems-3
+            echo '🚀 Start new containers (force recreate)'
+            docker compose up -d --force-recreate --remove-orphans btm-ems-3
 
-              echo '🚀 啟動容器（不在遠端 build）...'
-              if ! timeout 180 docker compose up -d --no-build btm-ems-3; then
-                echo '❌ docker compose up timed out or failed. collecting diagnostics...'
-                docker compose ps btm-ems-3 || true
-                docker compose logs --tail=100 btm-ems-3 || true
-                exit 1
-              fi
-              
-              echo '✅ 檢查容器狀態...'
-              docker compose ps btm-ems-3
-              sudo systemctl reload nginx || true
-              echo '✨ 部署完成！'
-            "; then
-              break
-            fi
+            echo '📊 Status'
+            docker compose ps
 
-            if [ "$attempt" -eq 2 ]; then
-              echo '❌ Deploy failed after 2 attempts.'
-              exit 1
-            fi
+            echo '✨ Deploy done'
+          "
 
-            echo '⚠️ SSH disconnected during deploy, retrying once...'
-          done
-
-      # 8️⃣ 清理本地 GitHub Action 用的 SSH key
-      - name: Clean up SSH key
+      # 7️⃣ Cleanup SSH key
+      - name: Cleanup
         if: always()
         run: rm -f key.pem
