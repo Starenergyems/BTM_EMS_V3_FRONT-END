@@ -50,7 +50,7 @@ jobs:
           file: dockerfile
           push: true
           tags: |
-          ghcr.io/starenergyems/btm_ems_v3_frontend:${{ github.ref_name }}
+            ghcr.io/starenergyems/btm_ems_v3_frontend:${{ github.ref_name }}
 
       # 5️⃣ Setup SSH key
       - name: Setup SSH key
