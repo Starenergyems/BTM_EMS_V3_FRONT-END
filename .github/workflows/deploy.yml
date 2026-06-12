@@ -95,9 +95,10 @@ jobs:
               echo '🔧 修正專案目錄權限...'
               sudo chown -R ubuntu:ubuntu /opt/BTM_EMS_V3_FRONT-END
               
-              echo '🛑 停止舊容器...'
+              echo '🛑 停止並強制移除舊容器...'
               cd /opt/BTM_EMS_V3_FRONT-END || exit 1
               docker compose down --remove-orphans || true
+              docker ps -aq --filter "name=btm_ems_v3_frontend_${{ github.ref_name }}" | xargs -r docker rm -f || true
               
               echo '🧹 清理專案暫存檔...'
               find /opt/BTM_EMS_V3_FRONT-END -type f \( -name '*.tmp' -o -name '*.temp' -o -name '*.log' \) -mtime +7 -delete || true
