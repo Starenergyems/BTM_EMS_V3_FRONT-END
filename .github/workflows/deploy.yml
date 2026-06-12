@@ -21,8 +21,28 @@ jobs:
         run: |
           echo "${{ secrets.EC2_KEY }}" > key.pem
           chmod 600 key.pem
+
+      # 3️⃣ 驗證部署 Secrets
+      - name: Validate deploy secrets
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+          EC2_KEY: ${{ secrets.EC2_KEY }}
+        run: |
+          set -e
+
+          [ -n "$EC2_HOST" ] || { echo "❌ EC2_HOST is empty. Please set repository secret EC2_HOST."; exit 1; }
+          [ -n "$EC2_USER" ] || { echo "❌ EC2_USER is empty. Please set repository secret EC2_USER."; exit 1; }
+          [ -n "$EC2_KEY" ] || { echo "❌ EC2_KEY is empty. Please set repository secret EC2_KEY."; exit 1; }
+
+          if [[ "$EC2_HOST" == *" "* ]]; then
+            echo "❌ EC2_HOST should be only hostname or IP (no spaces)."
+            exit 1
+          fi
+
+          echo "✅ Required deploy secrets are present."
       
-      # 3️⃣ SSH 部署到 EC2
+      # 4️⃣ SSH 部署到 EC2
       - name: Deploy on EC2
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
@@ -68,7 +88,7 @@ jobs:
             echo '✨ 部署完成！'
           "
       
-      # 4️⃣ 清理本地 GitHub Action 用的 SSH key
+      # 5️⃣ 清理本地 GitHub Action 用的 SSH key
       - name: Clean up SSH key
         if: always()
         run: rm -f key.pem
