@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - chatkit
+      - develop
 
 jobs:
   deploy:
@@ -45,58 +46,63 @@ jobs:
       # 4️⃣ SSH 部署到 EC2
       - name: Deploy on EC2
         run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
-            set -e
-            
-            echo '🔧 修正專案目錄權限...'
-            sudo chown -R ubuntu:ubuntu /opt/BTM_EMS_V3_FRONT-END
-            
-            echo '🛑 停止舊容器...'
-            cd /opt/BTM_EMS_V3_FRONT-END || exit 1
-            docker compose down || true
-            
-            echo '🧹 清理 Docker 舊資源...'
-            docker system prune -a --volumes --force
-            docker builder prune --all --force
-            
-            echo '🧹 清理系統資源...'
-            sudo apt-get clean
-            sudo apt-get autoremove --purge -y
-            sudo journalctl --vacuum-time=3d
-            sudo rm -rf /tmp/*
-            
-            echo '📂 拉最新程式碼...'
-            git fetch --all
-            git reset --hard origin/chatkit
-            git clean -fd
-            
-            echo '🐳 建立映像（先關閉 BuildKit 以避免 context canceled）...'
-            export DOCKER_BUILDKIT=0
-            export COMPOSE_DOCKER_CLI_BUILD=0
-            docker compose build || {
-              echo '⚠️ 第一次 build 失敗，輸出 Docker 狀態後重試一次...'
-              docker info || true
-              docker system df || true
-              docker compose build
-            }
+          SSH_OPTS="-o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ServerAliveCountMax=20 -o TCPKeepAlive=yes -o ConnectTimeout=20 -i key.pem"
 
-            echo '🚀 啟動容器...'
-            docker compose up -d
-            
-            echo '✅ 檢查容器狀態...'
-            docker compose ps
-            docker compose logs --tail=20 web
-            
-            echo '🔄 清理多餘 Docker（不影響新 build）...'
-            docker image prune -af
-            docker container prune -f
-            docker volume prune -f
-            
-            echo '🔄 重載 Nginx (如果有)...'
-            sudo systemctl reload nginx || true
-            
-            echo '✨ 部署完成！'
-          "
+          for attempt in 1 2; do
+            echo "🚀 Remote deploy attempt ${attempt}/2"
+
+            if ssh $SSH_OPTS ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
+              set -e
+              export COMPOSE_PROJECT_NAME=btm_ems_v3_frontend_chatkit
+              
+              echo '🔧 修正專案目錄權限...'
+              sudo chown -R ubuntu:ubuntu /opt/BTM_EMS_V3_FRONT-END
+              
+              echo '🛑 停止舊容器...'
+              cd /opt/BTM_EMS_V3_FRONT-END || exit 1
+              docker compose down --remove-orphans || true
+              
+              echo '🧹 清理專案暫存檔...'
+              find /opt/BTM_EMS_V3_FRONT-END -type f \( -name '*.tmp' -o -name '*.temp' -o -name '*.log' \) -mtime +7 -delete || true
+              
+              echo '📂 拉最新程式碼...'
+              echo 'Current trigger branch: ${{ github.ref_name }}'
+              git fetch --all
+              git reset --hard origin/${{ github.ref_name }}
+              git clean -fd
+              
+              echo '🐳 建立映像（先關閉 BuildKit 以避免 context canceled）...'
+              export DOCKER_BUILDKIT=0
+              export COMPOSE_DOCKER_CLI_BUILD=0
+              docker compose build || {
+                echo '⚠️ 第一次 build 失敗，輸出 Docker 狀態後重試一次...'
+                docker info || true
+                docker system df || true
+                docker compose build
+              }
+
+              echo '🚀 啟動容器...'
+              docker compose up -d
+              
+              echo '✅ 檢查容器狀態...'
+              docker compose ps
+              docker compose logs --tail=20 web
+              
+              echo '🔄 重載 Nginx (如果有)...'
+              sudo systemctl reload nginx || true
+              
+              echo '✨ 部署完成！'
+            "; then
+              break
+            fi
+
+            if [ "$attempt" -eq 2 ]; then
+              echo '❌ Deploy failed after 2 attempts.'
+              exit 1
+            fi
+
+            echo '⚠️ SSH disconnected during deploy, retrying once...'
+          done
       
       # 5️⃣ 清理本地 GitHub Action 用的 SSH key
       - name: Clean up SSH key
