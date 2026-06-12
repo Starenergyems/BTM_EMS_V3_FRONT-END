@@ -97,7 +97,6 @@ jobs:
               
               echo '🛑 停止舊容器...'
               cd /opt/BTM_EMS_V3_FRONT-END || exit 1
-              docker rm -f btm-ems-3 || true
               docker compose down --remove-orphans || true
               
               echo '🧹 清理專案暫存檔...'
@@ -113,15 +112,16 @@ jobs:
               echo '${{ github.token }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
 
               echo '🐳 拉取 GitHub 已建好的映像...'
-              docker compose pull
+              docker compose pull btm-ems-3
 
               echo '🚀 啟動容器（不在遠端 build）...'
-              docker compose up -d --no-build
+              docker compose up -d --no-build btm-ems-3
               
               echo '✅ 檢查容器狀態...'
-              docker compose ps
+              docker compose ps btm-ems-3
               docker compose logs --tail=50 btm-ems-3
-              docker inspect btm-ems-3 --format='Status={{.State.Status}} Health={{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}} RestartCount={{.RestartCount}}' || true
+              CID=$(docker compose ps -q btm-ems-3)
+              [ -n "$CID" ] && docker inspect "$CID" --format='Status={{.State.Status}} Health={{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}} RestartCount={{.RestartCount}}' || true
               
               echo '🔄 重載 Nginx (如果有)...'
               sudo systemctl reload nginx || true

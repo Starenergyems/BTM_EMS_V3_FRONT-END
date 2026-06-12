@@ -4,7 +4,6 @@ services:
     build:
       context: .
       dockerfile: dockerfile
-    container_name: btm-ems-3
     ports:
       - "3000:80"
     volumes:
