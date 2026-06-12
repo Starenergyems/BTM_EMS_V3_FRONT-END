@@ -65,16 +65,12 @@ jobs:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USER: ${{ secrets.EC2_USER }}
           EC2_KEY: ${{ secrets.EC2_KEY }}
-          GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
-          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
         run: |
           set -e
 
           [ -n "$EC2_HOST" ] || { echo "❌ EC2_HOST is empty. Please set repository secret EC2_HOST."; exit 1; }
           [ -n "$EC2_USER" ] || { echo "❌ EC2_USER is empty. Please set repository secret EC2_USER."; exit 1; }
           [ -n "$EC2_KEY" ] || { echo "❌ EC2_KEY is empty. Please set repository secret EC2_KEY."; exit 1; }
-          [ -n "$GHCR_USERNAME" ] || { echo "❌ GHCR_USERNAME is empty. Please set repository secret GHCR_USERNAME."; exit 1; }
-          [ -n "$GHCR_TOKEN" ] || { echo "❌ GHCR_TOKEN is empty. Please set repository secret GHCR_TOKEN."; exit 1; }
 
           if [[ "$EC2_HOST" == *" "* ]]; then
             echo "❌ EC2_HOST should be only hostname or IP (no spaces)."
@@ -113,7 +109,7 @@ jobs:
               git clean -fd
               
               echo '🔐 登入 GHCR...'
-              echo '${{ secrets.GHCR_TOKEN }}' | docker login ghcr.io -u '${{ secrets.GHCR_USERNAME }}' --password-stdin
+              echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
 
               echo '🐳 拉取 GitHub 已建好的映像...'
               docker compose pull
