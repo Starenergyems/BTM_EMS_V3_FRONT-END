@@ -70,8 +70,18 @@ jobs:
             git reset --hard origin/chatkit
             git clean -fd
             
-            echo '🐳 建立並啟動新容器...'
-            docker compose up -d --build
+            echo '🐳 建立映像（先關閉 BuildKit 以避免 context canceled）...'
+            export DOCKER_BUILDKIT=0
+            export COMPOSE_DOCKER_CLI_BUILD=0
+            docker compose build || {
+              echo '⚠️ 第一次 build 失敗，輸出 Docker 狀態後重試一次...'
+              docker info || true
+              docker system df || true
+              docker compose build
+            }
+
+            echo '🚀 啟動容器...'
+            docker compose up -d
             
             echo '✅ 檢查容器狀態...'
             docker compose ps
