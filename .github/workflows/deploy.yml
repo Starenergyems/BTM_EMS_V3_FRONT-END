@@ -115,7 +115,15 @@ jobs:
               docker compose pull btm-ems-3
 
               echo '🚀 啟動容器（不在遠端 build）...'
-              docker compose up -d --no-build btm-ems-3
+              if ! timeout 180 docker compose up -d --no-build btm-ems-3; then
+                echo '❌ docker compose up timed out or failed. collecting diagnostics...'
+                docker compose ps btm-ems-3 || true
+                docker ps -a --filter "name=btm_ems_v3_frontend_${{ github.ref_name }}" || true
+                docker compose logs --tail=100 btm-ems-3 || true
+                docker events --since 5m --until 0s | tail -n 50 || true
+                sudo ss -ltnp | grep ':3000' || true
+                exit 1
+              fi
               
               echo '✅ 檢查容器狀態...'
               docker compose ps btm-ems-3
