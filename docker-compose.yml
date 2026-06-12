@@ -1,5 +1,6 @@
 services:
   btm-ems-3:
+    image: ${IMAGE_TAG:-ghcr.io/starenergyems/btm_ems_v3_front-end:local}
     build:
       context: .
       dockerfile: dockerfile
