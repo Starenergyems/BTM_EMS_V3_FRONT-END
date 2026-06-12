@@ -1,6 +1,6 @@
 services:
   btm-ems-3:
-    image: ${IMAGE_TAG}
+    image: ghcr.io/starenergyems/btm_ems_v3_frontend:${BRANCH}
     ports:
       - "3000:80"
     restart: unless-stopped

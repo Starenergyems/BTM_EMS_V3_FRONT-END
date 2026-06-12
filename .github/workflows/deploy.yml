@@ -30,8 +30,6 @@ jobs:
           REPO_LC=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
 
           IMAGE_REPO="ghcr.io/${OWNER_LC}/${REPO_LC}"
-          IMAGE_TAG="${IMAGE_REPO}:${{ github.ref_name }}-${{ github.sha }}"
-          IMAGE_LATEST="${IMAGE_REPO}:${{ github.ref_name }}-latest"
 
           echo "image_tag=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
           echo "image_latest=${IMAGE_LATEST}" >> "$GITHUB_OUTPUT"
@@ -52,8 +50,7 @@ jobs:
           file: dockerfile
           push: true
           tags: |
-            ${{ steps.image_vars.outputs.image_tag }}
-            ${{ steps.image_vars.outputs.image_latest }}
+          ghcr.io/starenergyems/btm_ems_v3_frontend:${{ github.ref_name }}
 
       # 5️⃣ Setup SSH key
       - name: Setup SSH key
@@ -67,29 +64,29 @@ jobs:
           SSH_OPTS="-o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ServerAliveCountMax=20 -o ConnectTimeout=20 -i key.pem"
 
           ssh $SSH_OPTS ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
-            set -e
+          set -e
 
-            echo '🚀 Start deploy'
+          echo '🚀 Deploy start'
 
-            # project name（避免亂掉）
-            export COMPOSE_PROJECT_NAME=btm_ems_v3_frontend_${{ github.ref_name }}
+          # 👉 每個 branch 一個 compose project（完全隔離）
+          export COMPOSE_PROJECT_NAME=btm_ems_${{ github.ref_name }}
+          export BRANCH=${{ github.ref_name }}
 
-            cd /opt/BTM_EMS_V3_FRONT-END
+          cd /opt/BTM_EMS_V3_FRONT-END
 
-            echo '📦 Pull latest image'
-            docker login ghcr.io -u '${{ github.actor }}' -p '${{ github.token }}'
-            docker compose pull btm-ems-3
+          echo '📦 Login GHCR'
+          echo '${{ github.token }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
 
-            echo '🧹 Stop old containers safely'
-            docker compose down --remove-orphans || true
+          echo '⬇️ Pull image for branch'
+          BRANCH=$BRANCH docker compose pull
 
-            echo '🚀 Start new containers (force recreate)'
-            docker compose up -d --force-recreate --remove-orphans btm-ems-3
+          echo '🚀 Up service (only this branch)'
+          BRANCH=$BRANCH docker compose up -d --force-recreate --remove-orphans
 
-            echo '📊 Status'
-            docker compose ps
+          echo '📊 Status'
+          docker compose ps
 
-            echo '✨ Deploy done'
+          echo '✨ Done'
           "
 
       # 7️⃣ Cleanup SSH key
