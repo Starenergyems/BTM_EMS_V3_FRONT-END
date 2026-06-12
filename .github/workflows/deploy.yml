@@ -1,4 +1,4 @@
-name: Deploy to EC2 with Docker
+name: Deploy
 
 on:
   push:
@@ -10,40 +10,17 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      packages: write
-
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-
     steps:
-      # 1️⃣ Checkout
-      - name: Checkout repository
-        uses: actions/checkout@v5
+      - uses: actions/checkout@v5
 
-      # 2️⃣ Generate image tags
-      - name: Prepare image tags
-        id: image_vars
-        run: |
-          OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-          REPO_LC=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
-
-          IMAGE_REPO="ghcr.io/${OWNER_LC}/${REPO_LC}"
-
-          echo "image_tag=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
-          echo "image_latest=${IMAGE_LATEST}" >> "$GITHUB_OUTPUT"
-
-      # 3️⃣ Login GHCR
-      - name: Login to GHCR
+      - name: Login GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
-      # 4️⃣ Build & Push Image
-      - name: Build and push image
+      - name: Build & Push (branch tag)
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -52,44 +29,36 @@ jobs:
           tags: |
             ghcr.io/starenergyems/btm_ems_v3_frontend:${{ github.ref_name }}
 
-      # 5️⃣ Setup SSH key
-      - name: Setup SSH key
+      - name: Setup SSH
         run: |
           echo "${{ secrets.EC2_KEY }}" > key.pem
           chmod 600 key.pem
 
-      # 6️⃣ Deploy to EC2
-      - name: Deploy to EC2
+      - name: Deploy
         run: |
-          SSH_OPTS="-o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ServerAliveCountMax=20 -o ConnectTimeout=20 -i key.pem"
-
-          ssh $SSH_OPTS ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
+          ssh -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
           set -e
 
           echo '🚀 Deploy start'
 
-          # 👉 每個 branch 一個 compose project（完全隔離）
-          export COMPOSE_PROJECT_NAME=btm_ems_${{ github.ref_name }}
-          export BRANCH=${{ github.ref_name }}
-
           cd /opt/BTM_EMS_V3_FRONT-END
 
-          echo '📦 Login GHCR'
+          echo '📦 login'
           echo '${{ github.token }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
 
-          echo '⬇️ Pull image for branch'
-          BRANCH=$BRANCH docker compose pull
+          echo '⬇️ pull branch image'
+          docker pull ghcr.io/starenergyems/btm_ems_v3_frontend:${{ github.ref_name }}
 
-          echo '🚀 Up service (only this branch)'
-          BRANCH=$BRANCH docker compose up -d --force-recreate --remove-orphans
+          echo '🔁 switch latest pointer'
+          docker tag ghcr.io/starenergyems/btm_ems_v3_frontend:${{ github.ref_name }} \
+                     ghcr.io/starenergyems/btm_ems_v3_frontend:latest
 
-          echo '📊 Status'
-          docker compose ps
+          echo '🚀 restart container'
+          docker compose up -d
 
-          echo '✨ Done'
+          echo '✨ done'
           "
 
-      # 7️⃣ Cleanup SSH key
       - name: Cleanup
         if: always()
         run: rm -f key.pem
