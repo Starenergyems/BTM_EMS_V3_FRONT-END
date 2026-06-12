@@ -79,7 +79,7 @@ jobs:
 
           echo "✅ Required deploy secrets are present."
       
-     # 7️⃣ SSH 部署到 EC2（只 pull image，不在遠端 build）
+      # 7️⃣ SSH 部署到 EC2（只 pull image，不在遠端 build）
       - name: Deploy on EC2
         run: |
           SSH_OPTS="-o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ServerAliveCountMax=20 -o TCPKeepAlive=yes -o ConnectTimeout=20 -i key.pem"
@@ -88,30 +88,29 @@ jobs:
             echo "🚀 Remote deploy attempt ${attempt}/2"
 
             if ssh $SSH_OPTS ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
+              set -x  # 💡 啟用 Debug 模式，會在 Log 印出每一行真正執行的指令
               set -e
+              
               export COMPOSE_PROJECT_NAME=btm_ems_v3_frontend_${{ github.ref_name }}
               export IMAGE_TAG=${{ steps.image_vars.outputs.image_tag }}
               
               echo '🔧 修正專案目錄權限...'
               sudo chown -R ubuntu:ubuntu /opt/BTM_EMS_V3_FRONT-END
               
-              echo '📂 先拉最新程式碼（確保 docker-compose.yml 是最新的）...'
+              echo '📂 先拉最新程式碼...'
               cd /opt/BTM_EMS_V3_FRONT-END || exit 1
-              echo 'Current trigger branch: ${{ github.ref_name }}'
               git fetch --all
               git reset --hard origin/${{ github.ref_name }}
               git clean -fd
               
               echo '🛑 停止並強制移除舊容器...'
-              # 1. 優先使用 compose down 清理
               docker compose down --remove-orphans || true
               
-              # 2. 精準強制刪除可能殘留的衝突容器（解決你遇到的 Error）
-              TARGET_CONTAINER_NAME=\"btm_ems_v3_frontend_${{ github.ref_name }}-btm-ems-3-1\"
-              if docker ps -a --format '{{.Names}}' | grep -q \"^${TARGET_CONTAINER_NAME}$\"; then
-                echo \"⚠️ 偵測到殘留容器 \${TARGET_CONTAINER_NAME}，正在強制刪除...\"
-                docker rm -f \"\${TARGET_CONTAINER_NAME}\" || true
-              fi
+              # 💥 終極大絕招：直接指定名稱，強制砍掉這個害你卡住的容器，就算它不存在報錯也直接跳過
+              docker rm -f btm_ems_v3_frontend_${{ github.ref_name }}-btm-ems-3-1 || true
+              
+              # 💥 追加保險：用 image 名稱去搜，把所有跟這個服務相關的殘留容器全砍了
+              docker ps -a -q --filter \"name=btm-ems-3\" | xargs -r docker rm -f || true
               
               echo '🧹 清理專案暫存檔...'
               find /opt/BTM_EMS_V3_FRONT-END -type f \( -name '*.tmp' -o -name '*.temp' -o -name '*.log' \) -mtime +7 -delete || true
@@ -126,22 +125,13 @@ jobs:
               if ! timeout 180 docker compose up -d --no-build btm-ems-3; then
                 echo '❌ docker compose up timed out or failed. collecting diagnostics...'
                 docker compose ps btm-ems-3 || true
-                docker ps -a --filter \"name=\${TARGET_CONTAINER_NAME}\" || true
                 docker compose logs --tail=100 btm-ems-3 || true
-                docker events --since 5m --until 0s | tail -n 50 || true
-                sudo ss -ltnp | grep ':3000' || true
                 exit 1
               fi
               
               echo '✅ 檢查容器狀態...'
               docker compose ps btm-ems-3
-              docker compose logs --tail=50 btm-ems-3
-              CID=$(docker compose ps -q btm-ems-3)
-              [ -n \"\$CID\" ] && docker inspect \"\$CID\" --format='Status={{.State.Status}} Health={{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}} RestartCount={{.RestartCount}}' || true
-              
-              echo '🔄 重載 Nginx (如果有)...'
               sudo systemctl reload nginx || true
-              
               echo '✨ 部署完成！'
             "; then
               break
