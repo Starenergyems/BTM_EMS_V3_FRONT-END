@@ -80,6 +80,7 @@ jobs:
           echo "✅ Required deploy secrets are present."
       
       # 7️⃣ SSH 部署到 EC2（只 pull image，不在遠端 build）
+      # 7️⃣ SSH 部署到 EC2（只 pull image，不在遠端 build）
       - name: Deploy on EC2
         run: |
           SSH_OPTS="-o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ServerAliveCountMax=20 -o TCPKeepAlive=yes -o ConnectTimeout=20 -i key.pem"
@@ -88,7 +89,7 @@ jobs:
             echo "🚀 Remote deploy attempt ${attempt}/2"
 
             if ssh $SSH_OPTS ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
-              set -x  # 💡 啟用 Debug 模式，會在 Log 印出每一行真正執行的指令
+              set -x
               set -e
               
               export COMPOSE_PROJECT_NAME=btm_ems_v3_frontend_${{ github.ref_name }}
@@ -106,11 +107,21 @@ jobs:
               echo '🛑 停止並強制移除舊容器...'
               docker compose down --remove-orphans || true
               
-              # 💥 終極大絕招：直接指定名稱，強制砍掉這個害你卡住的容器，就算它不存在報錯也直接跳過
-              docker rm -f btm_ems_v3_frontend_${{ github.ref_name }}-btm-ems-3-1 || true
+              # 🎯 【核心修正】直接逆向抓出霸佔這個名稱的容器 ID，並強制把它刪除！
+              CONFLICT_ID=\$(docker inspect --format='{{.Id}}' \"btm_ems_v3_frontend_${{ github.ref_name }}-btm-ems-3-1\" 2>/dev/null || true)
+              if [ -z \"\$CONFLICT_ID\" ]; then
+                # 如果用全名找不到，試著用斜線開頭的名稱去找
+                CONFLICT_ID=\$(docker ps -a --filter \"name=/btm_ems_v3_frontend_${{ github.ref_name }}-btm-ems-3-1\" -q)
+              fi
               
-              # 💥 追加保險：用 image 名稱去搜，把所有跟這個服務相關的殘留容器全砍了
-              docker ps -a -q --filter \"name=btm-ems-3\" | xargs -r docker rm -f || true
+              if [ -n \"\$CONFLICT_ID\" ]; then
+                echo \"💥 抓到衝突容器 ID: \${CONFLICT_ID}，正在強制執行銷毀...\"
+                docker rm -f \"\$CONFLICT_ID\" || true
+              else
+                echo \"⚠️ 無法透過常規管道抓到衝突容器，執行全域名稱掃描...\"
+                # 散彈槍打鳥：只要名字包含 btm_ems_v3_frontend_chatkit 的，全部抓出來拔掉
+                docker ps -a --format '{{.ID}} {{.Names}}' | grep \"btm_ems_v3_frontend_${{ github.ref_name }}\" | awk '{print \$1}' | xargs -r docker rm -f || true
+              fi
               
               echo '🧹 清理專案暫存檔...'
               find /opt/BTM_EMS_V3_FRONT-END -type f \( -name '*.tmp' -o -name '*.temp' -o -name '*.log' \) -mtime +7 -delete || true
@@ -144,7 +155,7 @@ jobs:
 
             echo '⚠️ SSH disconnected during deploy, retrying once...'
           done
-          
+
       # 8️⃣ 清理本地 GitHub Action 用的 SSH key
       - name: Clean up SSH key
         if: always()
