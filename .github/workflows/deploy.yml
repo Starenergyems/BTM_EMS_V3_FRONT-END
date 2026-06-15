@@ -76,7 +76,7 @@ jobs:
                      ghcr.io/starenergyems/btm_ems_v3_frontend:latest
 
           echo '🚀 restart container'
-          docker compose up -d
+          docker compose up -d --no-build --force-recreate
 
           echo '✨ done'
           "
