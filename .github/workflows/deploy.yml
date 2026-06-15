@@ -58,11 +58,11 @@ jobs:
 
       - name: Upload Compose
         run: |
-          scp -i key.pem -o UserKnownHostsFile=~/.ssh/known_hosts docker-compose.yml ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/opt/BTM_EMS_V3_FRONT-END/docker-compose.yml
+          scp -i key.pem -o UserKnownHostsFile=~/.ssh/known_hosts -o ServerAliveInterval=30 -o ServerAliveCountMax=6 docker-compose.yml ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/opt/BTM_EMS_V3_FRONT-END/docker-compose.yml
 
       - name: Deploy
         run: |
-          ssh -i key.pem -o UserKnownHostsFile=~/.ssh/known_hosts ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
+          ssh -i key.pem -o UserKnownHostsFile=~/.ssh/known_hosts -o ServerAliveInterval=30 -o ServerAliveCountMax=6 ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
           set -e
 
           echo '🚀 Deploy start'
@@ -79,8 +79,20 @@ jobs:
           docker tag ghcr.io/starenergyems/btm_ems_v3_frontend:${{ github.ref_name }} \
                      ghcr.io/starenergyems/btm_ems_v3_frontend:latest
 
+          echo '🔎 compose config'
+          docker compose -p btm-ems-v3 -f docker-compose.yml config
+
           echo '🚀 restart container'
-          docker compose -f docker-compose.yml up -d --no-build --force-recreate
+          if ! timeout 180s docker compose -p btm-ems-v3 -f docker-compose.yml up -d --no-build --force-recreate --remove-orphans; then
+            echo '❌ compose up failed or timed out'
+            docker compose -p btm-ems-v3 -f docker-compose.yml ps -a || true
+            docker ps -a --filter name=btm-ems-3 || true
+            docker images ghcr.io/starenergyems/btm_ems_v3_frontend || true
+            docker logs --tail=120 btm-ems-v3-btm-ems-3-1 || true
+            exit 1
+          fi
+
+          docker compose -p btm-ems-v3 -f docker-compose.yml ps
 
           echo '✨ done'
           "
