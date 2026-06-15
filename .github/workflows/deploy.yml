@@ -56,6 +56,10 @@ jobs:
           echo "${{ secrets.EC2_KEY }}" > key.pem
           chmod 600 key.pem
 
+      - name: Upload Compose
+        run: |
+          scp -i key.pem -o UserKnownHostsFile=~/.ssh/known_hosts docker-compose.yml ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/opt/BTM_EMS_V3_FRONT-END/docker-compose.yml
+
       - name: Deploy
         run: |
           ssh -i key.pem -o UserKnownHostsFile=~/.ssh/known_hosts ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
@@ -76,7 +80,7 @@ jobs:
                      ghcr.io/starenergyems/btm_ems_v3_frontend:latest
 
           echo '🚀 restart container'
-          docker compose up -d --no-build --force-recreate
+          docker compose -f docker-compose.yml up -d --no-build --force-recreate
 
           echo '✨ done'
           "
