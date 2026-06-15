@@ -9,7 +9,7 @@ import {
 } from '@/slices/api/main/token';
 import { delay } from '@/utils/common';
 
-const { VITE_API_BASEURL, VITE_WEB_URL } = import.meta.env;
+const { VITE_API_BASEURL } = import.meta.env;
 
 const statusCode = {
   error: 0,
@@ -22,12 +22,6 @@ const statusCode = {
   orderNotFound: 6,
   success: 1,
 };
-
-//本機開發使用vite proxy，因此使用相對路徑即可，dev及production使用絕對路徑
-// const baseURL =
-//   VITE_WEB_URL && VITE_WEB_URL.includes(location.origin)
-//     ? VITE_API_BASEURL
-//     : "/dev";
 
 const baseURL = VITE_API_BASEURL;
 

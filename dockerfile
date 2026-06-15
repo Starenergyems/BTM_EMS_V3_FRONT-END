@@ -11,11 +11,9 @@ RUN npm ci --no-audit --progress=false
 COPY . .
 
 ARG VITE_API_BASEURL
-ARG VITE_WEB_URL
 ARG VITE_CHATKIT_API_URL
 
 ENV VITE_API_BASEURL=$VITE_API_BASEURL \
-    VITE_WEB_URL=$VITE_WEB_URL \
     VITE_CHATKIT_API_URL=$VITE_CHATKIT_API_URL
 
 RUN test -n "$VITE_API_BASEURL" || (echo "VITE_API_BASEURL is required for production build" && exit 1)
