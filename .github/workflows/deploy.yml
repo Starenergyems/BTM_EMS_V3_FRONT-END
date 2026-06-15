@@ -85,8 +85,11 @@ jobs:
           echo '🔎 compose config'
           docker compose -p btm-ems-v3 -f docker-compose.yml config
 
-          echo '🚀 restart container'
-          if ! timeout 180s docker compose -p btm-ems-v3 -f docker-compose.yml up -d --no-build --force-recreate --remove-orphans; then
+          echo '🧹 reset old container'
+          docker compose -p btm-ems-v3 -f docker-compose.yml down --remove-orphans --timeout 10
+
+          echo '🚀 start container'
+          if ! timeout 180s docker compose -p btm-ems-v3 -f docker-compose.yml up -d --no-build --remove-orphans; then
             echo '❌ compose up failed or timed out'
             docker compose -p btm-ems-v3 -f docker-compose.yml ps -a || true
             docker ps -a --filter name=btm-ems-3 || true

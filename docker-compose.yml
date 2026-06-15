@@ -4,3 +4,5 @@ services:
     ports:
       - "3000:80"
     restart: unless-stopped
+    stop_signal: SIGTERM
+    stop_grace_period: 10s
