@@ -46,6 +46,10 @@ jobs:
           push: true
           tags: |
             ghcr.io/starenergyems/btm_ems_v3_frontend:${{ github.ref_name }}
+          build-args: |
+            VITE_API_BASEURL=${{ secrets.VITE_API_BASEURL }}
+            VITE_WEB_URL=${{ secrets.VITE_WEB_URL }}
+            VITE_CHATKIT_API_URL=${{ secrets.VITE_CHATKIT_API_URL }}
 
       - name: Setup SSH
         run: |

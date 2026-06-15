@@ -1,9 +1,7 @@
 export const chatkitApiUrl =
   import.meta.env.VITE_CHATKIT_API_URL ?? 'http://localhost:8002/chatkit';
 
-export const chatkitDomainKey =
-  import.meta.env.VITE_CHATKIT_DOMAIN_KEY ?? 'domain_pk_local_dev';
-
+ 
 // export const THEME_STORAGE_KEY = "chatkit-boilerplate-theme";
 
 export const GREETING = `Hey there! 💭 \n How can we help?`;
