@@ -17,6 +17,7 @@ function FormSelect(
   ref,
 ) {
   const componentProps = { ...inputAttr, ...forwardRefProps };
+
   return (
     <ScopeStyle
       $themecategory={themecategory}

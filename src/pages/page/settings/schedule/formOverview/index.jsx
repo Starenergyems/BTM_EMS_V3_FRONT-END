@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Icon } from '@iconify/react';
 import dayjs from 'dayjs';
 import Button from '@/components/units/button';
@@ -6,6 +6,7 @@ import { OuterFrame } from '@/components/units/outerFrame/index';
 import Typography from '@/components/units/typography';
 import { renderField } from '@/components/widgets/modalForm/indexHelper';
 import { Flex, Form } from 'antd';
+import { useFields } from '../../demandRp/indexConfig';
 import { config } from '../indexConfig';
 import { useHelpers } from './indexHelper';
 import { ScopeStyle } from './indexStyle';
@@ -15,20 +16,23 @@ export const FormOverview = ({ events, getEventData, initialList = [] }) => {
   // const favToggle = useBoolean(false);
   const [formInstance] = Form.useForm();
   const [formSecInstance] = Form.useForm();
-  const normalisedInitialList = Array.isArray(initialList)
-    ? initialList
-    : initialList
-      ? [initialList]
-      : [];
-  const [list, setList] = useState(normalisedInitialList);
+  const [list, setList] = useState(initialList);
   const [, setFavList] = useState([]);
-  const [showPreviewFav] = useState([]);
 
-  const { addListHandler, formFields, handleDelete, onSubmit } = useHelpers({
+  const { DemandRpFormFields } = useFields({});
+
+  const {
+    addListHandler,
+    formFields,
+    getDefaultValuesHandler,
+    handleDelete,
+    onSubmit,
+  } = useHelpers({
     events,
     formInstance,
     formSecInstance,
     getEventData,
+    initialList,
     list,
     setFavList,
     setList,
@@ -38,8 +42,11 @@ export const FormOverview = ({ events, getEventData, initialList = [] }) => {
   //   getFavList();
   // }, []);
 
-  const showList = showPreviewFav.length > 0 ? showPreviewFav : list;
-  const safeShowList = Array.isArray(showList) ? showList : [];
+  
+
+  const formInitialValues = getDefaultValuesHandler();
+
+ 
 
   return (
     <ScopeStyle>
@@ -49,9 +56,10 @@ export const FormOverview = ({ events, getEventData, initialList = [] }) => {
           name: '新增',
           onClick: addListHandler,
         }}
+        initialValues={formInitialValues}
         instance={formInstance}
         // title={favToggle.value ? '常用清單' : '新增排程'}
-        title={'常用清單'}
+        title={'新增排程'}
         // icon={
         //   <Button
         //     variant="icon"
@@ -101,6 +109,7 @@ export const FormOverview = ({ events, getEventData, initialList = [] }) => {
           name: '儲存',
           onClick: list?.length > 0 ? onSubmit : undefined,
         }}
+        initialValues={formInitialValues}
         instance={formSecInstance}
         title="排程預覽"
       >
@@ -110,7 +119,8 @@ export const FormOverview = ({ events, getEventData, initialList = [] }) => {
           </Form.Item>
         ))} */}
         <ul>
-          {safeShowList.map((item, idx) => (
+          {console.log('list123', list)}
+          {list?.map((item, idx) => (
             <li className="list-item" key={`list-item-${idx}`}>
               <Typography
                 color={color.themeBlack}
@@ -120,11 +130,14 @@ export const FormOverview = ({ events, getEventData, initialList = [] }) => {
               >
                 {dayjs(item.start).format('YYYY-MM-DD HH:mm')}~
                 {dayjs(item.end).format('YYYY-MM-DD HH:mm')} <br />
-                {
-                  config?.filter(
-                    (el) => el.strategy === item.extendedProps?.strategy,
-                  )[0]?.title
-                }
+                {config?.filter(
+                  (el) => el.strategy === item.extendedProps.strategy,
+                )[0]?.title ||
+                  `需量反應
+                  ${
+                    DemandRpFormFields?.[item.extendedProps.strategy]?.title ||
+                    item.extendedProps.strategy
+                  }`}
               </Typography>
               <Button onClick={() => handleDelete(idx)} variant="icon">
                 <Icon color={color.themeBlack} fontSize="24" icon="mdi:trash" />
@@ -137,12 +150,17 @@ export const FormOverview = ({ events, getEventData, initialList = [] }) => {
   );
 };
 
-const RenderFormItem = ({ button, children, icon, instance, title }) => {
-  const { getDefaultValuesHandler } = useHelpers({});
-
+const RenderFormItem = ({
+  button,
+  children,
+  icon,
+  initialValues,
+  instance,
+  title,
+}) => {
   return (
     <OuterFrame icon={icon} title={title}>
-      <Form form={instance} initialValues={getDefaultValuesHandler()}>
+      <Form form={instance} initialValues={initialValues}>
         {children}
       </Form>
       {button.name && (

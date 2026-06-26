@@ -33,6 +33,7 @@ export const endpoints = {
   },
   schedule: {
     calendarEvent: `/api/${currentVersion}/setting/schedule/calendarEvent`,
+    deleteCalendarEvent: (eventId) => `/api/${currentVersion}/setting/schedule/calendarEvent/${eventId}`,
     deleteList: `/api/${currentVersion}/setting/schedule/deleteList`,
     favoriteList: `/api/${currentVersion}/setting/schedule/favoriteList`,
   },

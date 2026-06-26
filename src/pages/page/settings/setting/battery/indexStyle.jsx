@@ -46,6 +46,7 @@ const ScopeStyle = styled.div`
     bottom: 0;
     width: 100%;
     padding: 16px;
+    max-height: 100%;
   }
   .battery-value {
     width: 100%;
@@ -61,7 +62,7 @@ const ScopeStyle = styled.div`
   }
   .battery-label {
     position: absolute;
-    left: 0;
+    left: 15px;
     transform: translate(-138%, -50%);
   }
 

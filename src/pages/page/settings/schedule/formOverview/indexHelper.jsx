@@ -8,19 +8,32 @@ import { endpoints } from '@/utils/endpoints';
 import { errorMsgHandler } from '@/utils/helpers';
 import { Form } from 'antd';
 
+import { useHelpers as useDemandRpHelpers } from '../../demandRp/indexHelper';
 import { config } from '../indexConfig';
-import { ExtraFormFields } from './indexConfig';
+import { useFields } from './indexConfig';
 
 export const useHelpers = ({
   events,
   formInstance,
   formSecInstance,
   getEventData,
+  initialList,
   list,
   setFavList,
   setList,
 }) => {
+  const { submitResponse } = useDemandRpHelpers({});
+  const {
+    assertRangeGreaterThan30Minutes,
+    ExtraFormFields,
+    ExtraInitialFields,
+    getScheduleRange,
+  } = useFields({
+    formInstance,
+  });
+
   const strategy = Form.useWatch('strategy', formInstance);
+  const selectedStrategy = Form.useWatch('demandRpType', formInstance);
   const fav = Form.useWatch('fav', formSecInstance);
 
   // 判斷清單中是否全部為同一天
@@ -57,64 +70,32 @@ export const useHelpers = ({
     }
   }, [isListAllSameDay, formSecInstance]);
 
-  const startTime = dayjs('00:00', 'HH:mm');
-  const endTime = dayjs('00:00', 'HH:mm');
+  useEffect(() => {
+    formInstance?.setFields([
+      {
+        errors: [],
+        name: 'range',
+      },
+    ]);
+  }, [formInstance, selectedStrategy]);
+
+  // 清空表單
+  const handleClearList = () => {
+    setList([]);
+  };
+
+  useEffect(() => {
+    console.log('selectedStrategy 刪掉ㄌ', selectedStrategy);
+    handleClearList();
+  }, [selectedStrategy]);
+
+  useEffect(() => {
+    setList(initialList);
+  }, [initialList]);
 
   // 新增排程表單資料
   const formFields = () => {
     return [
-      {
-        componentProps: {
-          inputAttr: {
-            placeholder: '請選擇日期',
-          },
-        },
-        formItemAttr: {
-          defaultValue: [dayjs(new Date()), dayjs(new Date())],
-          label: '日期',
-          name: 'range',
-          rules: [{ message: '請選擇日期', required: true }],
-        },
-        variants: 'rangePicker',
-      },
-      {
-        componentProps: {
-          inputAttr: {
-            minuteStep: 30,
-            placeholder: '請選擇時段',
-            // inputReadOnly: true,
-          },
-        },
-        formItemAttr: {
-          defaultValue: [startTime, endTime],
-          format: 'HH:mm',
-          label: '時段',
-          name: 'time',
-          rules: [
-            { message: '請選擇時段', required: true },
-            {
-              validator: (_, value) => {
-                if (!value) return Promise.resolve();
-                const range = formInstance.getFieldValue('range');
-                if (!range || !range[0] || !range[1]) return Promise.resolve();
-
-                try {
-                  const { endAt, startAt } = getScheduleRange({
-                    range,
-                    time: value,
-                  });
-                  assertRangeGreaterThan30Minutes(startAt, endAt);
-                } catch {
-                  return Promise.reject(new Error('時段區間需大於 30 分鐘'));
-                }
-
-                return Promise.resolve();
-              },
-            },
-          ],
-        },
-        variants: 'timerangepicker',
-      },
       {
         componentProps: {
           inputAttr: {
@@ -130,18 +111,68 @@ export const useHelpers = ({
           themecategory: 'circle-light',
         },
         formItemAttr: {
-          defaultValue: 'arbitrage',
+          // defaultValue: 'arbitrage',
           label: '服務模式',
           name: 'strategy',
           rules: [{ message: '請選擇服務模式', required: true }],
         },
+
         variants: 'select',
       },
+
+      ...(strategy && ExtraInitialFields?.[strategy]
+        ? ExtraInitialFields[strategy]
+        : []),
+
       ...(strategy && ExtraFormFields[strategy]
         ? ExtraFormFields[strategy]
         : []),
     ];
   };
+
+  // 動態欄位切換時，僅補上尚未存在的預設值，避免覆蓋使用者已輸入內容
+  useEffect(() => {
+    if (!formInstance) return;
+
+    const defaultFormFields = [
+      {
+        formItemAttr: {
+          defaultValue: 'arbitrage',
+          name: 'strategy',
+        },
+      },
+      ...(strategy && ExtraInitialFields?.[strategy]
+        ? ExtraInitialFields[strategy]
+        : []),
+
+      ...(strategy && ExtraFormFields?.[strategy]
+        ? ExtraFormFields[strategy]
+        : []),
+    ];
+
+    const defaults = getDefaultValues(defaultFormFields);
+    const missingDefaults = Object.entries(defaults).reduce(
+      (result, [name, value]) => {
+        const currentValue = formInstance.getFieldValue(name);
+        if (currentValue === undefined) {
+          result[name] = value;
+        }
+        return result;
+      },
+      {},
+    );
+
+    if (Object.keys(missingDefaults).length > 0) {
+      formInstance.setFieldsValue(missingDefaults);
+    }
+    // 僅依策略切換補預設，避免輸入過程被覆蓋
+  }, [
+    formInstance,
+    strategy,
+    selectedStrategy,
+    ExtraInitialFields,
+    ExtraFormFields,
+  ]);
 
   // 新增至常用清單表單資料
   const favFormFields = () => {
@@ -240,46 +271,6 @@ export const useHelpers = ({
     return startA < endB && endA > startB;
   };
 
-  // 判斷時間區間是否大於 30 分鐘
-  const assertRangeGreaterThan30Minutes = (startAt, endAt) => {
-    const diffMinutes = endAt.diff(startAt, 'minute');
-    if (diffMinutes <= 30) {
-      throw new Error('時段區間需大於 30 分鐘');
-    }
-  };
-
-  // 取得排程時間範圍
-  const getScheduleRange = (values) => {
-    const isFullDay =
-      values.time[0].format('HH:mm') === '00:00' &&
-      values.time[1].format('HH:mm') === '00:00' &&
-      values.range[0].isSame(values.range[1], 'day');
-
-    const startAt = isFullDay
-      ? values.range[0].startOf('day')
-      : values.range[0]
-          .hour(values.time[0].hour())
-          .minute(values.time[0].minute())
-          .second(0)
-          .millisecond(0);
-
-    let endAt = values.range[1]
-      .hour(values.time[1].hour())
-      .minute(values.time[1].minute())
-      .second(0)
-      .millisecond(0);
-
-    if (isFullDay) {
-      endAt = startAt.add(1, 'day');
-    }
-
-    if (!endAt.isAfter(startAt)) {
-      endAt = endAt.add(1, 'day');
-    }
-
-    return { endAt, isFullDay, startAt };
-  };
-
   // 判斷是否與現有日曆時間衝突
   const assertNoEventConflict = (startAt, endAt) => {
     events?.forEach((event) => {
@@ -316,6 +307,9 @@ export const useHelpers = ({
 
   // 依照日期區間拆成每日排程
   const getDailyScheduleRanges = (values) => {
+    console.log('values', values);
+    if (values?.strategy === 'demandRp') return;
+
     const startDay = values.range[0].startOf('day');
     const endDay = values.range[1].startOf('day');
     const dayDiff = endDay.diff(startDay, 'day');
@@ -339,31 +333,45 @@ export const useHelpers = ({
   // 新增排程至清單
   const addListHandler = () => {
     formInstance.validateFields().then(async (values) => {
-      const dailyRanges = getDailyScheduleRanges(values);
+      if (values.strategy === 'demandRp') {
+        const formattedValue = {
+          end: values.range[1].format('YYYY-MM-DD HH:mm'),
+          extendedProps: {
+            ...values,
+            daily_pick_time: values.daily_pick_time || '18:00-20:00',
+            strategy: values.demandRpType,
+          },
+          id: uuidv4(),
+          start: values.range[0].format('YYYY-MM-DD HH:mm'),
+        };
 
-      const formattedValuesList = dailyRanges.map(
-        ({ endAt, isFullDay, startAt }) => {
-          assertRangeGreaterThan30Minutes(startAt, endAt);
-          assertNoEventConflict(startAt, endAt);
-          assertNoListConflict(startAt, endAt);
+        setList((prev) => [...prev, formattedValue]);
+      } else {
+        const dailyRanges = getDailyScheduleRanges(values);
 
-          return {
-            allDay: isFullDay,
-            end: endAt.format('YYYY-MM-DD HH:mm'),
-            extendedProps: {
-              ...values,
-              strategy: values.strategy,
-            },
-            id: uuidv4(),
-            // title: config.find((c) => c.strategy === values.strategy)?.title || '',
-            start: startAt.format('YYYY-MM-DD HH:mm'),
-          };
-        },
-      );
+        const formattedValuesList = dailyRanges.map(
+          ({ endAt, isFullDay, startAt }) => {
+            assertRangeGreaterThan30Minutes(startAt, endAt);
+            assertNoEventConflict(startAt, endAt);
+            assertNoListConflict(startAt, endAt);
 
-      setList((prev) => [...prev, ...formattedValuesList]);
-      formInstance.resetFields(); // 重置表單
-      formInstance.setFieldsValue(getDefaultValuesHandler()); // 重置後重新設定預設值
+            return {
+              allDay: isFullDay,
+              end: endAt.format('YYYY-MM-DD HH:mm'),
+              extendedProps: {
+                ...values,
+                strategy: values.strategy,
+              },
+              id: uuidv4(),
+              // title: config.find((c) => c.strategy === values.strategy)?.title || '',
+              start: startAt.format('YYYY-MM-DD HH:mm'),
+            };
+          },
+        );
+        setList((prev) => [...prev, ...formattedValuesList]);
+        formInstance.resetFields(); // 重置表單
+        formInstance.setFieldsValue(getDefaultValuesHandler()); // 重置後重新設定預設值
+      }
     });
   };
 
@@ -380,6 +388,8 @@ export const useHelpers = ({
         list?.forEach((item) => {
           const startAt = dayjs(item.start);
           const endAt = dayjs(item.end);
+
+          if (item.extendedProps?.demandRpType) return; // 需量反應不進行時間衝突驗證
           assertNoEventConflict(startAt, endAt);
         });
 
@@ -415,13 +425,25 @@ export const useHelpers = ({
         const finalPayload = [...events, ...list];
 
         try {
-          const response = await api.post(endpoints.schedule.calendarEvent, {
-            events: finalPayload,
-          });
+          let response;
+          if (list?.[0]?.extendedProps?.demandRpType) {
+            console.log('需量反應');
+            response = await submitResponse(
+              list?.[0]?.extendedProps?.strategy,
+              list?.[0]?.extendedProps,
+            );
+            console.log('response', response);
+          } else {
+            console.log('一般排程');
+            response = await api.post(endpoints.schedule.calendarEvent, {
+              events: finalPayload,
+            });
+          }
+
           if (response.status === 200) {
             toast.success('已成功設定排程');
             getEventData(); // 加入後重新取得日曆資料
-            setList([]); // 清空清單
+            handleClearList(); // 清空清單
           }
         } catch (error) {
           console.error('API Error:', error);

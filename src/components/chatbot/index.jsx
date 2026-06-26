@@ -54,7 +54,6 @@ function Chatbot() {
             onClick={toggleChatbot.onFalse}
             variant="icon"
           />
-          {console.log('pageNamepageName', pageName)}
           <ChatComponent pageName={pageName} />
         </div>
       )}

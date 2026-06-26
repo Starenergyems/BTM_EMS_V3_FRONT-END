@@ -10,6 +10,7 @@ import RemoveModal from '@/components/units/removeModal/index';
 import Select from '@/components/units/select/index';
 import Textarea from '@/components/units/textarea/index';
 import Tooltip from '@/components/units/tooltip/index';
+import Typography from '@/components/units/typography/index';
 import WithUnitValue from '@/components/units/withUnitValue/index';
 
 export {
@@ -25,5 +26,6 @@ export {
   Select,
   Textarea,
   Tooltip,
+  Typography,
   WithUnitValue,
 };

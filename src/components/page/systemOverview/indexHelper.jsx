@@ -27,10 +27,11 @@ function useHelpers({ name, setInfoState, setState }) {
   const getInfoDatas = async () => {
     try {
       const data = await api.get(endpoints?.[name]?.invertor);
+      console.log('getInfoDatas', data);
       setInfoState((prevState) => {
         return {
           ...prevState,
-          ...data.data,
+          ...data.data.data,
         };
       });
     } catch (error) {

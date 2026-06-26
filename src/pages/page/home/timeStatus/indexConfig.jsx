@@ -55,6 +55,14 @@ const statusData = [
     title: 'No data',
     title_cn: '無資料',
   },
+  {
+    color: color.black,
+    icon: <CloseCircleFilled style={{ ...style, color: color.black }} />,
+    name: 'fake_data',
+    status: 5,
+    title: 'Fake data',
+    title_cn: '假資料',
+  },
 ];
 
 export { statusData };

@@ -9,7 +9,8 @@ import { useBoolean } from '@/hooks/useBoolean';
 import { pagesPathName } from '@/router';
 import { Card, Col, Row, Tooltip } from 'antd';
 import { FormOverview } from './formOverview/index';
-import { ExtraFormFields, ExtraLabels } from './formOverview/indexConfig';
+// import { ExtraFormFields, ExtraLabels } from './formOverview/indexConfig';
+import { useFields } from './formOverview/indexConfig';
 import { useHelpers } from './indexHelper';
 import { ModalOverview } from './modal/index';
 import ScopeStyle from './indexStyle';
@@ -22,7 +23,9 @@ function Schedule() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const { ExtraFormFields, ExtraLabels } = useFields({});
   const toggle = useBoolean(false);
+  // const toggle = useBoolean(true);
 
   const [eventIndex, setEventIndex] = useState(null);
   const [date, setDate] = useState(new Date());
@@ -31,12 +34,8 @@ function Schedule() {
   const [prefillEvent, setPrefillEvent] = useState(null);
   const [prefillVersion, setPrefillVersion] = useState(0);
 
-  const { delEvent, eventColors, getEventData, handleDelete } = useHelpers({
-    calevents,
-    eventIndex,
+  const { eventColors, getEventData } = useHelpers({
     setCalEvents,
-    setEventIndex,
-    toggle,
   });
 
   useEffect(() => {
@@ -46,8 +45,9 @@ function Schedule() {
 
   // 預填事件處理邏輯(from chatbot tool)
   useEffect(() => {
+    console.log('location.state', location.state);
     const nextPrefillEvent = location.state?.prefillEvent;
-
+    console.log('nextPrefillEvent', nextPrefillEvent);
     if (!nextPrefillEvent) return;
 
     setPrefillEvent(nextPrefillEvent);
@@ -127,6 +127,7 @@ function Schedule() {
       <PageBox headerTitle={`${routeName} Operation Scheduling`}>
         <Row className="calendar-wrap" gutter={20}>
           <Col xl={7} xs={24} xxl={6}>
+            {console.log('prefillList', prefillList)}
             <FormOverview
               events={calevents}
               getEventData={getEventData}
@@ -149,7 +150,10 @@ function Schedule() {
                 }))}
                 localizer={localizer}
                 onNavigate={(newDate) => setDate(newDate)}
-                onSelectEvent={(event) => delEvent(event)}
+                onSelectEvent={(event) => {
+                  setEventIndex(event);
+                  toggle.onTrue();
+                }}
                 onView={(newView) => setView(newView)}
                 scrollToTime={new Date(1970, 1, 1, 6)}
                 selectable
@@ -161,7 +165,11 @@ function Schedule() {
           </Col>
         </Row>
 
-        <ModalOverview handleDelete={handleDelete} toggle={toggle} />
+        <ModalOverview
+          eventIndex={eventIndex}
+          getEventData={getEventData}
+          toggle={toggle}
+        />
       </PageBox>
     </ScopeStyle>
   );

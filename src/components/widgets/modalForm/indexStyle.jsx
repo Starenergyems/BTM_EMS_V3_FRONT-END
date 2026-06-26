@@ -13,6 +13,7 @@ const style = styled(Modal)`
     --ant-modal-title-color: ${color.themeBlack};
     border-radius: 20px;
     overflow: hidden;
+    position: relative;
 
     .ant-modal-header {
       background-color: ${color.inputGray};
@@ -66,6 +67,7 @@ const style = styled(Modal)`
         }
       }
     }
+
     .ant-modal-footer {
       .ant-btn {
         --ant-color-primary-hover: #036f9f;
@@ -73,7 +75,6 @@ const style = styled(Modal)`
         --ant-color-primary-active: #036f9f;
 
         min-width: 98px;
-        padding-left: 25px;
         cursor: pointer;
 
         &.btn-cancel {
@@ -129,6 +130,32 @@ const style = styled(Modal)`
   }
   /* 外部引用元件要寫的樣式 */
   ${(props) => props.$customStyle}
+
+  .btn-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    .ant-btn {
+      width: 32px !important;
+      height: 32px;
+      min-width: 32px;
+      padding: 0;
+      border: none;
+      box-shadow: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        background: ${color.inputGray} !important;
+      }
+
+      svg {
+        display: block;
+      }
+    }
+  }
 `;
 
 export default style;

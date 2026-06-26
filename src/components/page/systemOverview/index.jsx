@@ -74,9 +74,15 @@ export const SystemOverview = ({ name, title, titleEn }) => {
               </Col>
             ))}
           </Row>
+          {console.log('infoState', infoState)}
           <Row className="mg-t-30" gutter={[16, 16]}>
             {infoState?.value?.map((info, idx) => (
+              // <div>
+              //
+              //   123</div>
               <Col key={`${info.name}_${idx}`} lg={6} md={12} xs={24}>
+                {/* {console.log('info', info, systemConfig?.[name]?.icon)} */}
+                {/* 123 */}
                 <Item data={info} icon={systemConfig?.[name]?.icon} />
               </Col>
             ))}

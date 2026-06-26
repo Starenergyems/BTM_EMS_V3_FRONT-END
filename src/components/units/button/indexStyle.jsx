@@ -14,7 +14,7 @@ const getVariantStyle = (variant) => {
         width: auto;
         padding: 6px 8px;
         background: transparent !important;
-        border: none;
+        border: none !important;
         box-shadow: none;
         &:hover {
           background: transparent;
@@ -54,23 +54,27 @@ const style = styled.div`
     &.ant-btn-color-default {
       color: ${color.white};
       // background: ${color.buttonGray} !important;
-      // border: 0 !important;
+      border: 0 !important;
 
       &:hover {
-        background: ${color.darkGray};
+        // background: ${color.darkGray}
+        background: transparent !important;
       }
     }
     &.ant-btn-color-dangerous {
-      color: ${color.white} !important;
-      background: ${color.red};
-
+      span {
+        color: ${color.red};
+      }
 
       &:hover {
         background: ${color.alertRed} !important;
+        span {
+          color: ${color.white};
+        }
       }
     }
-    ${(props) => getVariantStyle(props.$variant)}
-
+  }
+  ${(props) => getVariantStyle(props.$variant)}
 `;
 
 export default style;

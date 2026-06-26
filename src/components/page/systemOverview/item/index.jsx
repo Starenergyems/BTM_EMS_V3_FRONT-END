@@ -7,7 +7,10 @@ import ScopeStyle from './indexStyle';
 import { color } from '@/styles/variable/indexStyle';
 
 export const Item = ({ data, icon }) => {
+
+  console.log('data123', data, statusData);
   const status = statusData.find((item) => item.status === data?.status);
+  console.log('status123', status);
   const statusColor = status.status > 0 ? status.color : color.lightBlue;
   return (
     <ScopeStyle>

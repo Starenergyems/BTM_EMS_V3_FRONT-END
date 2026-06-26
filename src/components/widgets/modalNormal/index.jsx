@@ -1,3 +1,4 @@
+import { Icon } from '@iconify/react';
 import Button from '@/components/units/button';
 import Typography from '@/components/units/typography';
 import { Flex } from 'antd';
@@ -13,13 +14,24 @@ function ModalNormal({ children, modalAttr, styles }) {
       {...modalAttr}
       footer={[
         <Flex justify="center" key="modal-footer">
-          <Button
-            className="btn-cancel"
-            onClick={modalAttr?.onCancel}
-            size="md"
-          >
-            <Typography size="lg">{modalAttr?.cancelText}</Typography>
-          </Button>
+          {modalAttr?.onDelete ? (
+            <Button
+              className="btn-delete"
+              danger
+              onClick={modalAttr?.onDelete}
+              size="md"
+            >
+              <Typography size="lg">{modalAttr?.deleteText}</Typography>
+            </Button>
+          ) : (
+            <Button
+              className="btn-cancel"
+              onClick={modalAttr?.onCancel}
+              size="md"
+            >
+              <Typography size="lg">{modalAttr?.cancelText}</Typography>
+            </Button>
+          )}
           <Button
             className="btn-submit"
             onClick={modalAttr?.onOk}
@@ -36,7 +48,7 @@ function ModalNormal({ children, modalAttr, styles }) {
       }}
       styles={{
         footer: {
-          direction: 'rtl',
+          direction: 'ltr',
           textAlign: 'center',
         },
         header: { textAlign: 'center' },
@@ -49,6 +61,19 @@ function ModalNormal({ children, modalAttr, styles }) {
       }
       width="70vw"
     >
+      {modalAttr?.closeBtn && (
+        <Button
+          className="btn-close"
+          onClick={modalAttr?.onCancel}
+          variant="icon"
+        >
+          <Icon
+            color={color.themeBlack}
+            fontSize="24"
+            icon="material-symbols:close-rounded"
+          />
+        </Button>
+      )}
       {children}
     </ScopeStyle>
   );

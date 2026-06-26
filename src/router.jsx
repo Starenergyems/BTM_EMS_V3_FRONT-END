@@ -1,14 +1,14 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter } from 'react-router-dom';
 
-import PageIndex from "@/pages/index";
-import Login from "@/pages/page/(auth)/login/index";
-import ResetPassword from "@/pages/page/(auth)/resetPassword/index";
-import SendEmail from "@/pages/page/(auth)/sendEmail";
-import { pagesPathName } from "@/router/pagesPathName";
+import PageIndex from '@/pages/index';
+import Login from '@/pages/page/(auth)/login/index';
+import ResetPassword from '@/pages/page/(auth)/resetPassword/index';
+import SendEmail from '@/pages/page/(auth)/sendEmail';
+import { pagesPathName } from '@/router/pagesPathName';
 
-import ResetSuccess from "./pages/page/(auth)/resetSuccess";
-import NotFound from "./pages/page/notFound";
-import ProtectedRoute from "./pages/protectedRoute";
+import ResetSuccess from './pages/page/(auth)/resetSuccess';
+import NotFound from './pages/page/notFound';
+import ProtectedRoute from './pages/protectedRoute';
 
 // 動態載入頁面
 function getLazyComponent(importUrl) {

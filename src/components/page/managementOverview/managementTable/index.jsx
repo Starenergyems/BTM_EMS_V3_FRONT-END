@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Select } from '@/components/units';
 import Button from '@/components/units/button';
 import { useBoolean } from '@/hooks/useBoolean';

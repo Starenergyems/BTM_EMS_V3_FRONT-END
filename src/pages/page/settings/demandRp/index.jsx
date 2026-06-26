@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { PageBox } from '@/components/units';
+import { Typography } from '@/components/units';
 import Button from '@/components/units/button';
 import { OuterFrame } from '@/components/units/outerFrame/index';
 import {
@@ -11,9 +12,12 @@ import {
 import { useBoolean } from '@/hooks/useBoolean';
 import { pagesPathName } from '@/router';
 import { Col, Form, Row } from 'antd';
+import { useFields } from './indexConfig';
 import { useHelpers } from './indexHelper';
 import { ModalOverview } from './modal/index';
+
 import ScopeStyle from './indexStyle';
+import { color } from '@/styles/variable/indexStyle';
 
 function DemandRp() {
   const routeName = pagesPathName.setting.demandRp.pathName;
@@ -28,17 +32,22 @@ function DemandRp() {
   const selectedStrategy =
     Form.useWatch('strategy', formInstance) || 'daily_pick_time';
 
-  const { ExtraFormFields, formFields, getData, onSubmit } = useHelpers({
+  const { getData, onSubmit } = useHelpers({
     formInstance,
     selectedStrategy,
     toggle,
   });
 
+  const { DemandRpFormFields, FormFields } = useFields({
+    formInstance,
+    selectedStrategy,
+  });
+
   useEffect(() => {
     const strategyFields =
-      ExtraFormFields?.[selectedStrategy]?.formEields || [];
+      DemandRpFormFields?.[selectedStrategy]?.formFields || [];
     formInstance.setFieldsValue(getDefaultValues(strategyFields));
-  }, [selectedStrategy, formInstance]);
+  }, [selectedStrategy, formInstance, DemandRpFormFields]);
 
   useEffect(() => {
     if (hasInitializedRef.current) return;
@@ -68,26 +77,19 @@ function DemandRp() {
     if (!nextPrefillEvent) return;
 
     navigate(location.pathname, { replace: true, state: null });
-  }, [
-    formInstance,
-    getData,
-    location.pathname,
-    location.state,
-    navigate,
-    selectedStrategy,
-  ]);
+  }, [formInstance, location.pathname, location.state, navigate, getData]);
 
-  const strategyName = ExtraFormFields?.[selectedStrategy]?.title;
+  const strategyName = DemandRpFormFields?.[selectedStrategy]?.title;
   return (
     <PageBox headerTitle={`${routeName} Demand Response`}>
       <ScopeStyle>
         <Form
           form={formInstance}
-          initialValues={getDefaultValues([...formFields()])}
+          initialValues={getDefaultValues([...FormFields()])}
         >
           <OuterFrame title={'基本設定'}>
             <div className="item">
-              {formFields()?.map((item, idx) => (
+              {FormFields()?.map((item, idx) => (
                 <Col
                   key={`form-item-${idx}`}
                   lg={{ span: idx === 0 ? 6 : 8 }}
@@ -101,9 +103,18 @@ function DemandRp() {
             </div>
           </OuterFrame>
           <OuterFrame title={strategyName || '需量類型'}>
-            <Row justify="center">
-              <Col span={8}>
-                {ExtraFormFields?.[selectedStrategy]?.formEields?.map(
+            <Row className="item">
+              <Col className="mg-y-20" lg={{ span: 7 }} span={24}>
+                {/* <Typography
+                  color={color.themeBlack}
+                  md={{ size: 'sm' }}
+                  size="md"
+                >
+                  {DemandRpFormFields?.[selectedStrategy]?.title}
+                </Typography> */}
+              </Col>
+              <Col lg={{ span: 8 }} span={24}>
+                {DemandRpFormFields?.[selectedStrategy]?.formFields?.map(
                   (item, idx) => (
                     <Form.Item
                       key={`${selectedStrategy}-form-item-${idx}`}
@@ -114,6 +125,7 @@ function DemandRp() {
                   ),
                 )}
               </Col>
+              {/* <Col className="mg-y-20" lg={{ span: 6 }} span={24}></Col> */}
             </Row>
             <div className="center-btn">
               <Button onClick={() => onSubmit()} size="md" type="primary">
