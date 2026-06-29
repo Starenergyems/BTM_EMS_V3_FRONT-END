@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import {
   getAccountsInfo,
   getAccountsOperators,
-  postAccountsMicrosoftExchangeToken,
+  // postAccountsMicrosoftExchangeToken,
 } from './indexHelper';
 
 const omRole = {
@@ -29,13 +29,13 @@ const accountsSlice = createSlice({
       state.omRole = omRole;
       state.omRoleStr = omRoleStr;
     });
-    builder.addCase(
-      postAccountsMicrosoftExchangeToken.fulfilled,
-      (state, action) => {
-        const { data } = action.payload;
-        state.microsoftData = { ...data };
-      },
-    );
+    // builder.addCase(
+    //   postAccountsMicrosoftExchangeToken.fulfilled,
+    //   (state, action) => {
+    //     const { data } = action.payload;
+    //     state.microsoftData = { ...data };
+    //   },
+    // );
     builder.addCase(getAccountsOperators.fulfilled, (state, action) => {
       const { operators } = action.payload;
       state.operators = operators;

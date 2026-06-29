@@ -1,7 +1,7 @@
 import toast from "react-hot-toast";
 import { createSlice } from "@reduxjs/toolkit";
 import { pagesPathName, router } from "@/router";
-import { postAccountsMicrosoftExchangeToken } from "../accounts/indexHelper";
+// import { postAccountsMicrosoftExchangeToken } from "../accounts/indexHelper";
 import { postRefreshToken, postToken } from "./indexHelper";
 
 //state初始值
@@ -32,18 +32,18 @@ const tokenSlice = createSlice({
       localStorage.removeItem("access");
       localStorage.removeItem("refresh");
     });
-    builder.addCase(
-      postAccountsMicrosoftExchangeToken.fulfilled,
-      (state, action) => {
-        const {
-          data: { accessToken, refreshToken },
-        } = action.payload;
-        state.access = accessToken;
-        state.refresh = refreshToken;
-        localStorage.setItem("access", accessToken);
-        localStorage.setItem("refresh", refreshToken);
-      }
-    );
+    // builder.addCase(
+    //   postAccountsMicrosoftExchangeToken.fulfilled,
+    //   (state, action) => {
+    //     const {
+    //       data: { accessToken, refreshToken },
+    //     } = action.payload;
+    //     state.access = accessToken;
+    //     state.refresh = refreshToken;
+    //     localStorage.setItem("access", accessToken);
+    //     localStorage.setItem("refresh", refreshToken);
+    //   }
+    // );
   },
   initialState,
   name: "token",

@@ -8,18 +8,18 @@ const getAccountsInfo = createAsyncThunk(
     return fetchData.data;
   }
 );
-//Microsoft登入後的access token轉為平常在使用的access token
-const postAccountsMicrosoftExchangeToken = createAsyncThunk(
-  "accounts/postAccountsMicrosoftExchangeToken",
-  async ({ config, data }) => {
-    const fetchData = await api.post(
-      "accounts/microsoft/exchange_token",
-      data,
-      config
-    );
-    return fetchData.data;
-  }
-);
+// //Microsoft登入後的access token轉為平常在使用的access token
+// const postAccountsMicrosoftExchangeToken = createAsyncThunk(
+//   "accounts/postAccountsMicrosoftExchangeToken",
+//   async ({ config, data }) => {
+//     const fetchData = await api.post(
+//       "accounts/microsoft/exchange_token",
+//       data,
+//       config
+//     );
+//     return fetchData.data;
+//   }
+// );
 //忘記密碼重設驗證信前，帳號驗證
 const postAccountsSendResetEmail = createAsyncThunk(
   "accounts/postAccountsSendResetEmail",
@@ -47,7 +47,7 @@ const getAccountsOperators = createAsyncThunk(
 export {
   getAccountsInfo,
   getAccountsOperators,
-  postAccountsMicrosoftExchangeToken,
+  // postAccountsMicrosoftExchangeToken,
   postAccountsPasswordReset,
   postAccountsSendResetEmail,
 };
