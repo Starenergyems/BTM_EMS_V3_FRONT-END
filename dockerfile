@@ -10,7 +10,7 @@ RUN npm ci --no-audit --progress=false
 # 再複製其他原始碼
 COPY . .
 
-ARG VITE_API_BASEURL
+ARG VITE_API_BASEURL=/api/
 ARG VITE_CHATKIT_API_URL
 
 ENV VITE_API_BASEURL=$VITE_API_BASEURL \

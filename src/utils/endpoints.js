@@ -1,58 +1,61 @@
 // ----------------------------------------------------------------------
 
 const currentVersion = 'v1';
+const apiVersionPath = import.meta.env.MODE === 'development'
+  ? `/api/${currentVersion}`
+  : currentVersion;
 
 export const endpoints = {
   alarm: {
-    historic: `/api/${currentVersion}/alarm/hist/data`,
-    real: `/api/${currentVersion}/alarm/real/data`,
+    historic: `${apiVersionPath}/alarm/hist/data`,
+    real: `${apiVersionPath}/alarm/real/data`,
   },
   charger: {
-    billChart: `/api/${currentVersion}/bill/charger/chart`,
-    billMonthChart: `/api/${currentVersion}/bill/charger/month_chart`,
-    currentLineChart: `/api/${currentVersion}/charger/current_linechart`,
-    invertor: `/api/${currentVersion}/charger/invertor`,
-    lineChart: `/api/${currentVersion}/charger/linechart`,
+    billChart: `${apiVersionPath}/bill/charger/chart`,
+    billMonthChart: `${apiVersionPath}/bill/charger/month_chart`,
+    currentLineChart: `${apiVersionPath}/charger/current_linechart`,
+    invertor: `${apiVersionPath}/charger/invertor`,
+    lineChart: `${apiVersionPath}/charger/linechart`,
   },
   demandRp: {
     demandSet: (id) =>
-      `/api/${currentVersion}/setting/demandRp/demandSet/${id}`,
+      `${apiVersionPath}/setting/demandRp/demandSet/${id}`,
   },
 
   homepage: {
-    currentTrendChart: `/api/${currentVersion}/current_trend_chart`,
-    equipment: `/api/${currentVersion}/equipment`,
-    equipmentChart: `/api/${currentVersion}/equipment_chart`,
-    flowBlock: `/api/${currentVersion}/flow_block`,
-    trendChart: `/api/${currentVersion}/trend_chart`,
+    currentTrendChart: `${apiVersionPath}/current_trend_chart`,
+    equipment: `${apiVersionPath}/equipment`,
+    equipmentChart: `${apiVersionPath}/equipment_chart`,
+    flowBlock: `${apiVersionPath}/flow_block`,
+    trendChart: `${apiVersionPath}/trend_chart`,
   },
   report: {
-    day: `/api/${currentVersion}/report/day`,
-    month: `/api/${currentVersion}/report/month`,
-    year: `/api/${currentVersion}/report/year`,
+    day: `${apiVersionPath}/report/day`,
+    month: `${apiVersionPath}/report/month`,
+    year: `${apiVersionPath}/report/year`,
   },
   schedule: {
-    calendarEvent: `/api/${currentVersion}/setting/schedule/calendarEvent`,
-    deleteCalendarEvent: (eventId) => `/api/${currentVersion}/setting/schedule/calendarEvent/${eventId}`,
-    deleteList: `/api/${currentVersion}/setting/schedule/deleteList`,
-    favoriteList: `/api/${currentVersion}/setting/schedule/favoriteList`,
+    calendarEvent: `${apiVersionPath}/setting/schedule/calendarEvent`,
+    deleteCalendarEvent: (eventId) => `${apiVersionPath}/setting/schedule/calendarEvent/${eventId}`,
+    deleteList: `${apiVersionPath}/setting/schedule/deleteList`,
+    favoriteList: `${apiVersionPath}/setting/schedule/favoriteList`,
   },
   setting: {
-    limit: `/api/${currentVersion}/setting/limit`,
-    switch: `/api/${currentVersion}/setting/switch`,
+    limit: `${apiVersionPath}/setting/limit`,
+    switch: `${apiVersionPath}/setting/switch`,
   },
   solar: {
-    billChart: `/api/${currentVersion}/bill/solar/chart`,
-    billMonthChart: `/api/${currentVersion}/bill/solar/month_chart`,
-    currentLineChart: `/api/${currentVersion}/solar/current_linechart`,
-    invertor: `/api/${currentVersion}/solar/invertor`,
-    lineChart: `/api/${currentVersion}/solar/linechart`,
+    billChart: `${apiVersionPath}/bill/solar/chart`,
+    billMonthChart: `${apiVersionPath}/bill/solar/month_chart`,
+    currentLineChart: `${apiVersionPath}/solar/current_linechart`,
+    invertor: `${apiVersionPath}/solar/invertor`,
+    lineChart: `${apiVersionPath}/solar/linechart`,
   },
   storage: {
-    billChart: `/api/${currentVersion}/bill/storage/chart`,
-    billMonthChart: `/api/${currentVersion}/bill/storage/month_chart`,
-    currentLineChart: `/api/${currentVersion}/storage/current_linechart`,
-    invertor: `/api/${currentVersion}/storage/invertor`,
-    lineChart: `/api/${currentVersion}/storage/linechart`,
+    billChart: `${apiVersionPath}/bill/storage/chart`,
+    billMonthChart: `${apiVersionPath}/bill/storage/month_chart`,
+    currentLineChart: `${apiVersionPath}/storage/current_linechart`,
+    invertor: `${apiVersionPath}/storage/invertor`,
+    lineChart: `${apiVersionPath}/storage/linechart`,
   },
 };

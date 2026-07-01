@@ -6,3 +6,11 @@ services:
     restart: unless-stopped
     stop_signal: SIGTERM
     stop_grace_period: 10s
+    networks:
+      - default
+      - ems-network
+
+networks:
+  ems-network:
+    external: true
+    name: ems-network
