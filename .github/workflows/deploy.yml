@@ -48,7 +48,7 @@ jobs:
             ghcr.io/starenergyems/btm_ems_v3_frontend:${{ github.ref_name }}
           build-args: |
             VITE_API_BASEURL=/api/
-            VITE_CHATKIT_API_URL=${{ secrets.VITE_CHATKIT_API_URL }}
+            VITE_CHATKIT_API_URL=/chatkit
 
       - name: Setup SSH
         run: |

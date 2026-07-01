@@ -11,7 +11,7 @@ RUN npm ci --no-audit --progress=false
 COPY . .
 
 ARG VITE_API_BASEURL=/api/
-ARG VITE_CHATKIT_API_URL
+ARG VITE_CHATKIT_API_URL=/chatkit
 
 ENV VITE_API_BASEURL=$VITE_API_BASEURL \
     VITE_CHATKIT_API_URL=$VITE_CHATKIT_API_URL
@@ -23,5 +23,6 @@ RUN npm run build
 FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+RUN nginx -t
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
