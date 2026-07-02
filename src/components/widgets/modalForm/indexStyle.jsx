@@ -68,6 +68,12 @@ const style = styled(Modal)`
       }
     }
 
+    .btn-cancel {
+      button {
+        border: 1px solid ${color.blueGray} !important;
+      }
+    }
+
     .ant-modal-footer {
       .ant-btn {
         --ant-color-primary-hover: #036f9f;

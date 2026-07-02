@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { ChatKit, useChatKit } from '@openai/chatkit-react';
 
 import { pagesPathName, router } from '@/router';
@@ -24,6 +24,7 @@ export default function ChatComponent ({ pageName }) {
  
   const [, setChatkitError] = useState('');
   const [selectedToolId, setSelectedToolId] = useState(null);
+  const selectedActionRef = useRef(null);
 
   const activePrompts = useMemo(() => {
     switch (selectedToolId) {
@@ -31,8 +32,12 @@ export default function ChatComponent ({ pageName }) {
         return STARTER_PROMPTS;
       case TOOLS.search_docs:
         return DOCS_PROMPTS;
-      default:
-        return PAGES_PROMPTS?.[pageName] ?? STARTER_PROMPTS;
+      default: {
+        const finalData = PAGES_PROMPTS?.[pageName]?.map(
+          (item) => item?.renders,
+        );
+        return finalData ?? STARTER_PROMPTS;
+      }
     }
   }, [pageName, selectedToolId]);
 
@@ -74,12 +79,17 @@ export default function ChatComponent ({ pageName }) {
     api: {
       domainKey: chatkitDomainKey,
       fetch: (input, init) => {
-        console.log('selectedToolId???', selectedToolId);
+        const selectedAction = selectedActionRef.current;
+
         const headers = new Headers(init?.headers);
 
         headers.set('X-Page', pageName ?? '');
         headers.set('X-Tool-Id', selectedToolId ?? '');
 
+        if (selectedAction) {
+          headers.set('X-ActionId', selectedAction?.actionId ?? '');
+          headers.set('X-RequestSource', selectedAction?.requestSource ?? '');
+        }
         return fetch(input, {
           ...init,
           headers,
@@ -115,12 +125,25 @@ export default function ChatComponent ({ pageName }) {
       console.log('Tool called:', toolCall);
     },
     onError: ({ error }) => {
+      selectedActionRef.current = null;
       setChatkitError(error?.message || 'ChatKit 發生錯誤');
     },
     onLog: (event) => {
       console.log('ChatKit log:', event);
+      if (event?.name === 'startScreenPrompt.select') {
+        const promptText =
+          event?.data?.prompt ?? event?.data?.text ?? event?.payload?.prompt;
+        const selectedPrompt = PAGES_PROMPTS?.[pageName]?.find(
+          (item) => item?.renders?.prompt === promptText,
+        );
+
+        selectedActionRef.current = selectedPrompt?.actions ?? null;
+      }
     },
     onReady: () => {},
+    onResponseEnd: () => {
+      selectedActionRef.current = null;
+    },
     onToolChange: ({ toolId }) => {
       console.log('Tool changed:', toolId);
 
