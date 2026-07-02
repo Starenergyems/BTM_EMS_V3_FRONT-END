@@ -7,11 +7,18 @@ import Button from '@/components/units/button';
 import { useBoolean } from '@/hooks/useBoolean';
 import { pagesPathName } from '@/router';
 import ChatComponent from './chatkit/index';
+import {
+  chatkitApiUrl,
+ 
+} from './lib/config';
+
 import ScopeStyle from './indexStyle';
 
 function Chatbot() {
   const toggleChatbot = useBoolean(false);
   const location = useLocation();
+
+  console.log('aaa', chatkitApiUrl);
 
   let pageName = '';
 

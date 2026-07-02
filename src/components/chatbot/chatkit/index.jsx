@@ -20,7 +20,8 @@ const getPrefillEvent = (params) => {
   return params.prefillEvent || params.event || params.calendarEvent || params;
 };
 
-export default function ChatComponent({ pageName }) {
+export default function ChatComponent ({ pageName }) {
+ 
   const [, setChatkitError] = useState('');
   const [selectedToolId, setSelectedToolId] = useState(null);
 
