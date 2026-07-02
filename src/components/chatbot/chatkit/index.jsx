@@ -141,6 +141,7 @@ export default function ChatComponent({ pageName }) {
 
   return (
     <ScopeStyle>
+      {console.log('chatkitApiUrl', chatkitApiUrl)}
       <ChatKit className="chat-bot" control={control} />
     </ScopeStyle>
   );
