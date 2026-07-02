@@ -15,6 +15,22 @@
       as="font"
       crossorigin="anonymous"
     />
+    <script>
+      // ChatKit 暫時需在 HTTP 環境運行；非安全來源可能沒有 crypto.randomUUID。
+      // 必須在載入 ChatKit script 前補上，待正式環境改為 HTTPS 後可移除。
+      if (globalThis.crypto && !globalThis.crypto.randomUUID) {
+        globalThis.crypto.randomUUID = () =>
+          '10000000-1000-4000-8000-100000000000'.replace(
+            /[018]/g,
+            (char) =>
+              (
+                Number(char) ^
+                (globalThis.crypto.getRandomValues(new Uint8Array(1))[0] &
+                  (15 >> (Number(char) / 4)))
+              ).toString(16),
+          );
+      }
+    </script>
     <script
       src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js"
       async
